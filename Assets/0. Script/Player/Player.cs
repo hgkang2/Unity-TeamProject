@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
     HP hp;
     public HP HP => hp;
@@ -83,13 +83,10 @@ public class Player : MonoBehaviour
         {
             isGrounded = true;
         }
-        //부딪힌 게임오브젝트에서 IAttackable을 찾음
-        //적 몸체, 투사체, 함정 등 종류 상관없이 이 한줄의 코드로 정리 
-        IAttackable attacker = collision.collider.GetComponent<IAttackable>();
-        if (attacker != null)
-        {
-            HP.TakeDamage(attacker.Damage);
-        }
+    }
+    public void TakeDamage(float amount)
+    {
+        hp.TakeDamage(amount);
     }
 
     void Move()
@@ -126,5 +123,6 @@ public class Player : MonoBehaviour
             spriter.flipX = inputVec.x < 0;
         }
     }
+
 
 }
