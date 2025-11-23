@@ -43,6 +43,9 @@ public class PlayerStats : MonoBehaviour
     // 외부에서 추가 보정(소울/버프)이 들어올 때
     Dictionary<PlayerStatType, float> flatBonus = new();
     Dictionary<PlayerStatType, float> percentBonus = new();
+
+    public float MoveSpeed { get; internal set; }
+
     public void AddStat(PlayerStatType type, float flat, float percent = 0f)
     {
         if (!flatBonus.ContainsKey(type))

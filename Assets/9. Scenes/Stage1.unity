@@ -5256,7 +5256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 695a00bae40b79b48abfcfc03f1d38f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetHP: {fileID: 1240395422}
+  targetHP: {fileID: 0}
   curHPText: {fileID: 1225650289}
   maxHPText: {fileID: 366153017}
   rect: {fileID: 0}
@@ -6922,8 +6922,8 @@ GameObject:
   - component: {fileID: 1240395418}
   - component: {fileID: 1240395426}
   - component: {fileID: 1240395427}
-  - component: {fileID: 1240395422}
   - component: {fileID: 1240395424}
+  - component: {fileID: 1240395428}
   - component: {fileID: 1240395416}
   - component: {fileID: 1240395419}
   - component: {fileID: 1240395421}
@@ -7085,21 +7085,6 @@ CapsuleCollider2D:
   m_Offset: {x: -0.22453761, y: 0.045754075}
   m_Size: {x: 0.6608529, y: 1.870765}
   m_Direction: 0
---- !u!114 &1240395422
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1240395415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b0cfcb006423844fa0546325608247b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHP: 100
-  armor: 0
-  initializeOnAwake: 1
 --- !u!95 &1240395423
 Animator:
   serializedVersion: 7
@@ -7153,7 +7138,7 @@ MonoBehaviour:
   upHitbox: {fileID: 1884215457}
   downHitbox: {fileID: 1959406664}
   specialHitbox: {fileID: 0}
-  jumpHitbox: {fileID: 0}
+  jumpHitbox: {fileID: 1842604867}
 --- !u!114 &1240395427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7180,6 +7165,21 @@ MonoBehaviour:
   curCooldown: 0
   curLifeSteal: 0
   curJumpForce: 0
+--- !u!114 &1240395428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240395415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67614e89845d0bd4fb6bb16b9d4a935c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
+  armor: 0
+  initializeOnAwake: 1
 --- !u!1 &1259777695
 GameObject:
   m_ObjectHideFlags: 0

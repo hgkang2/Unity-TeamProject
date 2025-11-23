@@ -16,6 +16,12 @@ public class Player : MonoBehaviour
     public Vector2 inputVec;
     public bool isGrounded = true;
     public bool isAttcking = false;
+    private float dodgeEndTime;
+    private float cooldownEndTime;
+    private float dodgeTime = 0.3f;
+    private float dodgeCooldown = 1f;
+    private bool isDodging = false;
+
     private void Awake()
     {
         hp = GetComponent<HP>();
@@ -27,7 +33,45 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
+        if (HP.IsDead)
+        return;
         Move();
+        if (isDodging)
+        {  
+            if (Time.time >= dodgeEndTime)
+            {
+                EndDodge();
+            }
+            return; 
+        }
+
+        HandleDodgeInput();
+    }
+    void HandleDodgeInput()
+    {
+    
+        if (Input.GetKeyDown(KeyCode.D) && Time.time >= cooldownEndTime)
+        {
+            StartDodge();
+        }
+    }
+    void StartDodge()
+    {
+        isDodging = true;
+        dodgeEndTime = Time.time + dodgeTime;
+        cooldownEndTime = Time.time + dodgeCooldown;
+        anim.SetTrigger("Dodge");
+        float dodgeDirection = spriter.flipX ? 1f : -1f;
+        float originalGravity = rb.gravityScale;
+        rb.gravityScale = 0;
+        rb.linearVelocity = new Vector2(dodgeDirection * stats.MoveSpeed * 2f, 0);
+    }
+
+    void EndDodge()
+    {
+        isDodging = false;
+        rb.gravityScale = 1f;
+        rb.linearVelocity = Vector2.zero;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
