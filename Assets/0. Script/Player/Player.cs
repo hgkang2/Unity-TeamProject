@@ -79,9 +79,15 @@ public class Player : MonoBehaviour, IDamageable
         GameObject go = collision.gameObject;
         //수평 벽은 Ground, 수직 벽은 Wall로 일단 했음
         //일단은 벽타기도 가능하게 함
+        bool wasJumping = !isGrounded;
         if ((go.CompareTag("Ground") || go.CompareTag("Wall")) && !isGrounded)
         {
             isGrounded = true;
+            if (wasJumping)
+            {
+                anim.SetTrigger("Land");
+                anim.SetBool("Isjumping",false);
+            }
         }
     }
     public void TakeDamage(float amount)
@@ -96,6 +102,7 @@ public class Player : MonoBehaviour, IDamageable
             rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
             isGrounded = false;
             anim.SetTrigger("Jump");
+            anim.SetBool("IsJumping", true);
         }
 
         float horizontalMovement = 0f;
