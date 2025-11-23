@@ -52,7 +52,7 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            rb.AddForce(Vector2.up * stats.JumpForce, ForceMode2D.Impulse);
+            rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
             isGrounded = false;
             anim.SetTrigger("Jump");
         }
@@ -68,7 +68,7 @@ public class Player : MonoBehaviour
             horizontalMovement = -1f;
         }
         inputVec = new Vector2(horizontalMovement, Input.GetAxisRaw("Vertical"));
-        rb.linearVelocity = new Vector2(horizontalMovement * stats.MoveSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(horizontalMovement * stats.curMoveSpeed, rb.linearVelocity.y);
     }
 
     void LateUpdate()

@@ -1,38 +1,37 @@
+using NaughtyAttributes;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SoulData", menuName = "Scriptable Objects/SoulData")]
 public class SoulData : ScriptableObject
 {
-
-
-    [Header("영성 ID")]
+    [Label("영성 ID")]
     public int index;
-    [Header("영성 그룹")]
-    public int group;
-    [Header("영성 이미지(풀버전)")]
+    [Label("영성 이미지(풀버전)")]
     public Sprite soulSprite;
-    [Header("영성 이미지(아이콘)")]
+    [Label("영성 이미지(아이콘)")]
     public Sprite soulIcon;
-    [Header("영성 이름")]
-    public string displayName; //게임내 표기할 이름(파일이름)
-    [Header("영성 설명")]
+    [Label("영성 이름")]
+    public string displayName;
+    [Label("영성 효과")]
+    public string soulEffectText = "Atk +10%";
+    [Label("영성 설명")]
     public string soulDescript;
     
-    [Header("영성 효과")]
+    [Label("영성 효과")]
     public SoulEffect[] effects;
     
-    [Header("캐릭터 제한")]
+    [Label("캐릭터 제한")]
     public CharacterId soulCharacterType;
 
-    [Header("기타 조건 제한")]
+    [Label("기타 조건 제한")]
     public SoulNeedType soulNeedType;
 
-    [Header("레벨 제한일 경우 몇 제한?")]
+    [Label("레벨 제한")]
     public int levelConstrains = 0;
 
-    [Header("최대 보유 개수")]
+    [Label("최대 보유 개수")]
     public int maxStack = 1;
-    [Header("즉시 발동인지?")]
+    [Label("일회용인지")]
     public bool isDisposable;
 
 

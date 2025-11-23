@@ -16,6 +16,7 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     [SerializeField] Image soulImage;
     [SerializeField] TMP_Text soulName;
+    [SerializeField] TMP_Text soulEffect;
     [SerializeField] TMP_Text soulDescript;
     SoulData soulData;
     public SoulData SoulData => soulData;
@@ -57,6 +58,7 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         soulImage.sprite = data.soulSprite;
         soulName.text = data.displayName;
+        soulEffect.text = data.soulEffectText;
         soulDescript.text = data.soulDescript;
         soulData = data;
         OriginPanelScale();

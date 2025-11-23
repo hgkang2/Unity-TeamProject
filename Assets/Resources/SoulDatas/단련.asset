@@ -13,13 +13,20 @@ MonoBehaviour:
   m_Name: "\uB2E8\uB828"
   m_EditorClassIdentifier: 
   index: 1002
-  group: 1001
   soulSprite: {fileID: 9101181491800818358, guid: c662293f0b8cd094bbb331264825b823, type: 3}
   soulIcon: {fileID: 5700019135636183792, guid: c69e021deaa5e0e429d31d195899e3fd, type: 3}
   displayName: "\uB2E8\uB828"
-  soulDescript: "\"Max HP+20 \uB354\uC6B1 \uB2E8\uB828\uD558\uC5EC \uCD5C\uB300 \uCCB4\uB825\uC774
-    \uC99D\uAC00\uD569\uB2C8\uB2E4.\""
-  effects: []
+  soulEffectText: Max HP +20
+  soulDescript: "\uB354\uC6B1 \uB2E8\uB828\uD558\uC5EC \uCD5C\uB300 \uCCB4\uB825\uC774
+    \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  effects:
+  - type: 0
+    targetStat: 1
+    flatValue: 20
+    percentValue: 0
+    skillToLearn: 0
+    soulEtcEffect: 0
+    healAmount: 0
   soulCharacterType: 0
   soulNeedType: 0
   levelConstrains: 0

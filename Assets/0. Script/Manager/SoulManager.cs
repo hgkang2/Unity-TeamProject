@@ -25,51 +25,43 @@ public class SoulManager : MonoBehaviour
     {
         if (data == null) return;
 
-        //1회용 영성일 경우 사용하고 끝
-        if (data.isDisposable)
-        {
-            ApplySoulEffectsOnce(data);
-            return;
-        }
-
         SoulInstance inst = curSouls.Find(s => s.data == data);
 
-        // 이미 보유한 영성이면 스택 쌓기
+        // 이미 보유한 영성일 경우 → 스택 증가
         if (inst != null)
         {
             // maxStack <= 0 → 무한 스택
             if (data.maxStack <= 0 || inst.stack < data.maxStack)
             {
                 inst.stack++;
-                //플레이어 스탯에게 스탯 변경 알림
-                player.Stats.MakeDirty();
+
+                // 이번에 추가된 스택 1개분만 효과 적용
+                ApplySoulDataEffectsOnce(data, player, 1);
             }
             // 더 이상 쌓을 수 없으면 무시
             return;
         }
 
-        // 처음 얻는 경우 그대로 추가
-        curSouls.Add(new SoulInstance(data));
-        player.Stats.MakeDirty();
+        // 처음 얻는 경우 리스트에 등록
+        SoulInstance newInst = new SoulInstance(data);
+        curSouls.Add(newInst);
+
+        // 새로 얻은 1개분 효과 적용
+        ApplySoulDataEffectsOnce(data, player, 1);
     }
-    void ApplySoulEffectsOnce(SoulData data)
+
+    /// SoulData 안에 있는 모든 SoulEffect를 한 번씩 실행
+    /// (실제 로직은 SoulEffect 쪽에 있음)
+    void ApplySoulDataEffectsOnce(SoulData data, Player player, int stackDelta)
     {
         if (data.effects == null) return;
 
-        foreach (var effect in data.effects)
+        for (int i = 0; i < data.effects.Length; i++)
         {
-            if (effect == null) continue;
-
-            switch (effect.type)
+            SoulEffect effect = data.effects[i];
+            if (effect != null)
             {
-                case SoulEffectType.HealHP:
-                    player.HP.Heal(effect.healAmount);
-                    break;
-
-                case SoulEffectType.LearnSkill:
-                    //skillManager.UnlockSkill(effect.skillToLearn);
-                    Debug.Log($"{effect.skillToLearn} skill 배움");
-                    break;
+                effect.ApplyOnce(player, stackDelta);
             }
         }
     }
@@ -87,7 +79,19 @@ public class SoulManager : MonoBehaviour
         // 0. 먼저 조건(캐릭터/레벨/기타) 만족하는 애들만 필터링
         List<SoulData> candidates = allSouls
             .Where(soul => soul != null && soul.CanOffer(player))
+            .Where(soul =>
+            {
+                // SoulManager에서 현재 스택 조회
+                SoulInstance inst = CurSouls.Find(s => s.data == soul);
+
+                // 없는 경우는 새로 획득 가능
+                if (inst == null) return true;
+
+                // maxStack <= 0 → 무제한, 그 외에는 스택 한도 미만만 후보
+                return soul.maxStack <= 0 || inst.stack < soul.maxStack;
+            })
             .ToList();
+
 
         if (candidates.Count == 0)
         {

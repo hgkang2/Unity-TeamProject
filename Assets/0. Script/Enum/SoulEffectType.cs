@@ -4,5 +4,6 @@ public enum SoulEffectType
     StatPercent,
     LearnSkill,
     HealHP,
+    IncreaseJumpNum
     // ... 앞으로 추가
 }

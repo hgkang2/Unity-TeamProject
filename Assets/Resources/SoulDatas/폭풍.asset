@@ -13,13 +13,20 @@ MonoBehaviour:
   m_Name: "\uD3ED\uD48D"
   m_EditorClassIdentifier: 
   index: 1004
-  group: 1001
   soulSprite: {fileID: 21300004, guid: a75445bb16444f14f96fdf9c734945cc, type: 3}
   soulIcon: {fileID: -1193241744032689177, guid: bf111c476c1f7d7458ada2a8dd521da5, type: 3}
   displayName: "\uD3ED\uD48D"
-  soulDescript: "\"AS+5% \uD3ED\uD48D\uACFC \uAC19\uC740 \uACF5\uACA9\uC73C\uB85C
-    \uACF5\uACA9\uC18D\uB3C4\uAC00 \uC99D\uAC00\uD569\uB2C8\uB2E4.\""
-  effects: []
+  soulEffectText: AS +5%
+  soulDescript: "\uD3ED\uD48D\uACFC \uAC19\uC740 \uACF5\uACA9\uC73C\uB85C \uACF5\uACA9\uC18D\uB3C4\uAC00
+    \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  effects:
+  - type: 1
+    targetStat: 3
+    flatValue: 0
+    percentValue: 5
+    skillToLearn: 0
+    soulEtcEffect: 0
+    healAmount: 0
   soulCharacterType: 0
   soulNeedType: 0
   levelConstrains: 0

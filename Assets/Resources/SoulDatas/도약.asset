@@ -13,14 +13,21 @@ MonoBehaviour:
   m_Name: "\uB3C4\uC57D"
   m_EditorClassIdentifier: 
   index: 1007
-  group: 1008
   soulSprite: {fileID: 21300004, guid: a75445bb16444f14f96fdf9c734945cc, type: 3}
   soulIcon: {fileID: -1193241744032689177, guid: bf111c476c1f7d7458ada2a8dd521da5, type: 3}
   displayName: "\uB3C4\uC57D"
-  soulDescript: "\uB450\uBC88 \uC810\uD504\uAC00 \uAC00\uB2A5\uD574\uC9D1\uB2C8\uB2E4."
-  effects: []
+  soulEffectText: "\uC810\uD504 \uD69F\uC218 \uC99D\uAC00"
+  soulDescript: "\uC810\uD504\uB97C \uD55C \uBC88 \uB354 \uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  effects:
+  - type: 4
+    targetStat: 0
+    flatValue: 0
+    percentValue: 0
+    skillToLearn: 0
+    soulEtcEffect: 0
+    healAmount: 0
   soulCharacterType: 0
   soulNeedType: 0
   levelConstrains: 0
-  maxStack: 9999
+  maxStack: 3
   isDisposable: 0

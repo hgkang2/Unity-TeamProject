@@ -6,5 +6,6 @@ public enum PlayerStatType
     AttackSpeed,
     MoveSpeed,
     SkillCooldown,
+    JumpForce,
     LifeSteal //흡혈
 }
