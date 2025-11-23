@@ -54,6 +54,7 @@ public class Player : MonoBehaviour
         {
             rb.AddForce(Vector2.up * stats.JumpForce, ForceMode2D.Impulse);
             isGrounded = false;
+            anim.SetTrigger("Jump");
         }
 
         float horizontalMovement = 0f;
@@ -75,6 +76,7 @@ public class Player : MonoBehaviour
         if(PauseManager.IsPaused) return;
         
         anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
+        anim.SetBool("IsGrounded",isGrounded);
         if (inputVec.x != 0)
         {
             spriter.flipX = inputVec.x < 0;

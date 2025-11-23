@@ -70,11 +70,11 @@ public class PlayerAttack : MonoBehaviour
             case AttackType.Down: // 3
                 animator.SetTrigger("Attack_Down");
                 break;
-            case AttackType.Jump:
-                animator.SetTrigger("Attack_Jump");
-                break;
             case AttackType.Special: // 4
                 animator.SetTrigger("Attack_Special");
+                break;
+            case AttackType.Jump: // 5
+                animator.SetTrigger("Attack_Jump");
                 break;
         }
     }
