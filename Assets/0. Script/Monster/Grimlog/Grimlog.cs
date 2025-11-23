@@ -62,6 +62,11 @@ public class Grimlog : MonsterBase
         canUseSkillA = true;
     }
 
+    void EnterSkillA()
+    {
+
+    }
+
     protected override void ExitSkill()
     {
         throw new System.NotImplementedException();
