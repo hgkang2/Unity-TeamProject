@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Monster : MonoBehaviour, IEnemyStradegy, IAttackable
+public class Monster : MonoBehaviour, IEnemyStradegy
 {
     public EnemyStateType currentState = EnemyStateType.Idle;
     HP hp;
