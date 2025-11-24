@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
     HP hp;
     public HP HP => hp;
@@ -79,17 +79,20 @@ public class Player : MonoBehaviour
         GameObject go = collision.gameObject;
         //수평 벽은 Ground, 수직 벽은 Wall로 일단 했음
         //일단은 벽타기도 가능하게 함
+        bool wasJumping = !isGrounded;
         if ((go.CompareTag("Ground") || go.CompareTag("Wall")) && !isGrounded)
         {
             isGrounded = true;
+            if (wasJumping)
+            {
+                anim.SetTrigger("Land");
+                anim.SetBool("Isjumping",false);
+            }
         }
-        //부딪힌 게임오브젝트에서 IAttackable을 찾음
-        //적 몸체, 투사체, 함정 등 종류 상관없이 이 한줄의 코드로 정리 
-        IAttackable attacker = collision.collider.GetComponent<IAttackable>();
-        if (attacker != null)
-        {
-            HP.TakeDamage(attacker.Damage);
-        }
+    }
+    public void TakeDamage(float amount)
+    {
+        hp.TakeDamage(amount);
     }
 
     void Move()
@@ -99,6 +102,7 @@ public class Player : MonoBehaviour
             rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
             isGrounded = false;
             anim.SetTrigger("Jump");
+            anim.SetBool("IsJumping", true);
         }
 
         float horizontalMovement = 0f;
@@ -126,5 +130,6 @@ public class Player : MonoBehaviour
             spriter.flipX = inputVec.x < 0;
         }
     }
+
 
 }
