@@ -162,7 +162,7 @@ public class Player : MonoBehaviour, IDamageable
         if (HP.IsDead || isDodging) return;
         if(!isGrounded)
         {
-            if (Mathf.Abs(rb.velocity.y) < apexThreshold && rb.velocity.y >= 0)
+            if (Mathf.Abs(rb.linearVelocity.y) < apexThreshold && rb.linearVelocity.y >= 0)
             {
                 rb.gravityScale = apexGravityScale;
             }

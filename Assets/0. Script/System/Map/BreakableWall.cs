@@ -9,7 +9,13 @@ public class BreakableWall : MonoBehaviour, IDamageable
     {
         
         wallHP -= amount;
-        transform.DOShakePosition(0.5f, amount*0.01f);
+
+        float shakeAmount = Mathf.Log(amount + 1) * 0.025f; 
+        transform.DOShakePosition(duration: 0.5f, 
+            strength: new Vector3(shakeAmount, 0f, 0f), 
+            vibrato: 10, 
+            randomness: 90f, 
+            fadeOut: true);
         if(wallHP <= 0) Destroy(gameObject);
     }
 }
