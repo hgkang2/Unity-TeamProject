@@ -1303,7 +1303,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -8507,7 +8507,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1240395415}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67614e89845d0bd4fb6bb16b9d4a935c, type: 3}
+  m_Script: {fileID: 11500000, guid: 6b0cfcb006423844fa0546325608247b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 100
@@ -11537,11 +11537,13 @@ MonoBehaviour:
   PlayerLayermask:
     serializedVersion: 2
     m_Bits: 0
+  isUsingSkill: 0
   StateTimer: 0
   DistanceToPlayer: 0
   isSkillReady: 0
   PlayerPosition: {fileID: 0}
   rb: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!1 &1747842109
 GameObject:
   m_ObjectHideFlags: 0
@@ -12073,7 +12075,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -12458,7 +12460,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -13284,7 +13286,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -13309,7 +13311,7 @@ Transform:
   m_GameObject: {fileID: 1959406663}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.69, y: -1.04, z: 0}
+  m_LocalPosition: {x: 1.982, y: -1.04, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

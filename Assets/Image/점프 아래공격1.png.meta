@@ -102,6 +102,45 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -109,7 +148,7 @@ TextureImporter:
       name: "\uC810\uD504 \uC544\uB798\uACF5\uACA91_0"
       rect:
         serializedVersion: 2
-        x: 36
+        x: 61
         y: 11
         width: 159
         height: 223
@@ -131,7 +170,7 @@ TextureImporter:
       name: "\uC810\uD504 \uC544\uB798\uACF5\uACA91_1"
       rect:
         serializedVersion: 2
-        x: 163
+        x: 79
         y: 11
         width: 14
         height: 21
@@ -153,7 +192,7 @@ TextureImporter:
       name: "\uC810\uD504 \uC544\uB798\uACF5\uACA91_2"
       rect:
         serializedVersion: 2
-        x: 124
+        x: 126
         y: 0
         width: 6
         height: 5
@@ -184,10 +223,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      "\uC810\uD504 \uC544\uB798\uACF5\uACA91_0": 6691066601938560044
-      "\uC810\uD504 \uC544\uB798\uACF5\uACA91_1": -3565226034211586517
-      "\uC810\uD504 \uC544\uB798\uACF5\uACA91_2": -1896732400841646645
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
