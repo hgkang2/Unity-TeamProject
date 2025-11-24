@@ -39,7 +39,8 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
 
     [SerializeField]
     LayerMask PlayerLayermask;
-    bool isPlayerDetected = false;
+    
+    public bool isUsingSkill = false;
 
     public float StateTimer;
     public float DistanceToPlayer; // 플레이어와 적 사이의 거리
@@ -52,11 +53,14 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
 
     protected Coroutine skillCoroutine;
 
+    public Animator animator;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         hp = GetComponent<HP>();
         player = GetComponent<Player>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     private void Start()
@@ -85,7 +89,7 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
         switch (currentState)
         {
             case MonsterStateType.Idle: Idle(); break;
-            case MonsterStateType.Patrol: Patrol(); break;
+            case MonsterStateType.Patrol: Patrol();  break;
             case MonsterStateType.Aggro: Aggro(); break;
             case MonsterStateType.Skill: Skill(); break;
         }
@@ -101,12 +105,9 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
     {
         if(StateTimer >= monsterData.IdleTime)
         {
+            animator.SetTrigger("Patrol");
             ChangeState(MonsterStateType.Patrol);
-        }
-
-        if (isPlayerDetected)
-        {
-            ChangeState(MonsterStateType.Aggro);
+            return;
         }
     }
 
@@ -119,7 +120,9 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
         if(StateTimer >= monsterData.PatrolTime)
         { 
             monsterData.MoveDirection *= -1;
+            animator.SetTrigger("Idle");
             ChangeState(MonsterStateType.Idle);
+            return;
         }
     }
 
@@ -129,12 +132,16 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
 
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
         {
+            animator.SetTrigger("Idle");
             ChangeState(MonsterStateType.Idle);
+            return;
         }
 
         if (DistanceToPlayer <= monsterData.SkillA_ActiveRange && isSkillReady)
         {
+            animator.SetTrigger("Skill");
             ChangeState(MonsterStateType.Skill);
+            return;
         }
     }
 
@@ -153,14 +160,19 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
 
                 direction = (playerPos - myPos).normalized;
 
-                ChangeState(MonsterStateType.Aggro);
-
                 DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
+
+                if (isUsingSkill) return;
+                animator.SetTrigger("Aggro");
+                ChangeState(MonsterStateType.Aggro);
+                return;
             }
         }
         else
         {  
             PlayerPosition = null;
+
+            DistanceToPlayer = Mathf.Infinity;
         }
     }
 
@@ -169,7 +181,7 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
         return MonsterSkillType.None;
     }
 
-    protected virtual void Skill()
+    public virtual void Skill()
     {
         MonsterSkillType type = DecideSkillType();
         if(type != MonsterSkillType.None)
@@ -202,11 +214,14 @@ public abstract class MonsterBase : MonoBehaviour ,IAttackable
         selectedSkill = MonsterSkillType.None;
     }
 
+    public virtual void OnSkillUpdate() { }
+
+    public virtual void OnSkillExit() { }
+
     protected virtual IEnumerator SkillA() { yield break; }
     protected virtual IEnumerator SkillB() { yield break; }
     protected virtual IEnumerator SkillC() { yield break; }
 
-    protected abstract void ExitSkill();
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {

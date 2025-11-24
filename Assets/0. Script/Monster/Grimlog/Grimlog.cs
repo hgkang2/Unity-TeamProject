@@ -40,6 +40,7 @@ public class Grimlog : MonsterBase
     protected override IEnumerator SkillA()
     {
         canUseSkillA = false;
+        isUsingSkill = true;
 
         float dirX = Mathf.Sign(PlayerPosition.position.x - transform.position.x);
         monsterData.PatrolSpeed = 0f;
@@ -51,24 +52,15 @@ public class Grimlog : MonsterBase
         yield return new WaitForSeconds(0.2f);
 
         rb.linearVelocity = new Vector2(0f, 0f);
-        
+        animator.SetTrigger("Idle");
+
         yield return new WaitForSeconds(3f);
 
+        isUsingSkill = false;
         monsterData.PatrolSpeed = 3f;
         ChangeState(MonsterStateType.Aggro);
 
         yield return new WaitForSeconds(monsterData.SkillA_coolTime);
-
         canUseSkillA = true;
-    }
-
-    void EnterSkillA()
-    {
-
-    }
-
-    protected override void ExitSkill()
-    {
-        throw new System.NotImplementedException();
     }
 }

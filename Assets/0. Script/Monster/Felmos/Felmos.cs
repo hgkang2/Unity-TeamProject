@@ -85,9 +85,4 @@ public class Felmos : MonsterBase
 
         canUseSkillA = true;
     }
-
-    protected override void ExitSkill()
-    {
-        throw new System.NotImplementedException();
-    }
 }
