@@ -43,7 +43,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public bool isUsingSkill = false;
 
     public float StateTimer;
-    public float DistanceToPlayer; // �÷��̾�� �� ������ �Ÿ�
+    public float DistanceToPlayer; // 플레이 거리
 
     public bool isSkillReady;
 
