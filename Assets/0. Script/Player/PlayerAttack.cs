@@ -20,12 +20,16 @@ public class PlayerAttack : MonoBehaviour
     AttackType currentType = AttackType.None;
 
 
-    private void Awake()
+    void Awake()
     {
         animator = GetComponent<Animator>();
         stats = GetComponent<PlayerStats>();
+    }
+    void Start()
+    {
         DisableAllHitboxes();
     }
+    
     void OnEnable()
     {
         normalHitbox.OnHit += HandleHit;
