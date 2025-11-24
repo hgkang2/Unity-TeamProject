@@ -11,6 +11,7 @@ public class Player : MonoBehaviour, IDamageable
     PlayerStats stats;
     public PlayerStats Stats => stats;
     Rigidbody2D rb; // 변수 선언은 소문자로 시작. 단 rigidbody2D같은 일부 예약어는 사용 불가해서 rb로 바꿈
+    Collider2D collider2d;
     Animator anim;
     SpriteRenderer spriter;
     public Vector2 inputVec;
@@ -21,6 +22,9 @@ public class Player : MonoBehaviour, IDamageable
     private float dodgeTime = 0.3f;
     private float dodgeCooldown = 1f;
     private bool isDodging = false;
+    private float originalGravityScale;
+    public float apexGravityScale = 0.5f;
+    public float apexThreshold = 0.5f;
 
     private void Awake()
     {
@@ -30,6 +34,8 @@ public class Player : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriter = GetComponent<SpriteRenderer>();
+        collider2d = GetComponent<Collider2D>();
+        originalGravityScale = rb.gravityScale;
     }
     void OnAbled(){
         hp.OnDied += HandleDie;
@@ -117,7 +123,7 @@ public class Player : MonoBehaviour, IDamageable
 
     void Move()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isDodging)
         {
             rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
             isGrounded = false;
@@ -137,6 +143,10 @@ public class Player : MonoBehaviour, IDamageable
         }
         inputVec = new Vector2(horizontalMovement, Input.GetAxisRaw("Vertical"));
         rb.linearVelocity = new Vector2(horizontalMovement * stats.curMoveSpeed, rb.linearVelocity.y);
+        if (!isDodging)
+        {
+            
+        }
     }
 
     void LateUpdate()
