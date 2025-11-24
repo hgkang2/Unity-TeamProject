@@ -105,15 +105,12 @@ public class Player : MonoBehaviour, IDamageable
         GameObject go = collision.gameObject;
         //수평 벽은 Ground, 수직 벽은 Wall로 일단 했음
         //일단은 벽타기도 가능하게 함
-        bool wasJumping = !isGrounded;
         if ((go.CompareTag("Ground") || go.CompareTag("Wall")) && !isGrounded)
         {
             isGrounded = true;
-            if (wasJumping)
-            {
-                anim.SetTrigger("Land");
-                anim.SetBool("Isjumping",false);
-            }
+            anim.SetBool ("IsJumping",false);
+            anim.SetTrigger("Land");
+            rb.gravityScale = originalGravityScale;
         }
     }
     public void TakeDamage(float amount)
@@ -145,7 +142,7 @@ public class Player : MonoBehaviour, IDamageable
         rb.linearVelocity = new Vector2(horizontalMovement * stats.curMoveSpeed, rb.linearVelocity.y);
         if (!isDodging)
         {
-            
+            rb.linearVelocity = new Vector2(horizontalMovement * stats.curMoveSpeed, rb.linearVelocity.y);
         }
     }
 
@@ -160,6 +157,17 @@ public class Player : MonoBehaviour, IDamageable
             spriter.flipX = inputVec.x < 0;
         }
     }
-
+    void FixedUpdate() 
+    { 
+        if (HP.IsDead || isDodging) return;
+        if(!isGrounded)
+        {
+            if (Mathf.Abs(rb.velocity.y) < apexThreshold && rb.velocity.y >= 0)
+            {
+                rb.gravityScale = apexGravityScale;
+            }
+        }
+    }
+    
 
 }
