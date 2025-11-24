@@ -23,7 +23,7 @@ public struct MonsterData  // �� ������
     public float SkillC_coolTime;
 }
 
-public enum MonsterStateType { Idle, Patrol, Aggro, Skill, Take_Damage,Dead }
+public enum MonsterStateType { Idle, Patrol, Aggro, Take_Damage,Dead }
 public enum MonsterSkillType { None, Skill_A, Skill_B, Skill_C }
 
 public abstract class MonsterBase : MonoBehaviour, IDamageable
@@ -35,7 +35,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public MonsterData monsterData;
     public MonsterStateType currentState = MonsterStateType.Idle;
-    public MonsterSkillType selectedSkill = MonsterSkillType.None;
 
     [SerializeField]
     LayerMask PlayerLayermask;
@@ -61,6 +60,8 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         hp = GetComponent<HP>();
         player = GetComponent<Player>();
         animator = GetComponentInChildren<Animator>();
+
+        isUsingSkill = false;
     }
 
     private void Start()
@@ -91,7 +92,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             case MonsterStateType.Idle: Idle(); break;
             case MonsterStateType.Patrol: Patrol();  break;
             case MonsterStateType.Aggro: Aggro(); break;
-            case MonsterStateType.Skill: Skill(); break;
         }
     }
 
@@ -137,10 +137,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             return;
         }
 
-        if (DistanceToPlayer <= monsterData.SkillA_ActiveRange && isSkillReady)
+        if (DistanceToPlayer <= monsterData.SkillA_ActiveRange && isSkillReady && !isUsingSkill)
         {
             animator.SetTrigger("Skill");
-            ChangeState(MonsterStateType.Skill);
+
             return;
         }
     }
@@ -162,7 +162,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
                 DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
 
-                if (isUsingSkill) return;
                 animator.SetTrigger("Aggro");
                 ChangeState(MonsterStateType.Aggro);
                 return;
@@ -176,51 +175,14 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         }
     }
 
-    protected virtual MonsterSkillType DecideSkillType()
+    public virtual void UseSkill()
     {
-        return MonsterSkillType.None;
+
     }
 
-    public virtual void Skill()
-    {
-        MonsterSkillType type = DecideSkillType();
-        if(type != MonsterSkillType.None)
-        {
-            UseSkill(type);
-        }
-    }
-
-    protected virtual void UseSkill(MonsterSkillType skillType)
-    {
-        if (!isSkillReady || skillType == MonsterSkillType.None) return;
-
-        if (skillCoroutine != null) StopCoroutine(skillCoroutine);
-
-        skillCoroutine = StartCoroutine(ReadySkill(skillType));
-    }
-
-    protected virtual IEnumerator ReadySkill(MonsterSkillType skillType)
-    {
-        isSkillReady = false;
-
-        switch (skillType)
-        {
-            case MonsterSkillType.Skill_A: yield return SkillA(); break;
-            case MonsterSkillType.Skill_B: yield return SkillB(); break;
-            case MonsterSkillType.Skill_C: yield return SkillC(); break;
-        }
-
-        isSkillReady = true;
-        selectedSkill = MonsterSkillType.None;
-    }
-
-    public virtual void OnSkillUpdate() { }
-
-    public virtual void OnSkillExit() { }
-
-    protected virtual IEnumerator SkillA() { yield break; }
-    protected virtual IEnumerator SkillB() { yield break; }
-    protected virtual IEnumerator SkillC() { yield break; }
+    public virtual void SkillA() { }
+    public virtual void SkillB() { }
+    public virtual void SkillC() { }
 
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
