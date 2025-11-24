@@ -31,6 +31,12 @@ public class Player : MonoBehaviour, IDamageable
         anim = GetComponent<Animator>();
         spriter = GetComponent<SpriteRenderer>();
     }
+    void OnAbled(){
+        hp.OnDied += HandleDie;
+    }
+    void OnDisabled(){
+        hp.OnDied -= HandleDie;
+    }
     void Update()
     {
         if (HP.IsDead)
@@ -72,6 +78,24 @@ public class Player : MonoBehaviour, IDamageable
         isDodging = false;
         rb.gravityScale = 1f;
         rb.linearVelocity = Vector2.zero;
+    }
+
+    void HandleDie(){
+        if (anim != null)
+        {
+            anim.SetTrigger("Die");
+        }
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero; 
+            rb.isKinematic = true; 
+        }
+
+        if (collider2d != null)
+        {
+            collider2d.enabled = false;
+        }
+        Destroy(gameObject, 2f); 
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
