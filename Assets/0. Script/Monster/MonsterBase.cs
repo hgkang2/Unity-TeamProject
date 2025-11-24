@@ -35,6 +35,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public MonsterData monsterData;
     public MonsterStateType currentState = MonsterStateType.Idle;
+    public MonsterSkillType selectedSkill = MonsterSkillType.None;
 
     [SerializeField]
     LayerMask PlayerLayermask;
