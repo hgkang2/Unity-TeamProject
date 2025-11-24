@@ -91,10 +91,6 @@ public class Player : MonoBehaviour, IDamageable
             rb.isKinematic = true; 
         }
 
-        if (collider2d != null)
-        {
-            collider2d.enabled = false;
-        }
         Destroy(gameObject, 2f); 
     }
 

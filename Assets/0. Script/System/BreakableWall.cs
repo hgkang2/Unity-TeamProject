@@ -1,16 +1,15 @@
 using UnityEngine;
+using DG.Tweening;
 
-public class BreakableWall : MonoBehaviour
+public class BreakableWall : MonoBehaviour, IDamageable
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public float wallHP;
 
-    // Update is called once per frame
-    void Update()
+    public void TakeDamage(float amount)
     {
         
+        wallHP -= amount;
+        transform.DOShakePosition(0.5f, amount*0.01f);
+        if(wallHP <= 0) Destroy(gameObject);
     }
 }

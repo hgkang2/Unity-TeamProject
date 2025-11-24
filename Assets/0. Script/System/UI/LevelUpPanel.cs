@@ -201,6 +201,7 @@ public class LevelUpPanel : MonoBehaviour
     int nowrot = 0;
     public void PlayRerollIconAnim()
     {
+        return;
         rerollIcon.DOKill();
 
         Sequence seq = DOTween.Sequence().SetUpdate(true); ;

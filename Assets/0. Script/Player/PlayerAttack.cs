@@ -3,24 +3,50 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
+    PlayerStats stats;
+
     Animator animator;
 
     //Player 아래에 각 공격 범위 별로 히트박스 만들기 후 
     //4개다 Player-PlayerAttack 인스펙터에 끝어다 넣기(Player 하위에 만들어논거 참고)
     [Header("각 공격별 히트박스")]
-    [SerializeField] Collider2D normalHitbox;
-    [SerializeField] Collider2D upHitbox;
-    [SerializeField] Collider2D downHitbox;
-    [SerializeField] Collider2D specialHitbox;
-    [SerializeField] Collider2D jumpHitbox;
+    [SerializeField] PlayerHitBox normalHitbox;
+    [SerializeField] PlayerHitBox upHitbox;
+    [SerializeField] PlayerHitBox downHitbox;
+    //[SerializeField] PlayerHitBox specialHitbox;
+    [SerializeField] PlayerHitBox jumpHitbox;
 
     bool isAttacking;
     AttackType currentType = AttackType.None;
 
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        stats = GetComponent<PlayerStats>();
         DisableAllHitboxes();
+    }
+    void OnEnable()
+    {
+        normalHitbox.OnHit += HandleHit;
+        upHitbox.OnHit += HandleHit;
+        downHitbox.OnHit += HandleHit;
+        //specialHitbox.OnHit += HandleHit;
+        jumpHitbox.OnHit += HandleHit;
+    }
+    void OnDisable()
+    {
+        normalHitbox.OnHit -= HandleHit;
+        upHitbox.OnHit -= HandleHit;
+        downHitbox.OnHit -= HandleHit;
+        //specialHitbox.OnHit -= HandleHit;
+        jumpHitbox.OnHit -= HandleHit;
+    }
+
+    void HandleHit(IDamageable target)
+    {
+        Debug.Log($"{stats.curDamage}");
+        target.TakeDamage(stats.curDamage);
     }
 
     void Update()
@@ -115,29 +141,29 @@ public class PlayerAttack : MonoBehaviour
         switch (type)
         {
             case AttackType.Normal:
-                if (normalHitbox != null) normalHitbox.enabled = true;
+                if (normalHitbox != null) normalHitbox.col.enabled = true;
                 break;
             case AttackType.Up:
-                if (upHitbox != null) upHitbox.enabled = true;
+                if (upHitbox != null) upHitbox.col.enabled = true;
                 break;
             case AttackType.Down:
-                if (downHitbox != null) downHitbox.enabled = true;
+                if (downHitbox != null) downHitbox.col.enabled = true;
                 break;
             case AttackType.Jump:
-                if(jumpHitbox != null) jumpHitbox.enabled = true;
+                if(jumpHitbox != null) jumpHitbox.col.enabled = true;
                 break;
             case AttackType.Special:
-                if (specialHitbox != null) specialHitbox.enabled = true;
+                //if (specialHitbox != null) specialHitbox.enabled = true;
                 break;
         }
     }
 
     void DisableAllHitboxes()
     {
-        if (normalHitbox != null) normalHitbox.enabled = false;
-        if (upHitbox != null) upHitbox.enabled = false;
-        if (downHitbox != null) downHitbox.enabled = false;
-        if (specialHitbox != null) specialHitbox.enabled = false;
-        if (jumpHitbox != null) jumpHitbox.enabled = false;
+        if (normalHitbox != null) normalHitbox.col.enabled = false;
+        if (upHitbox != null) upHitbox.col.enabled = false;
+        if (downHitbox != null) downHitbox.col.enabled = false;
+        //if (specialHitbox != null) specialHitbox.enabled = false;
+        if (jumpHitbox != null) jumpHitbox.col.enabled = false;
     }
 }
