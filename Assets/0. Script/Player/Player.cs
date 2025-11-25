@@ -111,6 +111,7 @@ public class Player : MonoBehaviour, IDamageable
             anim.SetBool ("IsJumping",false);
             anim.SetTrigger("Land");
             rb.gravityScale = originalGravityScale;
+
         }
     }
     public void TakeDamage(float amount)
@@ -150,13 +151,14 @@ public class Player : MonoBehaviour, IDamageable
     {
         if(PauseManager.IsPaused) return;
         
+        anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
         anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
-        anim.SetBool("IsGrounded",isGrounded);
         if (inputVec.x != 0)
         {
             spriter.flipX = inputVec.x < 0;
         }
     }
+
     void FixedUpdate() 
     { 
         if (HP.IsDead || isDodging) return;
@@ -166,6 +168,15 @@ public class Player : MonoBehaviour, IDamageable
             {
                 rb.gravityScale = apexGravityScale;
             }
+            else if (rb.linearVelocity.y < 0 )
+            {
+                rb.gravityScale = originalGravityScale;
+            }
+            else
+            {
+                rb.gravityScale = originalGravityScale;
+            }
+
         }
     }
     
