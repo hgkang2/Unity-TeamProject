@@ -19,8 +19,30 @@ public class Grimlog : MonsterBase
         monsterData.SkillA_coolTime = 15f;
     }
 
-    //bool canUseSkillA = true;
-    //float SkillPower = 20f;
+    public override void UseSkill()
+    {
+        transform.DOMoveX(1f , 0.5f);
+    }
 
-    
+
+    public override void OnSkillExit()
+    {
+        StartCoroutine(SkillCooldown());
+    }
+
+    IEnumerator SkillCooldown()
+    {
+        
+        yield return new WaitForSeconds(3f);
+        
+        isUsingSkill = false;
+        animator.SetTrigger("Aggro");
+        ChangeState(MonsterStateType.Aggro);
+
+        yield return new WaitForSeconds(5f);
+
+        isSkillReady = true;
+        
+    }
+
 }

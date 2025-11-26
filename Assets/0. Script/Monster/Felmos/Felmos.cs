@@ -19,7 +19,6 @@ public class Felmos : MonsterBase
     Vector2[] patrolDir = new Vector2[]
     { Vector2.left, Vector2.right, Vector2.up, Vector2.down };
 
-    //bool canUseSkillA = true;
     [SerializeField]
     GameObject FelmosCorrosive;
     Transform FirePos;
@@ -35,42 +34,19 @@ public class Felmos : MonsterBase
         {
             patrolDirIndex = (patrolDirIndex + 1) % patrolDir.Length;
 
+            animator.SetTrigger("Idle");
             ChangeState(MonsterStateType.Idle);
         }
 
         if(DistanceToPlayer <= monsterData.AggroRange)
         {
+            animator.SetTrigger("Aggro");
             ChangeState(MonsterStateType.Aggro);
         }
     }
 
-    public override void Aggro()
+    public override void UseSkill()
     {
-        //Vector2 TargetPosition = new Vector2(PlayerPosition.position.x, PlayerPosition.position.y);
-
-        //Vector2 direction = (TargetPosition - (Vector2)transform.position).normalized;
-
-        transform.position = Vector2.MoveTowards(transform.position, PlayerPosition.transform.position, monsterData.PatrolSpeed * Time.deltaTime);
-
-        if (DistanceToPlayer > monsterData.AggroRange * 1.2f)
-        {
-            ChangeState(MonsterStateType.Idle);
-        }
-
+        
     }
-
-   
-
-    //protected override IEnumerator SkillA()
-    //{
-    //    canUseSkillA = false;
-
-    //    Instantiate(FelmosCorrosive, FirePos.position, Quaternion.identity);
-
-    //    ChangeState(MonsterStateType.Aggro);
-
-    //    yield return new WaitForSeconds(monsterData.SkillA_coolTime);
-
-    //    canUseSkillA = true;
-    //}
 }

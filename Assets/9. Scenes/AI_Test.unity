@@ -1018,16 +1018,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  selectedSkill: 0
   PlayerLayermask:
     serializedVersion: 2
     m_Bits: 64
   isUsingSkill: 0
+  isSkillReady: 0
   StateTimer: 0
   DistanceToPlayer: 0
-  isSkillReady: 0
   PlayerPosition: {fileID: 399982679}
-  rb: {fileID: 1087074460}
+  direction: {x: 0, y: 0}
   animator: {fileID: 0}
   FelmosCorrosive: {fileID: 0}
 --- !u!1 &1201786442
@@ -1064,16 +1063,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  selectedSkill: 0
   PlayerLayermask:
     serializedVersion: 2
     m_Bits: 64
   isUsingSkill: 0
+  isSkillReady: 1
   StateTimer: 0
   DistanceToPlayer: 0
-  isSkillReady: 1
   PlayerPosition: {fileID: 399982679}
-  rb: {fileID: 0}
+  direction: {x: 0, y: 0}
   animator: {fileID: 0}
 --- !u!50 &1201786444
 Rigidbody2D:

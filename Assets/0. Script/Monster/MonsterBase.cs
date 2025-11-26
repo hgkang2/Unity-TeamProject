@@ -24,7 +24,6 @@ public struct MonsterData  // �� ������
 }
 
 public enum MonsterStateType { Idle, Patrol, Aggro, Take_Damage,Dead }
-public enum MonsterSkillType { None, Skill_A, Skill_B, Skill_C }
 
 public abstract class MonsterBase : MonoBehaviour, IDamageable
 {
@@ -35,23 +34,21 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public MonsterData monsterData;
     public MonsterStateType currentState = MonsterStateType.Idle;
-    public MonsterSkillType selectedSkill = MonsterSkillType.None;
 
     [SerializeField]
     LayerMask PlayerLayermask;
-    
+
     public bool isUsingSkill = false;
+    public bool isSkillReady = true;
 
     public float StateTimer;
     public float DistanceToPlayer; // 플레이 거리
 
-    public bool isSkillReady;
-
     public Transform PlayerPosition; // �÷��̾� ���� ��ġ
-    public Rigidbody2D rb;
-    Vector2 direction;
+    Rigidbody2D rb;
+    SpriteRenderer spriteRenderer;
 
-    protected Coroutine skillCoroutine;
+    public Vector2 direction;
 
     public Animator animator;
 
@@ -61,6 +58,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         hp = GetComponent<HP>();
         player = GetComponent<Player>();
         animator = GetComponentInChildren<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
         isUsingSkill = false;
     }
@@ -110,6 +108,12 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             ChangeState(MonsterStateType.Patrol);
             return;
         }
+
+        if (DistanceToPlayer <= monsterData.AggroRange)
+        {
+            animator.SetTrigger("Aggro");
+            ChangeState(MonsterStateType.Aggro);
+        }
     }
 
     public virtual void Patrol()
@@ -125,10 +129,18 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             ChangeState(MonsterStateType.Idle);
             return;
         }
+
+        if(DistanceToPlayer <= monsterData.AggroRange)
+        {
+            animator.SetTrigger("Aggro");
+            ChangeState(MonsterStateType.Aggro);
+        }
     }
 
     public virtual void Aggro()
     {
+        if (isUsingSkill) return;
+
         transform.position += (Vector3)(direction * monsterData.PatrolSpeed * Time.deltaTime);
 
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
@@ -141,38 +153,48 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         if (DistanceToPlayer <= monsterData.SkillA_ActiveRange && isSkillReady && !isUsingSkill)
         {
             animator.SetTrigger("Skill");
-
-            return;
+            isUsingSkill = true;
+            isSkillReady = false;
         }
     }
 
     public void DetectPlayer()
     {
+        //if (currentState == MonsterStateType.Aggro || isUsingSkill) return;
+
         Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
 
-        if (detectCollider != null)
+        if (detectCollider != null && detectCollider.CompareTag("Player") && !isUsingSkill)
         {
-            if (detectCollider.CompareTag("Player"))
-            {
-                PlayerPosition = detectCollider.transform;
 
-                Vector2 playerPos = new Vector2(PlayerPosition.position.x, transform.position.y);
-                Vector2 myPos = new Vector2(transform.position.x, transform.position.y);
+            PlayerPosition = detectCollider.transform;
 
-                direction = (playerPos - myPos).normalized;
+            Vector2 playerPos = new Vector2(PlayerPosition.position.x, transform.position.y);
+            Vector2 myPos = new Vector2(transform.position.x, transform.position.y);
 
-                DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
+            direction = (playerPos - myPos).normalized;
 
-                animator.SetTrigger("Aggro");
-                ChangeState(MonsterStateType.Aggro);
-                return;
-            }
+            DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
+
         }
         else
-        {  
+        {
             PlayerPosition = null;
 
             DistanceToPlayer = Mathf.Infinity;
+        }
+        FlipSprite(direction.x);
+    }
+
+    void FlipSprite(float moveDirection)
+    { 
+        if(moveDirection < 0)
+        {
+            spriteRenderer.flipX = false;
+        }
+        else if(moveDirection > 0)
+        {
+            spriteRenderer.flipX = true;
         }
     }
 
@@ -181,10 +203,15 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     }
 
-    public virtual void SkillA() { }
-    public virtual void SkillB() { }
-    public virtual void SkillC() { }
+    public virtual void OnSkillUpdate()
+    {
 
+    }
+
+    public virtual void OnSkillExit()
+    {
+
+    }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
