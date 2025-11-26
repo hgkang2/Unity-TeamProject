@@ -16,7 +16,6 @@ public class Player : MonoBehaviour, IDamageable
     SpriteRenderer spriter;
     public Vector2 inputVec;
     public bool isGrounded = true;
-    public bool isAttcking = false;
     private float dodgeEndTime;
     private float cooldownEndTime;
     private float dodgeTime = 0.3f;
@@ -25,6 +24,7 @@ public class Player : MonoBehaviour, IDamageable
     private float originalGravityScale;
     public float apexGravityScale = 0.5f;
     public float apexThreshold = 0.5f;
+    PlayerAttack playerAttack;
 
     private void Awake()
     {
@@ -35,6 +35,7 @@ public class Player : MonoBehaviour, IDamageable
         anim = GetComponent<Animator>();
         spriter = GetComponent<SpriteRenderer>();
         collider2d = GetComponent<Collider2D>();
+        playerAttack = GetComponent<PlayerAttack>();
         originalGravityScale = rb.gravityScale;
     }
     void OnAbled(){
@@ -121,6 +122,7 @@ public class Player : MonoBehaviour, IDamageable
 
     void Move()
     {
+        
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isDodging)
         {
             rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
@@ -139,7 +141,11 @@ public class Player : MonoBehaviour, IDamageable
         {
             horizontalMovement = -1f;
         }
-        inputVec = new Vector2(horizontalMovement, Input.GetAxisRaw("Vertical"));
+        inputVec = new Vector2(horizontalMovement, 0);
+        if (playerAttack.isAttacking)
+        {
+            horizontalMovement = 0;
+        }
         rb.linearVelocity = new Vector2(horizontalMovement * stats.curMoveSpeed, rb.linearVelocity.y);
         if (!isDodging)
         {

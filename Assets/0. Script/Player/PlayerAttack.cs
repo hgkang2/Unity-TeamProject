@@ -16,7 +16,7 @@ public class PlayerAttack : MonoBehaviour
     //[SerializeField] PlayerHitBox specialHitbox;
     [SerializeField] PlayerHitBox jumpHitbox;
 
-    bool isAttacking;
+    public bool isAttacking;
     AttackType currentType = AttackType.None;
 
 
@@ -92,18 +92,22 @@ public class PlayerAttack : MonoBehaviour
         switch (type)
         {
             case AttackType.Normal: // 1
+            Debug.Log($"normalAttack");
                 animator.SetTrigger("Attack_Normal");
                 break;
             case AttackType.Up: // 2
+            Debug.Log($"UpAttack");
                 animator.SetTrigger("Attack_Up");
                 break;
             case AttackType.Down: // 3
+            Debug.Log($"DownAttack");
                 animator.SetTrigger("Attack_Down");
                 break;
             case AttackType.Special: // 4
                 animator.SetTrigger("Attack_Special");
                 break;
             case AttackType.Jump: // 5
+            Debug.Log($"jumpAttack");
                 animator.SetTrigger("Attack_Jump");
                 break;
         }
