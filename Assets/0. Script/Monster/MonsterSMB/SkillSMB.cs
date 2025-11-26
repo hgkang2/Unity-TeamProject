@@ -4,6 +4,12 @@ public class SkillSMB : MonsterStateSMB
 {
     public override void OnEnter()
     {
-        monsterBase.SkillA();
+        monsterBase.UseSkill();
+    }
+
+    public override void OnExit()
+    {
+        
+        monsterBase.OnSkillExit();
     }
 }
