@@ -8195,6 +8195,7 @@ GameObject:
   - component: {fileID: 1240395417}
   - component: {fileID: 1240395418}
   - component: {fileID: 1240395426}
+  - component: {fileID: 1240395429}
   - component: {fileID: 1240395427}
   - component: {fileID: 1240395424}
   - component: {fileID: 1240395428}
@@ -8292,10 +8293,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf701f8d195e4ef4c8c6387d011b3904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputVec: {x: 0, y: 0}
-  isGrounded: 1
-  apexGravityScale: 0.1
-  apexThreshold: 0.7
 --- !u!50 &1240395419
 Rigidbody2D:
   serializedVersion: 5
@@ -8455,6 +8452,33 @@ MonoBehaviour:
   maxHP: 100
   armor: 0
   initializeOnAwake: 1
+--- !u!114 &1240395429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240395415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b423e0e571c2af4eba89d254686aeaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputVec: {x: 0, y: 0}
+  isGrounded: 1
+  jumpRequested: 0
+  isDodging: 0
+  isKnockback: 0
+  apexGrav: 0.1
+  apexThreshold: 0.7
+  fallGravityMultiplier: 2
+  airControlLerp: 8
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 128
+  groundRayLength: 0.2
+  groundRayOffsetX: 0.25
+  minGroundDistanceForAirAttack: 0
 --- !u!1 &1259777695
 GameObject:
   m_ObjectHideFlags: 0
@@ -11547,7 +11571,7 @@ GameObject:
   - component: {fileID: 1763627068}
   - component: {fileID: 1763627067}
   - component: {fileID: 1763627069}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground
   m_TagString: Ground
   m_Icon: {fileID: 0}

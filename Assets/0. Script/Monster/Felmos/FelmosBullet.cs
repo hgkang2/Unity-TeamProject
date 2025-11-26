@@ -22,4 +22,10 @@ public class FelmosBullet : MonoBehaviour, IDamageable
     {
         throw new System.NotImplementedException();
     }
+
+    public void TakeDamage(float amount, Vector2 attackerWorldPosition)
+    {
+        throw new System.NotImplementedException();
+    }
+
 }
