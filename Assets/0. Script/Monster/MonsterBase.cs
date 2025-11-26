@@ -46,7 +46,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public Transform PlayerPosition; // �÷��̾� ���� ��ġ
     Rigidbody2D rb;
-    SpriteRenderer spriteRenderer;
+    public SpriteRenderer spriteRenderer;
 
     public Vector2 direction;
 
@@ -70,7 +70,16 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        MonsterFSM();  
+        MonsterFSM();
+
+        if(direction.x > 0)
+        {
+            spriteRenderer.flipX = true;
+        }
+        else if(direction.x < 0)
+        {
+            spriteRenderer.flipX = false;
+        }
     }
 
     private void FixedUpdate()
@@ -104,6 +113,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         if(StateTimer >= monsterData.IdleTime)
         {
+            //monsterData.MoveDirection *= -1;
             animator.SetTrigger("Patrol");
             ChangeState(MonsterStateType.Patrol);
             return;
@@ -118,13 +128,11 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void Patrol()
     {
-        transform.rotation = Quaternion.Euler(0, monsterData.MoveDirection > 0 ? 180 : 0, 0);
-
-        transform.position += new Vector3(monsterData.MoveDirection * monsterData.PatrolSpeed * Time.deltaTime, 0f, 0f);
+        transform.position += new Vector3(direction.x * monsterData.PatrolSpeed * Time.deltaTime,0,0);
 
         if(StateTimer >= monsterData.PatrolTime)
-        { 
-            monsterData.MoveDirection *= -1;
+        {
+            direction.x *= -1;
             animator.SetTrigger("Idle");
             ChangeState(MonsterStateType.Idle);
             return;
@@ -132,6 +140,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         if(DistanceToPlayer <= monsterData.AggroRange)
         {
+            
             animator.SetTrigger("Aggro");
             ChangeState(MonsterStateType.Aggro);
         }
@@ -142,6 +151,8 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         if (isUsingSkill) return;
 
         transform.position += (Vector3)(direction * monsterData.PatrolSpeed * Time.deltaTime);
+
+        //if (direction.x < 0) monsterData.MoveDirection *= -1;
 
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
         {
@@ -166,7 +177,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         if (detectCollider != null && detectCollider.CompareTag("Player") && !isUsingSkill)
         {
-
             PlayerPosition = detectCollider.transform;
 
             Vector2 playerPos = new Vector2(PlayerPosition.position.x, transform.position.y);
@@ -175,26 +185,12 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             direction = (playerPos - myPos).normalized;
 
             DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
-
         }
         else
         {
             PlayerPosition = null;
 
             DistanceToPlayer = Mathf.Infinity;
-        }
-        FlipSprite(direction.x);
-    }
-
-    void FlipSprite(float moveDirection)
-    { 
-        if(moveDirection < 0)
-        {
-            spriteRenderer.flipX = false;
-        }
-        else if(moveDirection > 0)
-        {
-            spriteRenderer.flipX = true;
         }
     }
 
@@ -217,20 +213,19 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         if(collision.gameObject.CompareTag("Wall"))
         {
-            monsterData.MoveDirection *= -1; // ���� �浹�ϸ� �ݴ� �������� �̵�
+            //monsterData.MoveDirection *= -1; 
         }
     }
 
     void OnDrawGizmos()
     {
-        // ��׷� ���� (����)
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, monsterData.AggroRange);
 
-        // ��ų �ߵ� ���� (�Ķ�)
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, monsterData.SkillA_ActiveRange);
     }
+
     public void TakeDamage(float amount){
         hp.TakeDamage(amount);
     }

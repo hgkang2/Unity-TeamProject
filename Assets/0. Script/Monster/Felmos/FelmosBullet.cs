@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FelmosBullet : MonoBehaviour
+public class FelmosBullet : MonoBehaviour, IDamageable
 {
     [SerializeField]
     Transform PlayerPos;
@@ -13,9 +13,13 @@ public class FelmosBullet : MonoBehaviour
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void TakeDamage(float amount)
+    {
+        throw new System.NotImplementedException();
     }
 }

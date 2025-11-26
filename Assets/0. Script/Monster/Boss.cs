@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class Boss : MonoBehaviour
+public class Boss : MonsterBase, IDamageable
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void MonsterDataSetting()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void TakeDamage(float amount)
     {
-        
+
     }
 }

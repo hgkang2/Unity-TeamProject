@@ -38,11 +38,11 @@ public class Grimlog : MonsterBase
         isUsingSkill = false;
         animator.SetTrigger("Aggro");
         ChangeState(MonsterStateType.Aggro);
+        
 
         yield return new WaitForSeconds(5f);
 
         isSkillReady = true;
         
     }
-
 }
