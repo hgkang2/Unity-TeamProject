@@ -23,8 +23,8 @@ public class Player : MonoBehaviour, IDamageable
     private float dodgeCooldown = 1f;
     private bool isDodging = false;
     private float originalGravityScale;
-    public float apexGravityScale = 0.5f;
-    public float apexThreshold = 0.5f;
+    public float apexGravityScale = 0.1f;
+    public float apexThreshold = 0.7f;
 
     private void Awake()
     {
