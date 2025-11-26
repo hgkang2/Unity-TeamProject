@@ -10635,7 +10635,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputVec: {x: 0, y: 0}
   isGrounded: 1
-  isAttcking: 0
   apexGravityScale: 0.5
   apexThreshold: 0.5
 --- !u!50 &1240395419
@@ -10755,6 +10754,7 @@ MonoBehaviour:
   upHitbox: {fileID: 1884215458}
   downHitbox: {fileID: 1959406666}
   jumpHitbox: {fileID: 1842604868}
+  isAttacking: 0
 --- !u!114 &1240395427
 MonoBehaviour:
   m_ObjectHideFlags: 0

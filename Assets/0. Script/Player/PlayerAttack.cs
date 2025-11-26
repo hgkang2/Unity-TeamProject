@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
+    PlayerMove move;
     PlayerStats stats;
 
     Animator animator;
@@ -22,8 +23,9 @@ public class PlayerAttack : MonoBehaviour
 
     void Awake()
     {
-        animator = GetComponent<Animator>();
+        move = GetComponent<PlayerMove>();
         stats = GetComponent<PlayerStats>();
+        animator = GetComponent<Animator>();
     }
     void Start()
     {
@@ -58,8 +60,19 @@ public class PlayerAttack : MonoBehaviour
         // 키는 방향키+A 등 조합으로 바꾸기
         if (Input.GetKeyDown(KeyCode.A) && !isAttacking)
         {
-           //윗 방향키 + A
-           if (Input.GetKey(KeyCode.UpArrow))
+            // 공중 + 바닥 너무 가까우면 공격 금지
+            if (move != null && !move.isGrounded)
+            {
+                float dist = move.GetGroundDistance();
+                if (dist >= 0f && dist < move.minGroundDistanceForAirAttack)
+                {
+                    // 그냥 무시: 도약/착지만 하게
+                    return;
+                }
+            }
+
+            //윗 방향키 + A
+            if (Input.GetKey(KeyCode.UpArrow))
             {
                 StartAttack(AttackType.Up);
             }
@@ -92,22 +105,18 @@ public class PlayerAttack : MonoBehaviour
         switch (type)
         {
             case AttackType.Normal: // 1
-            Debug.Log($"normalAttack");
                 animator.SetTrigger("Attack_Normal");
                 break;
             case AttackType.Up: // 2
-            Debug.Log($"UpAttack");
                 animator.SetTrigger("Attack_Up");
                 break;
             case AttackType.Down: // 3
-            Debug.Log($"DownAttack");
                 animator.SetTrigger("Attack_Down");
                 break;
             case AttackType.Special: // 4
                 animator.SetTrigger("Attack_Special");
                 break;
             case AttackType.Jump: // 5
-            Debug.Log($"jumpAttack");
                 animator.SetTrigger("Attack_Jump");
                 break;
         }

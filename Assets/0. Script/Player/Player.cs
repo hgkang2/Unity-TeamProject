@@ -1,190 +1,59 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
 public class Player : MonoBehaviour, IDamageable
 {
     HP hp;
-    public HP HP => hp;
-    Exp exp;
-    public Exp Exp => exp;
-    PlayerStats stats;
-    public PlayerStats Stats => stats;
-    Rigidbody2D rb; // 변수 선언은 소문자로 시작. 단 rigidbody2D같은 일부 예약어는 사용 불가해서 rb로 바꿈
-    Collider2D collider2d;
-    Animator anim;
-    SpriteRenderer spriter;
-    public Vector2 inputVec;
-    public bool isGrounded = true;
-    private float dodgeEndTime;
-    private float cooldownEndTime;
-    private float dodgeTime = 0.3f;
-    private float dodgeCooldown = 1f;
-    private bool isDodging = false;
-    private float originalGravityScale;
-    public float apexGravityScale = 0.5f;
-    public float apexThreshold = 0.5f;
-    PlayerAttack playerAttack;
+    public HP HP { get { return hp; } }
 
-    private void Awake()
+    Exp exp;
+    public Exp Exp { get { return exp; } }
+
+    PlayerStats stats;
+    public PlayerStats Stats { get { return stats; } }
+
+    PlayerMove move;
+
+    void Awake()
     {
         hp = GetComponent<HP>();
         exp = GetComponent<Exp>();
         stats = GetComponent<PlayerStats>();
-        rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
-        spriter = GetComponent<SpriteRenderer>();
-        collider2d = GetComponent<Collider2D>();
-        playerAttack = GetComponent<PlayerAttack>();
-        originalGravityScale = rb.gravityScale;
+        move = GetComponent<PlayerMove>();
     }
-    void OnAbled(){
+
+    void OnEnable()
+    {
         hp.OnDied += HandleDie;
     }
-    void OnDisabled(){
+
+    void OnDisable()
+    {
         hp.OnDied -= HandleDie;
     }
-    void Update()
+
+    void HandleDie()
     {
-        if (HP.IsDead)
-        return;
-        Move();
-        if (isDodging)
-        {  
-            if (Time.time >= dodgeEndTime)
-            {
-                EndDodge();
-            }
-            return; 
-        }
+        move.HandleDieMotion();
 
-        HandleDodgeInput();
-    }
-    void HandleDodgeInput()
-    {
-    
-        if (Input.GetKeyDown(KeyCode.D) && Time.time >= cooldownEndTime)
-        {
-            StartDodge();
-        }
-    }
-    void StartDodge()
-    {
-        isDodging = true;
-        dodgeEndTime = Time.time + dodgeTime;
-        cooldownEndTime = Time.time + dodgeCooldown;
-        anim.SetTrigger("Dodge");
-        float dodgeDirection = spriter.flipX ? 1f : -1f;
-        float originalGravity = rb.gravityScale;
-        rb.gravityScale = 0;
-        rb.linearVelocity = new Vector2(dodgeDirection * stats.MoveSpeed * 2f, 0);
+        Destroy(gameObject, 2f);
     }
 
-    void EndDodge()
-    {
-        isDodging = false;
-        rb.gravityScale = 1f;
-        rb.linearVelocity = Vector2.zero;
-    }
-
-    void HandleDie(){
-        if (anim != null)
-        {
-            anim.SetTrigger("Die");
-        }
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero; 
-            rb.bodyType = RigidbodyType2D.Kinematic; 
-        }
-
-        Destroy(gameObject, 2f); 
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        GameObject go = collision.gameObject;
-        //수평 벽은 Ground, 수직 벽은 Wall로 일단 했음
-        //일단은 벽타기도 가능하게 함
-        if ((go.CompareTag("Ground") || go.CompareTag("Wall")) && !isGrounded)
-        {
-            isGrounded = true;
-            anim.SetBool ("IsJumping",false);
-            anim.SetTrigger("Land");
-            rb.gravityScale = originalGravityScale;
-
-        }
-    }
+    // IDamageable 기본 버전 (공격자 위치 모를 때)
     public void TakeDamage(float amount)
     {
+        if (HP.IsDead) return;
+
         hp.TakeDamage(amount);
+        move.StartKnockbackByFacing();
     }
 
-    void Move()
+    // 공격자 위치를 아는 버전
+    public void TakeDamage(float amount, Vector2 attackerWorldPosition)
     {
-        
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isDodging)
-        {
-            rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
-            isGrounded = false;
-            anim.SetTrigger("Jump");
-            anim.SetBool("IsJumping", true);
-        }
+        if (HP.IsDead) return;
 
-        float horizontalMovement = 0f;
-
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            horizontalMovement = 1f;
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            horizontalMovement = -1f;
-        }
-        inputVec = new Vector2(horizontalMovement, 0);
-        if (playerAttack.isAttacking)
-        {
-            horizontalMovement = 0;
-        }
-        rb.linearVelocity = new Vector2(horizontalMovement * stats.curMoveSpeed, rb.linearVelocity.y);
-        if (!isDodging)
-        {
-            rb.linearVelocity = new Vector2(horizontalMovement * stats.curMoveSpeed, rb.linearVelocity.y);
-        }
+        hp.TakeDamage(amount);
+        move.StartKnockbackFromAttacker(attackerWorldPosition);
     }
-
-    void LateUpdate()
-    {
-        if(PauseManager.IsPaused) return;
-        
-        anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
-        anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
-        if (inputVec.x != 0)
-        {
-            spriter.flipX = inputVec.x < 0;
-        }
-    }
-
-    void FixedUpdate() 
-    { 
-        if (HP.IsDead || isDodging) return;
-        if(!isGrounded)
-        {
-            if (Mathf.Abs(rb.linearVelocity.y) < apexThreshold && rb.linearVelocity.y >= 0)
-            {
-                rb.gravityScale = apexGravityScale;
-            }
-            else if (rb.linearVelocity.y < 0 )
-            {
-                rb.gravityScale = originalGravityScale;
-            }
-            else
-            {
-                rb.gravityScale = originalGravityScale;
-            }
-
-        }
-    }
-    
-
 }

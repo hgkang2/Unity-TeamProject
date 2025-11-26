@@ -207,4 +207,9 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public void TakeDamage(float amount){
         hp.TakeDamage(amount);
     }
+
+    void IDamageable.TakeDamage(float amount, Vector2 attackerWorldPosition)
+    {
+        hp.TakeDamage(amount);
+    }
 }

@@ -18,4 +18,9 @@ public class BreakableWall : MonoBehaviour, IDamageable
             fadeOut: true);
         if(wallHP <= 0) Destroy(gameObject);
     }
+
+    public void TakeDamage(float amount, Vector2 attackerWorldPosition)
+    {
+        TakeDamage(amount);
+    }
 }

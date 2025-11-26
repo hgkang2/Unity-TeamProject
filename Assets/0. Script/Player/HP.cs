@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class HP : MonoBehaviour, IDamageable
+public class HP : MonoBehaviour
 {
     [Header("기본 HP 설정")]
     [SerializeField] float maxHP = 100f;
