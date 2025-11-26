@@ -94,7 +94,7 @@ public class Player : MonoBehaviour, IDamageable
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero; 
-            rb.isKinematic = true; 
+            rb.bodyType = RigidbodyType2D.Kinematic; 
         }
 
         Destroy(gameObject, 2f); 
