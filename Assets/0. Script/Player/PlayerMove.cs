@@ -50,6 +50,9 @@ public class PlayerMove : MonoBehaviour
     public LayerMask groundMask;    // 인스펙터에서 "Ground" 레이어 할당
     public float groundRayLength = 0.2f; // 레이 길이
     public float groundRayOffsetX = 0.25f; // 좌우로 얼마나 벌려 쏠지
+    // --- 점프 횟수 관리 ---
+    public int maxJumpCount = 2;
+    int currentJumpCount;
 
     void Awake()
     {
@@ -61,6 +64,7 @@ public class PlayerMove : MonoBehaviour
         spr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
         baseGrav = rb.gravityScale;
+        currentJumpCount = maxJumpCount;
     }
 
     // -------------------------------
@@ -125,7 +129,7 @@ public class PlayerMove : MonoBehaviour
         else if (Input.GetKey(KeyCode.LeftArrow)) h = -1;
         inputVec = new Vector2(h, Input.GetAxisRaw("Vertical"));
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isDodging && !isKnockback)
+        if (Input.GetKeyDown(KeyCode.Space) && !isDodging && !isKnockback && (isGrounded || currentJumpCount > 0))
             jumpRequested = true;
     }
 
@@ -164,9 +168,21 @@ public class PlayerMove : MonoBehaviour
     {
         if (!jumpRequested) return;
         jumpRequested = false;
-        if (!isGrounded) return;
-        anim.ResetTrigger("Land");
 
+        bool canJump = isGrounded || currentJumpCount > 0;
+        if (!canJump)return;
+        anim.ResetTrigger("Land");
+        
+        if (isGrounded)
+        {
+            currentJumpCount = maxJumpCount -1;
+        }
+        else
+        {
+            currentJumpCount--;
+        }
+
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
         anim.SetTrigger("Jump");
@@ -290,6 +306,7 @@ public class PlayerMove : MonoBehaviour
 
         if (landedThisFrame)
         {
+            currentJumpCount = maxJumpCount;
             anim.SetBool("IsJumping", false);
 
             // 공중 공격 상태로 내려온 경우엔 Land 스킵
