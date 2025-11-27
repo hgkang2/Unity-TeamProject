@@ -17,6 +17,7 @@ public class RuntimeInspectorExample : MonoBehaviour
 
     void Update()
     {
+        return;
         if (Input.GetKeyDown(KeyCode.F1))
         {
             // 두 UI가 같은 부모(Canvas 밑)라면 하나만 기준으로 토글해도 됨

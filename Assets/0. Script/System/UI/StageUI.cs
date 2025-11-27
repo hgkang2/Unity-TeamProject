@@ -55,35 +55,35 @@ public class StageUI : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            haveSoulsPanel.gameObject.SetActive(true);
-        }
-        if (Input.GetKeyUp(KeyCode.Z))
-        {
-            haveSoulsPanel.gameObject.SetActive(false);
-        }
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            //우선 설정창 켜져있으면 닫기
-            if (settingPanel.activeSelf)
-            {
-                HideSettingPanel();
-                return;
-            }
+        // if (Input.GetKeyDown(KeyCode.Z))
+        // {
+        //     haveSoulsPanel.gameObject.SetActive(true);
+        // }
+        // if (Input.GetKeyUp(KeyCode.Z))
+        // {
+        //     haveSoulsPanel.gameObject.SetActive(false);
+        // }
+        // if (Input.GetKeyDown(KeyCode.Escape))
+        // {
+        //     //우선 설정창 켜져있으면 닫기
+        //     if (settingPanel.activeSelf)
+        //     {
+        //         HideSettingPanel();
+        //         return;
+        //     }
 
-            //아니면 일시정지 / 풀기
-            if (!PauseManager.IsPaused)
-            {
-                ShowEscPanel();
-                PauseManager.Pause();
-            }
-            else
-            {
-                HideEscPanel();
-                PauseManager.Resume();
-            }
-        }
+        //     //아니면 일시정지 / 풀기
+        //     if (!PauseManager.IsPaused)
+        //     {
+        //         ShowEscPanel();
+        //         PauseManager.Pause();
+        //     }
+        //     else
+        //     {
+        //         HideEscPanel();
+        //         PauseManager.Resume();
+        //     }
+        // }
     }
 
     public void ShowEscPanel()

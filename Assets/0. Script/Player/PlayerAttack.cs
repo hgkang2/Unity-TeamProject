@@ -39,6 +39,8 @@ public class PlayerAttack : MonoBehaviour
         downHitbox.OnHit += HandleHit;
         //specialHitbox.OnHit += HandleHit;
         jumpHitbox.OnHit += HandleHit;
+                InputManager.Instance.AttackPressed  += HandleAttackPressed;
+        InputManager.Instance.SpecialAttackPressed += HandleSpecialAttackPressed;
     }
     void OnDisable()
     {
@@ -47,6 +49,8 @@ public class PlayerAttack : MonoBehaviour
         downHitbox.OnHit -= HandleHit;
         //specialHitbox.OnHit -= HandleHit;
         jumpHitbox.OnHit -= HandleHit;
+                InputManager.Instance.AttackPressed  -= HandleAttackPressed;
+        InputManager.Instance.SpecialAttackPressed -= HandleSpecialAttackPressed;
     }
 
     void HandleHit(IDamageable target)
@@ -55,45 +59,52 @@ public class PlayerAttack : MonoBehaviour
         target.TakeDamage(stats.curDamage);
     }
 
-    void Update()
+    void HandleAttackPressed()
     {
-        // 키는 방향키+A 등 조합으로 바꾸기
-        if (Input.GetKeyDown(KeyCode.A) && !isAttacking)
-        {
-            // 공중 + 바닥 너무 가까우면 공격 금지
-            if (move != null && !move.isGrounded)
-            {
-                float dist = move.GetGroundDistance();
-                if (dist >= 0f && dist < move.minGroundDistanceForAirAttack)
-                {
-                    // 그냥 무시: 도약/착지만 하게
-                    return;
-                }
-            }
+        if (isAttacking) return;
 
-            //윗 방향키 + A
-            if (Input.GetKey(KeyCode.UpArrow))
-            {
-                StartAttack(AttackType.Up);
-            }
-            //아래 방향키 + A
-            else if (Input.GetKey(KeyCode.DownArrow))
-            {
-                StartAttack(AttackType.Down);
-            }
-            else if (Input.GetKey(KeyCode.Space))
-            {
-                StartAttack(AttackType.Jump);
-            }
-            else
-            {
-                StartAttack(AttackType.Normal);
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.S) && !isAttacking)
+        // 1. 공중 + 바닥 너무 가까우면 공격 금지
+        if (move != null && !move.isGrounded)
         {
-            StartAttack(AttackType.Special);
+            float dist = move.GetGroundDistance();
+            if (dist >= 0f && dist < move.minGroundDistanceForAirAttack)
+            {
+                return;
+            }
         }
+
+        // 2. 현재 방향/점프 상태에 따라 AttackType 결정
+        Vector2 dir = InputManager.Instance.Move;
+
+        AttackType type;
+
+        // 위 방향키 + A
+        if (dir.y > 0.5f)
+        {
+            type = AttackType.Up;
+        }
+        // 아래 방향키 + A
+        else if (dir.y < -0.5f)
+        {
+            type = AttackType.Down;
+        }
+        // 점프 버튼 + A (눌려있는지 체크)
+        else if (InputManager.Instance.IsJumpHeld)
+        {
+            type = AttackType.Jump;
+        }
+        else
+        {
+            type = AttackType.Normal;
+        }
+
+        StartAttack(type);
+    }
+
+    void HandleSpecialAttackPressed()
+    {
+        if (isAttacking) return;
+        //StartAttack(AttackType.Special);
     }
 
     //Animator에 각 Trigger Parameter 추가하기(오타주의)

@@ -62,6 +62,17 @@ public class PlayerMove : MonoBehaviour
         col = GetComponent<Collider2D>();
         baseGrav = rb.gravityScale;
     }
+    void OnEnable()
+    {
+        InputManager.Instance.JumpPressed += OnJumpPressed;
+        InputManager.Instance.DodgePressed += OnDodgePressed;
+    }
+
+    void OnDisable()
+    {
+        InputManager.Instance.JumpPressed -= OnJumpPressed;
+        InputManager.Instance.DodgePressed -= OnDodgePressed;
+    }
 
     // -------------------------------
     // Update : 입력 및 상태 판단
@@ -80,7 +91,6 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
-        HandleDodgeInput();
     }
 
     // -------------------------------
@@ -120,13 +130,15 @@ public class PlayerMove : MonoBehaviour
     // ---- 입력 ----
     void ReadInput()
     {
-        float h = 0;
-        if (Input.GetKey(KeyCode.RightArrow)) h = 1;
-        else if (Input.GetKey(KeyCode.LeftArrow)) h = -1;
-        inputVec = new Vector2(h, Input.GetAxisRaw("Vertical"));
-
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isDodging && !isKnockback)
+        inputVec = InputManager.Instance.Move;
+    }
+    void OnJumpPressed()
+    {
+        // 원래 ReadInput 안에서 하던 조건 그대로 옮김
+        if (isGrounded && !isDodging && !isKnockback)
+        {
             jumpRequested = true;
+        }
     }
 
     // ---- 이동 / 점프 ----
@@ -174,10 +186,13 @@ public class PlayerMove : MonoBehaviour
     }
 
     // ---- 구르기 ----
-    void HandleDodgeInput()
+
+    void OnDodgePressed()
     {
-        if (Input.GetKeyDown(KeyCode.D) && Time.time >= cooldownEndTime)
+        if (Time.time >= cooldownEndTime && !isKnockback && !player.HP.IsDead)
+        {
             StartDodge();
+        }
     }
 
     void StartDodge()
@@ -276,7 +291,6 @@ public class PlayerMove : MonoBehaviour
     {
         Bounds b = col.bounds;
 
-        // 좌하, 우하에서 레이 쏘기
         Vector2 leftOrigin = new Vector2(b.min.x + groundRayOffsetX, b.min.y + 0.05f);
         Vector2 rightOrigin = new Vector2(b.max.x - groundRayOffsetX, b.min.y + 0.05f);
 
@@ -285,14 +299,16 @@ public class PlayerMove : MonoBehaviour
 
         bool hitSomething = (hitLeft.collider != null) || (hitRight.collider != null);
 
-        bool groundedNow = hitSomething && rb.linearVelocity.y <= 0.01f;
-        bool landedThisFrame = !isGrounded && groundedNow;
+        bool wasGrounded = isGrounded;
+        bool groundedNow = hitSomething;
+        isGrounded = groundedNow;
+
+        bool landedThisFrame = !wasGrounded && groundedNow && rb.linearVelocityY < -0.01;
 
         if (landedThisFrame)
         {
             anim.SetBool("IsJumping", false);
 
-            // 공중 공격 상태로 내려온 경우엔 Land 스킵
             if (!playerAttack.isAttacking)
             {
                 anim.SetTrigger("Land");
@@ -303,14 +319,13 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        isGrounded = groundedNow;
-
 #if UNITY_EDITOR
         Color c = groundedNow ? Color.green : Color.red;
         Debug.DrawRay(leftOrigin, Vector2.down * groundRayLength, c);
         Debug.DrawRay(rightOrigin, Vector2.down * groundRayLength, c);
 #endif
     }
+
 
     public float minGroundDistanceForAirAttack; // 이보다 낮으면 공중공격 금지
 

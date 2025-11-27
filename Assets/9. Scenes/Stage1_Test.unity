@@ -727,7 +727,7 @@ GameObject:
   - component: {fileID: 126338635}
   - component: {fileID: 126338634}
   - component: {fileID: 126338633}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (2)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -2948,7 +2948,7 @@ GameObject:
   - component: {fileID: 480099655}
   - component: {fileID: 480099654}
   - component: {fileID: 480099653}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (8)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -6783,7 +6783,7 @@ GameObject:
   - component: {fileID: 934482626}
   - component: {fileID: 934482625}
   - component: {fileID: 934482624}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (5)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -8397,7 +8397,7 @@ GameObject:
   - component: {fileID: 1052847003}
   - component: {fileID: 1052847002}
   - component: {fileID: 1052847001}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (1)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -10536,6 +10536,7 @@ GameObject:
   - component: {fileID: 1240395417}
   - component: {fileID: 1240395418}
   - component: {fileID: 1240395426}
+  - component: {fileID: 1240395429}
   - component: {fileID: 1240395427}
   - component: {fileID: 1240395428}
   - component: {fileID: 1240395424}
@@ -10633,10 +10634,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf701f8d195e4ef4c8c6387d011b3904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputVec: {x: 0, y: 0}
-  isGrounded: 1
-  apexGravityScale: 0.5
-  apexThreshold: 0.5
 --- !u!50 &1240395419
 Rigidbody2D:
   serializedVersion: 5
@@ -10796,6 +10793,33 @@ MonoBehaviour:
   maxHP: 100
   armor: 0
   initializeOnAwake: 1
+--- !u!114 &1240395429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240395415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b423e0e571c2af4eba89d254686aeaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputVec: {x: 0, y: 0}
+  isGrounded: 1
+  jumpRequested: 0
+  isDodging: 0
+  isKnockback: 0
+  apexGrav: 0.1
+  apexThreshold: 0.7
+  fallGravityMultiplier: 2
+  airControlLerp: 8
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 128
+  groundRayLength: 0.2
+  groundRayOffsetX: 0.25
+  minGroundDistanceForAirAttack: 0
 --- !u!1 &1259777695
 GameObject:
   m_ObjectHideFlags: 0
@@ -12214,7 +12238,7 @@ GameObject:
   - component: {fileID: 1441441798}
   - component: {fileID: 1441441800}
   - component: {fileID: 1441441799}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (3)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -14012,7 +14036,7 @@ GameObject:
   - component: {fileID: 1636693624}
   - component: {fileID: 1636693623}
   - component: {fileID: 1636693622}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (11)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -14667,16 +14691,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  selectedSkill: 0
   PlayerLayermask:
     serializedVersion: 2
     m_Bits: 0
   isUsingSkill: 0
+  isSkillReady: 0
   StateTimer: 0
   DistanceToPlayer: 0
-  isSkillReady: 0
   PlayerPosition: {fileID: 0}
-  rb: {fileID: 0}
+  spriteRenderer: {fileID: 0}
+  direction: {x: 0, y: 0}
   animator: {fileID: 0}
 --- !u!1 &1724118766
 GameObject:
@@ -15001,7 +15025,7 @@ GameObject:
   - component: {fileID: 1763627068}
   - component: {fileID: 1763627067}
   - component: {fileID: 1763627069}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -15210,7 +15234,7 @@ GameObject:
   - component: {fileID: 1835811726}
   - component: {fileID: 1835811725}
   - component: {fileID: 1835811724}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (13)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -17037,7 +17061,7 @@ GameObject:
   - component: {fileID: 2015605458}
   - component: {fileID: 2015605460}
   - component: {fileID: 2015605459}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (4)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -17625,7 +17649,7 @@ GameObject:
   - component: {fileID: 2034252178}
   - component: {fileID: 2034252177}
   - component: {fileID: 2034252176}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground (10)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -23536,7 +23560,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tailDuration: 0.25
   moveThreshold: 0.1
-  zDistanceFromCamera: 5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -23560,6 +23583,6 @@ SceneRoots:
   - {fileID: 986249351}
   - {fileID: 1118104740}
   - {fileID: 438115781}
-  - {fileID: 4485907838535958136}
   - {fileID: 264804732}
   - {fileID: 263096848}
+  - {fileID: 4485907838535958136}
