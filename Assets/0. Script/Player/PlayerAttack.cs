@@ -110,9 +110,6 @@ public class PlayerAttack : MonoBehaviour
     //Animator에 각 Trigger Parameter 추가하기(오타주의)
     public void StartAttack(AttackType type)
     {
-        currentType = type;
-        isAttacking = true;
-
         switch (type)
         {
             case AttackType.Normal: // 1
@@ -131,6 +128,7 @@ public class PlayerAttack : MonoBehaviour
                 animator.SetTrigger("Attack_Jump");
                 break;
         }
+        isAttacking = true;
     }
 
     // 각 공격 애니메이션의 첫 프레임에 연결 (꼭 숫자도 채우기)
