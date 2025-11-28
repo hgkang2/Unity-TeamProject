@@ -4,8 +4,8 @@ public class MouseTrailVFX : MonoBehaviour
 {
     ParticleSystem trailVFX;
 
-    [SerializeField] float tailDuration = 0.25f;       // 멈춘 뒤 몇 초 동안 유지
-    [SerializeField] float moveThreshold = 0.1f;       // 이 이상 움직여야 "움직임"으로 인정
+    [SerializeField] float tailDuration;     // 멈춘 뒤 몇 초 동안 유지
+    [SerializeField] float moveThreshold;      // 이 이상 움직여야 "움직임"으로 인정
 
     Vector3 lastMousePosition;
     float lastMoveTime;
