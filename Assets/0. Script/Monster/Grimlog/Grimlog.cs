@@ -4,6 +4,26 @@ using DG.Tweening;
 
 public class Grimlog : MonsterBase
 {
+    public override void Awake()
+    {
+        base.Awake();
+        direction.x = 1;
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (direction.x > 0)
+        {
+            spriteRenderer.flipX = true;
+        }
+        else if (direction.x < 0)
+        {
+            spriteRenderer.flipX = false;
+        }
+    }
+
     public override void MonsterDataSetting()
     {
         monsterData.IdleTime = 3f;
@@ -21,9 +41,8 @@ public class Grimlog : MonsterBase
 
     public override void UseSkill()
     {
-        transform.DOMoveX(1f , 0.5f);
+        rb.AddForce(10f * direction, ForceMode2D.Impulse);
     }
-
 
     public override void OnSkillExit()
     {

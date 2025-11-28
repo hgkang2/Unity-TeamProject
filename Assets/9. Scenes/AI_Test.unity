@@ -1013,7 +1013,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1087074459}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51d1e4a3b7b02ad45842ce268f95b75b, type: 3}
   m_Name: 
@@ -1027,10 +1027,11 @@ MonoBehaviour:
   StateTimer: 0
   DistanceToPlayer: 0
   PlayerPosition: {fileID: 399982679}
+  rb: {fileID: 0}
   spriteRenderer: {fileID: 0}
   direction: {x: 0, y: 0}
   animator: {fileID: 0}
-  FelmosCorrosive: {fileID: 0}
+  FelmosBullet: {fileID: 0}
 --- !u!95 &1087074465
 Animator:
   serializedVersion: 7
@@ -1039,7 +1040,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1087074459}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 25f8bd1275a72f541a9dc140fa2683d2, type: 2}
   m_CullingMode: 0
@@ -1073,7 +1074,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1201786443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1095,6 +1096,7 @@ MonoBehaviour:
   StateTimer: 0
   DistanceToPlayer: 0
   PlayerPosition: {fileID: 399982679}
+  rb: {fileID: 0}
   spriteRenderer: {fileID: 0}
   direction: {x: 0, y: 0}
   animator: {fileID: 0}
@@ -1124,7 +1126,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 6
+  m_Constraints: 7
 --- !u!61 &1201786445
 BoxCollider2D:
   m_ObjectHideFlags: 0
