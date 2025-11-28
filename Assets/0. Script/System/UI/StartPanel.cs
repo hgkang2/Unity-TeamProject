@@ -183,6 +183,17 @@ public class StartPanel : UIKeyboardHandler
         }
     }
 
+    public void ButtonMouseEnter(int index)
+    {
+        curIndex = index;
+        UpdateHighlight();
+    }
+
+    public void ButtonMouseExit()
+    {
+        ButtonSelectImage.gameObject.SetActive(false);
+    }
+
     protected override void OnUICancel()
     {
         //오프닝이라면 스킵
