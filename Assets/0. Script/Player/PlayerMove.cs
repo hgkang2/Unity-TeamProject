@@ -66,17 +66,6 @@ public class PlayerMove : MonoBehaviour
         baseGrav = rb.gravityScale;
         currentJumpCount = maxJumpCount;
     }
-    void OnEnable()
-    {
-        InputManager.Instance.JumpPressed += OnJumpPressed;
-        InputManager.Instance.DodgePressed += OnDodgePressed;
-    }
-
-    void OnDisable()
-    {
-        InputManager.Instance.JumpPressed -= OnJumpPressed;
-        InputManager.Instance.DodgePressed -= OnDodgePressed;
-    }
 
     // -------------------------------
     // Update : 입력 및 상태 판단
@@ -95,6 +84,7 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
+        HandleDodgeInput();
     }
 
     // -------------------------------
@@ -134,15 +124,13 @@ public class PlayerMove : MonoBehaviour
     // ---- 입력 ----
     void ReadInput()
     {
-        inputVec = InputManager.Instance.Move;
-    }
-    void OnJumpPressed()
-    {
-        if (!isDodging && !isKnockback && (isGrounded || currentJumpCount > 0))
-        {
-            jumpRequested = true;
-        }
+        float h = 0;
+        if (Input.GetKey(KeyCode.RightArrow)) h = 1;
+        else if (Input.GetKey(KeyCode.LeftArrow)) h = -1;
+        inputVec = new Vector2(h, Input.GetAxisRaw("Vertical"));
 
+        if (Input.GetKeyDown(KeyCode.Space) && !isDodging && !isKnockback && (isGrounded || currentJumpCount > 0))
+            jumpRequested = true;
     }
 
     // ---- 이동 / 점프 ----
@@ -152,7 +140,7 @@ public class PlayerMove : MonoBehaviour
         if (playerAttack.isAttacking && !isGrounded)
         {
             // 공중 공격 중에는 입력 무시, 현재 속도 유지
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             return;
         }
 
@@ -202,13 +190,10 @@ public class PlayerMove : MonoBehaviour
     }
 
     // ---- 구르기 ----
-
-    void OnDodgePressed()
+    void HandleDodgeInput()
     {
-        if (Time.time >= cooldownEndTime && !isKnockback && !player.HP.IsDead)
-        {
+        if (Input.GetKeyDown(KeyCode.D) && Time.time >= cooldownEndTime)
             StartDodge();
-        }
     }
 
     void StartDodge()
@@ -307,6 +292,7 @@ public class PlayerMove : MonoBehaviour
     {
         Bounds b = col.bounds;
 
+        // 좌하, 우하에서 레이 쏘기
         Vector2 leftOrigin = new Vector2(b.min.x + groundRayOffsetX, b.min.y + 0.05f);
         Vector2 rightOrigin = new Vector2(b.max.x - groundRayOffsetX, b.min.y + 0.05f);
 
@@ -315,17 +301,23 @@ public class PlayerMove : MonoBehaviour
 
         bool hitSomething = (hitLeft.collider != null) || (hitRight.collider != null);
 
+
+        bool groundedNow = hitSomething && rb.linearVelocity.y <= 0.01f;
+        bool landedThisFrame = !isGrounded && groundedNow;
+
         bool wasGrounded = isGrounded;
         bool groundedNow = hitSomething;
         isGrounded = groundedNow;
 
-        bool landedThisFrame = !wasGrounded && groundedNow && rb.linearVelocityY < -0.01;
+        bool landedThisFrame = !wasGrounded && groundedNow;
+
 
         if (landedThisFrame)
         {
             currentJumpCount = maxJumpCount;
             anim.SetBool("IsJumping", false);
 
+            // 공중 공격 상태로 내려온 경우엔 Land 스킵
             if (!playerAttack.isAttacking)
             {
                 anim.SetTrigger("Land");
@@ -336,13 +328,14 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
+        isGrounded = groundedNow;
+
 #if UNITY_EDITOR
         Color c = groundedNow ? Color.green : Color.red;
         Debug.DrawRay(leftOrigin, Vector2.down * groundRayLength, c);
         Debug.DrawRay(rightOrigin, Vector2.down * groundRayLength, c);
 #endif
     }
-
 
     public float minGroundDistanceForAirAttack; // 이보다 낮으면 공중공격 금지
 
