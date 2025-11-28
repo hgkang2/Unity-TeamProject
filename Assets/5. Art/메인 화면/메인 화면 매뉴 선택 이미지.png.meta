@@ -79,7 +79,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -118,6 +118,45 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -400,7 +439,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -409,7 +448,19 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_0": 6634606431218081836
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_1": -4664079739303242544
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_10": -4958988126782152712
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_11": -8759636776152690445
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_2": -2588925284448504692
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_3": -3084446148562117782
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_4": 4037655254359638862
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_5": -7461601456626407389
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_6": 6289225185076902760
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_7": 28671592203170085
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_8": -1282572244150473905
+      "\uBA54\uC778 \uD654\uBA74 \uB9E4\uB274 \uC120\uD0DD \uC774\uBBF8\uC9C0_9": -4172093153108730889
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

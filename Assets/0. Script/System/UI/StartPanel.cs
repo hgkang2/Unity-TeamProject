@@ -1,15 +1,27 @@
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class StartPanel : UIKeyboardHandler
 {
-    [SerializeField] Button[] menuButtons;
+    Button[] menuButtons;
+    [SerializeField] Transform ButtonSelectImage;
     [SerializeField] GameObject exitPanel;
     int? curIndex = null;
+
+    void Awake()
+    {
+        menuButtons = transform.Cast<Transform>()
+            .Select(t => t.GetComponent<Button>())
+            .Where(b => b != null)
+            .ToArray();
+    }
 
     void Start()
     {
         exitPanel.SetActive(false);
+        ButtonSelectImage.gameObject.SetActive(false);
         UpdateHighlight();
     }
 
@@ -43,15 +55,14 @@ public class StartPanel : UIKeyboardHandler
 
     void UpdateHighlight()
     {
-        for (int i = 0; i < menuButtons.Length; i++)
+        if(curIndex == null)
         {
-            Button btn = menuButtons[i];
-
-            // 강조 처리 or default 상태로 되돌리기
-            bool selected = (i == curIndex);
-            ColorBlock colors = btn.colors;
-            colors.normalColor = selected ? Color.yellow : Color.white;
-            btn.colors = colors;
+            ButtonSelectImage.gameObject.SetActive(false);
+        }
+        else
+        {
+            ButtonSelectImage.gameObject.SetActive(true);
+            ButtonSelectImage.transform.position = menuButtons[(int)curIndex].transform.position;
         }
     }
 
@@ -72,6 +83,16 @@ public class StartPanel : UIKeyboardHandler
         else
         {
             exitPanel.SetActive(true);
+        }
+    }
+
+    //버튼 선택만 해제
+    public void QuitButtonSelect()
+    {
+        if (curIndex != null)
+        {
+            curIndex = null;
+            UpdateHighlight();
         }
     }
 

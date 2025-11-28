@@ -18,7 +18,6 @@ public class InputManager : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log($"inputmanager awake");
         // 싱글톤
         if (Instance != null && Instance != this)
         {

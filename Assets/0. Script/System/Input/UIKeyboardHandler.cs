@@ -12,19 +12,27 @@ public abstract class UIKeyboardHandler : MonoBehaviour
 
     protected virtual void OnEnable()
     {
-        Debug.Log($"uikeybodehander onenable");
-        InputManager.Instance.UINavigateStarted  += HandleNavigateStarted;
+        Subscribe();
+    }
+
+    protected virtual void OnDisable()
+    {
+        UnSubscribe();
+    }
+
+    protected void Subscribe()
+    {
+        UnSubscribe();
+        InputManager.Instance.UINavigateStarted += HandleNavigateStarted;
         InputManager.Instance.UINavigateCanceled += HandleNavigateCanceled;
 
         InputManager.Instance.UICanceled += HandleUICancel;
         InputManager.Instance.UIConfirmed += HandleUIConfirm;
     }
 
-    protected virtual void OnDisable()
+    protected void UnSubscribe()
     {
-        if (InputManager.Instance == null) return;
-
-        InputManager.Instance.UINavigateStarted  -= HandleNavigateStarted;
+        InputManager.Instance.UINavigateStarted -= HandleNavigateStarted;
         InputManager.Instance.UINavigateCanceled -= HandleNavigateCanceled;
 
         InputManager.Instance.UICanceled -= HandleUICancel;
