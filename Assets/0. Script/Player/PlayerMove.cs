@@ -301,15 +301,11 @@ public class PlayerMove : MonoBehaviour
 
         bool hitSomething = (hitLeft.collider != null) || (hitRight.collider != null);
 
-
-        bool groundedNow = hitSomething && rb.linearVelocity.y <= 0.01f;
-        bool landedThisFrame = !isGrounded && groundedNow;
-
         bool wasGrounded = isGrounded;
-        groundedNow = hitSomething;
+        bool groundedNow = hitSomething;
         isGrounded = groundedNow;
 
-        landedThisFrame = !wasGrounded && groundedNow;
+        bool landedThisFrame = !wasGrounded && groundedNow && rb.linearVelocityY < -0.01;
 
 
         if (landedThisFrame)
