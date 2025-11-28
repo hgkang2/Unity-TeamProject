@@ -185,6 +185,15 @@ public class InputManager : MonoBehaviour
     #endregion
 
     //기타
+    public Vector3 GetMouseOriginPos()
+    {
+        if (Mouse.current == null)
+            return Vector3.zero;
+
+        Vector2 screenPos = Mouse.current.position.ReadValue();
+        return new Vector3(screenPos.x, screenPos.y, 0);
+    }
+
     public Vector3 GetMouseWorldPos()
     {
         Vector2 screenPos = input.System.MousePos.ReadValue<Vector2>();

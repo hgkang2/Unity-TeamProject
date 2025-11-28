@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5949272288399462737}
   - component: {fileID: 1385540612374048389}
   - component: {fileID: 4922820215715489189}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4897,7 +4897,7 @@ GameObject:
   - component: {fileID: 6024663592996619783}
   - component: {fileID: 2419797944689468814}
   - component: {fileID: 8449889976439472251}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Shockwave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9806,7 +9806,7 @@ GameObject:
   - component: {fileID: 7706510507108447011}
   - component: {fileID: 2796253519308722077}
   - component: {fileID: 5361278211949997796}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: MouseClickVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}

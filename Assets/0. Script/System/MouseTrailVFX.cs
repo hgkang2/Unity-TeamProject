@@ -7,6 +7,8 @@ public class MouseTrailVFX : MonoBehaviour
     [SerializeField] float tailDuration;     // 멈춘 뒤 몇 초 동안 유지
     [SerializeField] float moveThreshold;      // 이 이상 움직여야 "움직임"으로 인정
 
+    [SerializeField] Camera vfxCamera;
+
     Vector3 lastMousePosition;
     float lastMoveTime;
     bool initialized;
@@ -17,7 +19,7 @@ public class MouseTrailVFX : MonoBehaviour
 
         trailVFX.Play();
 
-        lastMousePosition = InputManager.Instance.GetMouseWorldPos();
+        lastMousePosition = GetMouseWorldPos();
         lastMoveTime = Time.time;
         initialized = true;
     }
@@ -30,7 +32,7 @@ public class MouseTrailVFX : MonoBehaviour
         }
 
         // 1. 현재 마우스 월드 위치 읽기
-        Vector3 currentMousePos = InputManager.Instance.GetMouseWorldPos();
+        Vector3 currentMousePos = GetMouseWorldPos();
 
         // 2. 이전 프레임과 거리 차이
         float deltaSqr = (currentMousePos - lastMousePosition).sqrMagnitude;
@@ -53,5 +55,13 @@ public class MouseTrailVFX : MonoBehaviour
 
         // 6. 마지막 위치 갱신 (제일 마지막!)
         lastMousePosition = currentMousePos;
+    }
+    Vector3 GetMouseWorldPos()
+    {
+        // 화면 좌표 → VFXCamera 기준 월드 좌표
+        Vector3 mouseScreen = InputManager.Instance.GetMouseOriginPos();
+        // 카메라 앞쪽 얼마만큼 떨어뜨릴지 (Orthographic이면 그냥 양수면 됨)
+        mouseScreen.z = 10f;
+        return vfxCamera.ScreenToWorldPoint(mouseScreen);
     }
 }

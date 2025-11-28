@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEditor;
@@ -9,8 +8,9 @@ using UnityEngine.Video;
 public class StartPanel : UIKeyboardHandler
 {
     [SerializeField] CanvasGroup openingGroup;
+    [SerializeField] VideoPlayer openingPlayer;
+    
     CanvasGroup startPanelCanvasGroup;
-    [SerializeField] VideoPlayer opening;
 
     bool isOpeningPhase = true;                         // 오프닝 중인지 여부
     Tween openingTimerTween;                            // DelayedCall 저장
@@ -26,17 +26,19 @@ public class StartPanel : UIKeyboardHandler
     {
         startPanelCanvasGroup = GetComponent<CanvasGroup>();
 
+        // 시작 시 메뉴는 숨기기
         startPanelCanvasGroup.alpha = 0f;
         startPanelCanvasGroup.interactable = false;
         startPanelCanvasGroup.blocksRaycasts = false;
 
-        if (openingGroup != null)
-        {
-            openingGroup.alpha = 1f;
-            openingGroup.interactable = false;
-            openingGroup.blocksRaycasts = false;
-        }
+        // 오프닝은 보이게
+        openingGroup.gameObject.SetActive(true);
+        openingGroup.alpha = 1f;
+        openingGroup.interactable = false;
+        openingGroup.blocksRaycasts = false;
 
+
+        // 직계 자식 버튼들만 수집
         menuButtons = transform.Cast<Transform>()
             .Select(t => t.GetComponent<Button>())
             .Where(b => b != null)
@@ -49,17 +51,21 @@ public class StartPanel : UIKeyboardHandler
         ButtonSelectImage.gameObject.SetActive(false);
         UpdateHighlight();
 
-        opening.prepareCompleted += OnVideoPrepared;
-        opening.Prepare();
+        // 오프닝 자동 재생
+        openingPlayer.prepareCompleted += OnVideoPrepared;
+        openingPlayer.Prepare();
     }
 
     void OnDestroy()
     {
-        opening.prepareCompleted -= OnVideoPrepared;
+        openingPlayer.prepareCompleted -= OnVideoPrepared;
+        openingSequence.Kill();
     }
 
     void OnVideoPrepared(VideoPlayer vp)
     {
+        if (!isOpeningPhase || vp.clip == null) return;
+
         // 영상 길이 가져오기
         float duration = (float)vp.clip.length;
 
@@ -88,16 +94,14 @@ public class StartPanel : UIKeyboardHandler
 
         // 3) 메뉴 fade-in
         openingSequence.Append(
-            startPanelCanvasGroup.DOFade(1f, 1)
+            startPanelCanvasGroup.DOFade(1f, 1f)
                 .OnStart(() =>
                 {
                     startPanelCanvasGroup.gameObject.SetActive(true);
                 })
                 .OnComplete(() =>
                 {
-                    startPanelCanvasGroup.interactable = true;
-                    startPanelCanvasGroup.blocksRaycasts = true;
-                    isOpeningPhase = false;  // 오프닝 단계 종료
+                    ShowMenuImmediate();   // 최종 상태 정리 공용 함수
                 })
         );
     }
@@ -115,25 +119,32 @@ public class StartPanel : UIKeyboardHandler
             openingSequence.Kill();
 
         // 비디오도 정지
-        opening.Stop();
+        openingPlayer.Stop();
 
-        // Opening 즉시 비활성화
-        openingGroup.alpha = 0f;
-        openingGroup.gameObject.SetActive(false);
+        ShowMenuImmediate();
+    }
 
-        // 메뉴 즉시 표시
+    // 메뉴를 최종 상태로 만드는 공용 함수 (페이드 완료 or 스킵)
+    void ShowMenuImmediate()
+    {
+        isOpeningPhase = false;
+
+        if (openingGroup != null)
+        {
+            openingGroup.gameObject.SetActive(false);
+            openingGroup.alpha = 0f;
+        }
+
         startPanelCanvasGroup.gameObject.SetActive(true);
         startPanelCanvasGroup.alpha = 1f;
         startPanelCanvasGroup.interactable = true;
         startPanelCanvasGroup.blocksRaycasts = true;
     }
 
-
-
     protected override void OnUIMove(Vector2 dir)
     {
         if(isOpeningPhase) return; 
-        
+
         // 현재 아무것도 선택되지 않은 상태라면
         if (curIndex == null)
         {
@@ -170,6 +181,17 @@ public class StartPanel : UIKeyboardHandler
             ButtonSelectImage.gameObject.SetActive(true);
             ButtonSelectImage.transform.position = menuButtons[(int)curIndex].transform.position;
         }
+    }
+
+    public void ButtonMouseEnter(int index)
+    {
+        curIndex = index;
+        UpdateHighlight();
+    }
+
+    public void ButtonMouseExit()
+    {
+        ButtonSelectImage.gameObject.SetActive(false);
     }
 
     protected override void OnUICancel()
