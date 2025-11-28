@@ -306,10 +306,10 @@ public class PlayerMove : MonoBehaviour
         bool landedThisFrame = !isGrounded && groundedNow;
 
         bool wasGrounded = isGrounded;
-        bool groundedNow = hitSomething;
+        groundedNow = hitSomething;
         isGrounded = groundedNow;
 
-        bool landedThisFrame = !wasGrounded && groundedNow;
+        landedThisFrame = !wasGrounded && groundedNow;
 
 
         if (landedThisFrame)
