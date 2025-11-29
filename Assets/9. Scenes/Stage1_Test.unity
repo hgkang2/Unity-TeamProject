@@ -128,7 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7808083}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: StartPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1765,7 +1765,7 @@ GameObject:
   - component: {fileID: 284505165}
   - component: {fileID: 284505164}
   - component: {fileID: 284505163}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DestroyPlatform (3)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -2515,6 +2515,8 @@ Transform:
   - {fileID: 901281659}
   - {fileID: 284505162}
   - {fileID: 628483216}
+  - {fileID: 1118104740}
+  - {fileID: 438115781}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &408708712
@@ -2902,9 +2904,9 @@ GameObject:
   m_Component:
   - component: {fileID: 438115781}
   - component: {fileID: 438115780}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LiftPlatform (1)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2935,7 +2937,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 438115779}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -3.925, y: -3.42, z: 0}
   m_LocalScale: {x: 1, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2943,7 +2945,7 @@ Transform:
   - {fileID: 2103875214}
   - {fileID: 1100281576}
   - {fileID: 2107363703}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 405777123}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &461756423
 GameObject:
@@ -4296,7 +4298,7 @@ GameObject:
   - component: {fileID: 628483219}
   - component: {fileID: 628483218}
   - component: {fileID: 628483217}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DestroyPlatform (4)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -5957,7 +5959,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 840313296}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EndPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6626,7 +6628,7 @@ GameObject:
   - component: {fileID: 901281662}
   - component: {fileID: 901281661}
   - component: {fileID: 901281660}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DestroyPlatform (1)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -7913,7 +7915,7 @@ GameObject:
   - component: {fileID: 1006839804}
   - component: {fileID: 1006839805}
   - component: {fileID: 1006839803}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DestroyPlatform
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -8947,7 +8949,7 @@ GameObject:
   - component: {fileID: 1084821890}
   - component: {fileID: 1084821889}
   - component: {fileID: 1084821888}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DestroyPlatform (2)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -9095,7 +9097,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1100281576}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: StartPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9129,7 +9131,7 @@ GameObject:
   - component: {fileID: 1105876888}
   - component: {fileID: 1105876886}
   - component: {fileID: 1105876889}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Platform
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -9396,9 +9398,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1118104740}
   - component: {fileID: 1118104739}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LiftPlatform
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9429,7 +9431,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118104738}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -32.56, y: -57.16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -9437,7 +9439,7 @@ Transform:
   - {fileID: 1105876887}
   - {fileID: 7808083}
   - {fileID: 840313296}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 405777123}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1148941868
 GameObject:
@@ -10663,13 +10665,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1240395417}
+  - component: {fileID: 1240395416}
   - component: {fileID: 1240395418}
   - component: {fileID: 1240395426}
   - component: {fileID: 1240395429}
   - component: {fileID: 1240395427}
   - component: {fileID: 1240395428}
   - component: {fileID: 1240395424}
-  - component: {fileID: 1240395416}
   - component: {fileID: 1240395419}
   - component: {fileID: 1240395421}
   - component: {fileID: 1240395423}
@@ -10724,7 +10726,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -714078004537871551, guid: ff9c6e46b5a91904db43027f30047268, type: 3}
+  m_Sprite: {fileID: -714078004537871551, guid: cd53fb0f23ef3e5449522f289c2e456a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -23386,7 +23388,7 @@ GameObject:
   - component: {fileID: 2103875217}
   - component: {fileID: 2103875216}
   - component: {fileID: 2103875215}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Platform
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -23536,7 +23538,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2107363703}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EndPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23714,7 +23716,5 @@ SceneRoots:
   - {fileID: 2089041987}
   - {fileID: 1311056247}
   - {fileID: 986249351}
-  - {fileID: 1118104740}
-  - {fileID: 438115781}
   - {fileID: 624811783}
   - {fileID: 113634484}

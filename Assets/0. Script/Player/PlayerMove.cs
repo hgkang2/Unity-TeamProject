@@ -67,6 +67,17 @@ public class PlayerMove : MonoBehaviour
         currentJumpCount = maxJumpCount;
     }
 
+    void OnEnable()
+    {
+        InputManager.Instance.JumpPressed += OnJumpPressed;
+        InputManager.Instance.DodgePressed += OnDodgePressed;
+    }
+
+    void OnDisable()
+    {
+        InputManager.Instance.JumpPressed -= OnJumpPressed;
+        InputManager.Instance.DodgePressed -= OnDodgePressed;
+    }
     // -------------------------------
     // Update : 입력 및 상태 판단
     // -------------------------------
@@ -83,8 +94,6 @@ public class PlayerMove : MonoBehaviour
             if (Time.time >= dodgeEndTime) EndDodge();
             return;
         }
-
-        HandleDodgeInput();
     }
 
     // -------------------------------
@@ -124,23 +133,23 @@ public class PlayerMove : MonoBehaviour
     // ---- 입력 ----
     void ReadInput()
     {
-        float h = 0;
-        if (Input.GetKey(KeyCode.RightArrow)) h = 1;
-        else if (Input.GetKey(KeyCode.LeftArrow)) h = -1;
-        inputVec = new Vector2(h, Input.GetAxisRaw("Vertical"));
-
-        if (Input.GetKeyDown(KeyCode.Space) && !isDodging && !isKnockback && (isGrounded || currentJumpCount > 0))
-            jumpRequested = true;
+        inputVec = InputManager.Instance.Move;
     }
-
-    // ---- 이동 / 점프 ----
-    void HandleMove()
+    void OnJumpPressed()
+    {
+        if (!isDodging && !isKnockback && (isGrounded || currentJumpCount > 0))
+        {
+            jumpRequested = true;
+        }
+    }
+        // ---- 이동 / 점프 ----
+        void HandleMove()
     {
         // 1) 공중 + 공격 중 → 입력 무시, 관성 유지
         if (playerAttack.isAttacking && !isGrounded)
         {
             // 공중 공격 중에는 입력 무시, 현재 속도 유지
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y);
             return;
         }
 
@@ -190,10 +199,12 @@ public class PlayerMove : MonoBehaviour
     }
 
     // ---- 구르기 ----
-    void HandleDodgeInput()
+    void OnDodgePressed()
     {
-        if (Input.GetKeyDown(KeyCode.D) && Time.time >= cooldownEndTime)
+        if (Time.time >= cooldownEndTime && !isKnockback && !player.HP.IsDead)
+        {
             StartDodge();
+        }
     }
 
     void StartDodge()
