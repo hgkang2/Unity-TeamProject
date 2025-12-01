@@ -4,6 +4,11 @@ using DG.Tweening;
 
 public class Grimlog : MonsterBase
 {
+    [SerializeField]
+    GameObject HitBox;
+    [SerializeField]
+    GameObject DetectBox;
+
     public override void Awake()
     {
         base.Awake();
@@ -17,10 +22,12 @@ public class Grimlog : MonsterBase
         if (direction.x > 0)
         {
             spriteRenderer.flipX = true;
+            DetectBox.transform.rotation = Quaternion.Euler(0, 180, 0);
         }
         else if (direction.x < 0)
         {
             spriteRenderer.flipX = false;
+            DetectBox.transform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
 
@@ -32,11 +39,13 @@ public class Grimlog : MonsterBase
 
         monsterData.MoveDirection = -1;
 
-        monsterData.AggroRange = 10f;
+        monsterData.AggroRange = 13f;
+
+        monsterData.Skill_Damage = 1f;
+        monsterData.Skill_Delay = 3f;
 
         monsterData.SkillA_ActiveRange = 6f;
-
-        monsterData.SkillA_coolTime = 15f;
+        monsterData.SkillA_coolTime = 12f;
     }
 
     public override void UseSkill()
@@ -53,16 +62,14 @@ public class Grimlog : MonsterBase
     {
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(monsterData.Skill_Delay);
         
         isUsingSkill = false;
         animator.SetTrigger("Aggro");
         ChangeState(MonsterStateType.Aggro);
-        
 
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(monsterData.SkillA_coolTime);
 
         isSkillReady = true;
-        
     }
 }

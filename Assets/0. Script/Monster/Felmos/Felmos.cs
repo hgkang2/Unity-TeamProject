@@ -9,6 +9,8 @@ public class Felmos : MonsterBase
 
     [SerializeField]
     GameObject FelmosBullet;
+
+    public Transform PlayerPos;
     public Transform FirePos;
 
     public override void Awake()
@@ -21,7 +23,7 @@ public class Felmos : MonsterBase
     {
         base.Update();
 
-        if (direction.x >= 0)
+        if (direction.x > 0)
         {
             //spriteRenderer.flipX = false;
             transform.rotation = Quaternion.Euler(0, 0, 0);
@@ -40,6 +42,9 @@ public class Felmos : MonsterBase
         monsterData.PatrolTime = 3f;
 
         monsterData.AggroRange = 10f;
+
+        monsterData.Skill_Damage = 1f;
+        monsterData.Skill_Delay = 0.5f;
 
         monsterData.SkillA_ActiveRange = 8f;
         monsterData.SkillA_coolTime = 10f;
@@ -113,24 +118,28 @@ public class Felmos : MonsterBase
     public override void UseSkill()
     {
         rb.linearVelocity = Vector2.zero;
-        var ShootSkill = Instantiate(FelmosBullet);
-        ShootSkill.transform.position = FirePos.position;
     }
 
     public override void OnSkillExit()
     {
+        var ShootSkill = Instantiate(FelmosBullet, FirePos.position, Quaternion.identity);
+
+        Vector2 dir = PlayerPos.position - FirePos.position;
+
+        ShootSkill.GetComponent<FelmosBullet>().Initialize(dir);
+
         StartCoroutine(SkillCooldown());
     }
 
     IEnumerator SkillCooldown()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(monsterData.Skill_Delay);
 
         isUsingSkill = false;
         animator.SetTrigger("Aggro");
         ChangeState(MonsterStateType.Aggro);
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(monsterData.SkillA_coolTime);
 
         isSkillReady = true;
     }

@@ -23,7 +23,7 @@ public class LevelUpPanel : MonoBehaviour
     void Awake()
     {
         soulPanels = GetComponentsInChildren<SoulPanel>();
-        for(int i=0; i<3; i++)
+        for (int i = 0; i < 3; i++)
         {
             soulPanels_OriginPos[i] = soulPanels[i].transform.position;
         }
@@ -31,13 +31,13 @@ public class LevelUpPanel : MonoBehaviour
 
     public void Initialize()
     {
-        remainRerollNum = RerollNum+1;
+        remainRerollNum = RerollNum + 1;
         rerollText.SetText("{0}", remainRerollNum);
         candidates = null;
 
         //대충 영성 선택지 2~3개 뜨게 하는 로직(임시)
         float rand = UnityEngine.Random.value;
-        if(rand < 0.7) panelNum = 2;
+        if (rand < 0.7) panelNum = 2;
         else panelNum = 3;
 
         for (int i = 0; i < 3; i++)
@@ -97,10 +97,11 @@ public class LevelUpPanel : MonoBehaviour
         // }
     }
 
+    #region 영성 anim 시작
     [Header("1. FadeIn : 시간 및 Ease")]
     [SerializeField] float first_FadeDuration = 0.4f;
     [SerializeField] Ease first_FadeInEase;
-    
+
     [Header("2. 펼쳐짐 : 중심에서 카드까지의 거리")]
     [SerializeField] float radius = 200f;      // 중심에서 카드까지의 거리
     [Header("2. 펼쳐짐 : 전체 부채각")]
@@ -198,8 +199,8 @@ public class LevelUpPanel : MonoBehaviour
 
             // 4단계 : 위치 재조정
             t = i - centerIndex;       // -1, 0, 1 같은 상대 인덱스
-            targetPos = new Vector2(500*t, 1000);
-            
+            targetPos = new Vector2(500 * t, 1000);
+
             cardSeq.Append(
                 rect.DOAnchorPos(targetPos, 0.1f)
             );
@@ -221,7 +222,7 @@ public class LevelUpPanel : MonoBehaviour
 
             // 6단계 : 회전 + 내용 보이기
             cardSeq.Append(
-                rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration/2, RotateMode.LocalAxisAdd)
+                rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
             );
 
@@ -231,14 +232,20 @@ public class LevelUpPanel : MonoBehaviour
                 soulPanels[index].visibleContent();
                 //카드가 뒤집힌 상태면 내용물도 같이 뒤집기
                 float yRot = rect.localRotation.eulerAngles.y % 360f;
-                if (Mathf.Abs(yRot % 180f) < 1f) // 0° 또는 180° (정면)
-                    soulPanels[index].NoFlipContent();
-                else
+
+                // 90° 또는 270° 부근일 때 뒤집기 적용
+                if (Mathf.Abs(yRot - 90f) < 1f)
+                {
                     soulPanels[index].FlipContent();
+                }
+                else if (Mathf.Abs(yRot - 270f) < 1f)
+                {
+                    soulPanels[index].NoFlipContent();
+                }
             });
 
             cardSeq.Append(
-                rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration/2, RotateMode.LocalAxisAdd)
+                rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
 
             ).OnComplete(() =>
@@ -250,13 +257,53 @@ public class LevelUpPanel : MonoBehaviour
             seq.Join(cardSeq);
         }
     }
+    #endregion
 
     SoulData[] candidates;
     public void Reroll()
     {
         if (remainRerollNum == 0) return;
-        
-        DrawSoul();
+
+        // 시퀀스 생성
+        Sequence seq = DOTween.Sequence();
+        seq.SetUpdate(true);
+
+        for (int i = 0; i < panelNum; i++)
+        {
+            RectTransform rect = soulPanels[i].GetComponent<RectTransform>();
+            Sequence cardSeq = DOTween.Sequence();
+
+            // 6단계 : 회전 + 내용 보이기
+            cardSeq.Append(
+                rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
+                    .SetEase(sixth_MoveEase)
+            );
+
+            int index = i;
+            cardSeq.AppendCallback(() =>
+            {
+                DrawSoul();
+                //카드가 뒤집힌 상태면 내용물도 같이 뒤집기
+                float yRot = rect.localRotation.eulerAngles.y % 360f;
+
+                // 90° 또는 270° 부근일 때 뒤집기 적용
+                if (Mathf.Abs(yRot - 90f) < 1f)
+                {
+                    soulPanels[index].FlipContent();
+                }
+                else if (Mathf.Abs(yRot - 270f) < 1f)
+                {
+                    soulPanels[index].NoFlipContent();
+                }
+            });
+
+            cardSeq.Append(
+                rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
+                    .SetEase(sixth_MoveEase)
+
+            );
+            seq.Join(cardSeq);
+        }
 
         remainRerollNum--;
 
@@ -370,7 +417,7 @@ public class LevelUpPanel : MonoBehaviour
         // Sequence seq = DOTween.Sequence().SetUpdate(true); ;
 
         // seq.Append(rerollIcon.DOScale(originalScale * 0.95f, duration * 0.6f))   // 1. 살짝 줄어듦
-            
+
         //    .Join(rerollIcon.DORotate(new Vector3(0, 0, nowrot + -120f), duration * 0.6f) // 2. 오른쪽으로 크게 회전
         //         .SetEase(Ease.OutBack));
 
