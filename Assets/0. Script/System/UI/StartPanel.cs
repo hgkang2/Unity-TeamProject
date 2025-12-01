@@ -1,5 +1,6 @@
 using System.Linq;
 using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,16 +8,13 @@ using UnityEngine.Video;
 
 public class StartPanel : UIKeyboardHandler
 {
-    [SerializeField] CanvasGroup openingGroup;
-    [SerializeField] VideoPlayer openingPlayer;
+    [SerializeField] Image openingImage;
     
     CanvasGroup startPanelCanvasGroup;
 
-    bool isOpeningPhase = true;                         // 오프닝 중인지 여부
-    Tween openingTimerTween;                            // DelayedCall 저장
-    Sequence openingSequence;                           // 페이드용 시퀀스 저장
+    DG.Tweening.Sequence openingSequence;                           // 페이드용 시퀀스 저장
 
-
+    bool isOpeningPhase = true;
     Button[] menuButtons;
     [SerializeField] Transform ButtonSelectImage;
     [SerializeField] GameObject exitPanel;
@@ -31,11 +29,7 @@ public class StartPanel : UIKeyboardHandler
         startPanelCanvasGroup.interactable = false;
         startPanelCanvasGroup.blocksRaycasts = false;
 
-        // 오프닝은 보이게
-        openingGroup.gameObject.SetActive(true);
-        openingGroup.alpha = 1f;
-        openingGroup.interactable = false;
-        openingGroup.blocksRaycasts = false;
+        
 
 
         // 직계 자식 버튼들만 수집
@@ -46,51 +40,34 @@ public class StartPanel : UIKeyboardHandler
     }
 
     void Start()
-    {
+    {   
+        // 오프닝은 보이게
+        openingImage.gameObject.SetActive(true);
         exitPanel.SetActive(false);
         ButtonSelectImage.gameObject.SetActive(false);
         UpdateHighlight();
-
-        // 오프닝 자동 재생
-        openingPlayer.prepareCompleted += OnVideoPrepared;
-        openingPlayer.Prepare();
+        OpeningStart();
     }
 
     void OnDestroy()
     {
-        openingPlayer.prepareCompleted -= OnVideoPrepared;
         openingSequence.Kill();
     }
 
-    void OnVideoPrepared(VideoPlayer vp)
+
+    public void OpeningStart()
     {
-        if (!isOpeningPhase || vp.clip == null) return;
-
-        // 영상 길이 가져오기
-        float duration = (float)vp.clip.length;
-
-        vp.Play();
-
-        // 영상 길이만큼 기다렸다가 다음 단계 실행
-        DOVirtual.DelayedCall(duration, OnOpeningFinished);
-    }
-
-    public void OnOpeningFinished()
-    {
-        if (!isOpeningPhase) return;
-
         openingSequence = DOTween.Sequence();
 
+        openingSequence.AppendInterval(0.5f);
+        
         // 1) Opening fade-out
         openingSequence.Append(
-            openingGroup.DOFade(0f, 1)
-        ).OnComplete(() =>
-        {
-            openingGroup.gameObject.SetActive(false);
-        });
+            openingImage.DOFade(0, 1f)
+        );
 
         // 2) 잠깐 대기
-        openingSequence.AppendInterval(1);
+        openingSequence.AppendInterval(0.5f);
 
         // 3) 메뉴 fade-in
         openingSequence.Append(
@@ -108,18 +85,9 @@ public class StartPanel : UIKeyboardHandler
 
     public void SkipOpening()
     {
-        if (!isOpeningPhase) return;
-        isOpeningPhase = false;
-
-        // DOTween 타이머/시퀀스 모두 정리
-        if (openingTimerTween != null && openingTimerTween.IsActive())
-            openingTimerTween.Kill();
 
         if (openingSequence != null && openingSequence.IsActive())
             openingSequence.Kill();
-
-        // 비디오도 정지
-        openingPlayer.Stop();
 
         ShowMenuImmediate();
     }
@@ -128,12 +96,7 @@ public class StartPanel : UIKeyboardHandler
     void ShowMenuImmediate()
     {
         isOpeningPhase = false;
-
-        if (openingGroup != null)
-        {
-            openingGroup.gameObject.SetActive(false);
-            openingGroup.alpha = 0f;
-        }
+        openingImage.gameObject.SetActive(false);
 
         startPanelCanvasGroup.gameObject.SetActive(true);
         startPanelCanvasGroup.alpha = 1f;

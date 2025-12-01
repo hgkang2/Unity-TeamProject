@@ -75,10 +75,12 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     }
     public void FlipContent()
     {
+        Debug.Log("flipped");
         contentGroup.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0f, 180f, 0f);
     }
     public void NoFlipContent()
     {
+        Debug.Log("Noflipped");
         contentGroup.GetComponent<RectTransform>().localRotation = Quaternion.identity;
     }
 
