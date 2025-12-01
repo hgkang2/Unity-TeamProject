@@ -51,7 +51,8 @@ public class Grimlog : MonsterBase
 
     IEnumerator SkillCooldown()
     {
-        
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+
         yield return new WaitForSeconds(3f);
         
         isUsingSkill = false;

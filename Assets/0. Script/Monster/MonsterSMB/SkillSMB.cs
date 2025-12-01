@@ -9,7 +9,6 @@ public class SkillSMB : MonsterStateSMB
 
     public override void OnExit()
     {
-        
         monsterBase.OnSkillExit();
     }
 }
