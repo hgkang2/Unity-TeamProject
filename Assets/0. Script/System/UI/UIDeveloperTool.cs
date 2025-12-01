@@ -37,7 +37,7 @@ public class UIDeveloperTool : MonoBehaviour
     }
     void Update()
     {
-        return;
+        
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             player.HP.Heal(HealSlider.value);

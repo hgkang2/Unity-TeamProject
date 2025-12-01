@@ -29,9 +29,9 @@ public class StageUI : MonoBehaviour
         levelUpPanel.SelectSoulCompleted += HideLevelupPanel;
 
         //기본적으로 모든 ui 한번 열었다 닫기(초기화용)
-        ShowEscPanel();
-        ShowSettingPanel();
-        ShowLevelupPanel();
+        escpanel.gameObject.SetActive(true);
+        settingPanel.gameObject.SetActive(true);
+        levelUpPanel.gameObject.SetActive(true);
         haveSoulsPanel.gameObject.SetActive(true);
         
 
@@ -41,9 +41,9 @@ public class StageUI : MonoBehaviour
     void Start()
     {
         //모든 ui 닫기
-        HideEscPanel();
-        HideSettingPanel();
-        HideLevelupPanel();
+        escpanel.gameObject.SetActive(false);
+        settingPanel.gameObject.SetActive(false);
+        levelUpPanel.gameObject.SetActive(false);
         haveSoulsPanel.gameObject.SetActive(false);
     }
     void OnDestroy()
@@ -111,12 +111,12 @@ public class StageUI : MonoBehaviour
     void HandleLevelUp()
     {
         ShowLevelupPanel();
-        levelUpPanel.Reroll();
     }
     public void ShowLevelupPanel()
     {
-        levelUpPanel.gameObject.SetActive(true);
         PauseManager.Pause();
+        levelUpPanel.gameObject.SetActive(true);
+        levelUpPanel.Initialize();
     }
     public void HideLevelupPanel()
     {

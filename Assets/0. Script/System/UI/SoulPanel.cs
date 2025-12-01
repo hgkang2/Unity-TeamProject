@@ -8,12 +8,13 @@ using DG.Tweening;
 public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("이동 설정")]
-    public float hoverScale = 1.1f;      // 얼마나 커질지
+    public float hoverScale = 1.00f;      // 얼마나 커질지
     public float hoverDuration = 0.2f;  // 커지는 시간
     public float backDuration = 0.15f;  // 원복 시간
     public Ease hoverEase = Ease.OutQuad;
     public Ease backEase = Ease.InQuad;
 
+    [SerializeField] CanvasGroup contentGroup;
     [SerializeField] Image soulImage;
     [SerializeField] TMP_Text soulName;
     [SerializeField] TMP_Text soulEffect;
@@ -63,6 +64,24 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         soulData = data;
         OriginPanelScale();
     }
+
+    public void visibleContent()
+    {
+        contentGroup.alpha = 1f;
+    }
+    public void InvisibleContent()
+    {
+        contentGroup.alpha = 0f;
+    }
+    public void FlipContent()
+    {
+        contentGroup.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0f, 180f, 0f);
+    }
+    public void NoFlipContent()
+    {
+        contentGroup.GetComponent<RectTransform>().localRotation = Quaternion.identity;
+    }
+
 
     public void ExpandPanelScale()
     {
