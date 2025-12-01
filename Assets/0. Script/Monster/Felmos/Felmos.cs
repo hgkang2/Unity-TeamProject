@@ -9,7 +9,7 @@ public class Felmos : MonsterBase
 
     [SerializeField]
     GameObject FelmosBullet;
-    Transform FirePos;
+    public Transform FirePos;
 
     public override void Awake()
     {
@@ -23,11 +23,13 @@ public class Felmos : MonsterBase
 
         if (direction.x >= 0)
         {
-            spriteRenderer.flipX = false;
+            //spriteRenderer.flipX = false;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
         }
         else if (direction.x < 0)
         {
-            spriteRenderer.flipX = true;
+            //spriteRenderer.flipX = true;
+            transform.rotation = Quaternion.Euler(0, 180, 0);
         }
     }
 
@@ -46,9 +48,10 @@ public class Felmos : MonsterBase
     public override void Patrol()
     {
         Vector2 dir = patrolDir[patrolDirIndex];    
-        transform.position += (Vector3)(dir * monsterData.PatrolSpeed * Time.deltaTime);
 
-        if(StateTimer >= monsterData.PatrolTime)
+        rb.linearVelocity = dir * monsterData.PatrolSpeed;
+
+        if (StateTimer >= monsterData.PatrolTime)
         {
             patrolDirIndex = (patrolDirIndex + 1) % patrolDir.Length;
 
@@ -60,6 +63,27 @@ public class Felmos : MonsterBase
         {
             animator.SetTrigger("Aggro");
             ChangeState(MonsterStateType.Aggro);
+        }
+    }
+
+    public override void Aggro()
+    {
+        if (isUsingSkill) return;
+
+        rb.linearVelocity = direction * monsterData.PatrolSpeed;
+
+        if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
+        {
+            animator.SetTrigger("Idle");
+            ChangeState(MonsterStateType.Idle);
+            return;
+        }
+
+        if (DistanceToPlayer <= monsterData.SkillA_ActiveRange && isSkillReady && !isUsingSkill)
+        {
+            animator.SetTrigger("Skill");
+            isUsingSkill = true;
+            isSkillReady = false;
         }
     }
 
@@ -88,6 +112,7 @@ public class Felmos : MonsterBase
 
     public override void UseSkill()
     {
+        rb.linearVelocity = Vector2.zero;
         var ShootSkill = Instantiate(FelmosBullet);
         ShootSkill.transform.position = FirePos.position;
     }
@@ -99,7 +124,7 @@ public class Felmos : MonsterBase
 
     IEnumerator SkillCooldown()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(0.5f);
 
         isUsingSkill = false;
         animator.SetTrigger("Aggro");

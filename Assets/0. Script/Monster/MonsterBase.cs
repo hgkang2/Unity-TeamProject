@@ -41,7 +41,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public bool isUsingSkill = false;
     public bool isSkillReady = true;
 
-    public float StateTimer;
+    protected float StateTimer;
     public float DistanceToPlayer; // 플레이 거리
 
     public Transform PlayerPosition; // �÷��̾� ���� ��ġ
@@ -98,6 +98,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         currentState = nextState;
         StateTimer = 0f;
+        rb.linearVelocity = Vector2.zero;
     }
 
     public virtual void Idle()
@@ -118,9 +119,9 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void Patrol()
     {
-        transform.position += new Vector3(direction.x * monsterData.PatrolSpeed * Time.deltaTime,0,0);
+        rb.linearVelocity = new Vector2(direction.x * monsterData.PatrolSpeed, rb.linearVelocity.y);
 
-        if(StateTimer >= monsterData.PatrolTime)
+        if (StateTimer >= monsterData.PatrolTime)
         {
             animator.SetTrigger("Idle");
             ChangeState(MonsterStateType.Idle);
@@ -138,7 +139,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         if (isUsingSkill) return;
 
-        transform.position += (Vector3)(direction * monsterData.PatrolSpeed * Time.deltaTime);
+        rb.linearVelocity = new Vector2(direction.x * monsterData.PatrolSpeed, rb.linearVelocity.y);
 
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
         {

@@ -268,7 +268,7 @@ GameObject:
   m_Layer: 0
   m_Name: FirePos
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -281,7 +281,7 @@ Transform:
   m_GameObject: {fileID: 120266553}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.09, y: 0.06, z: 0}
+  m_LocalPosition: {x: 1.59, y: -0.73, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -433,7 +433,7 @@ Transform:
   m_GameObject: {fileID: 399982674}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.34, y: -2, z: 0}
+  m_LocalPosition: {x: -5.26, y: -3.66, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -853,8 +853,8 @@ GameObject:
   - component: {fileID: 1087074462}
   - component: {fileID: 1087074461}
   - component: {fileID: 1087074460}
-  - component: {fileID: 1087074464}
   - component: {fileID: 1087074465}
+  - component: {fileID: 1087074464}
   m_Layer: 0
   m_Name: Felmos
   m_TagString: Enemy
@@ -999,7 +999,7 @@ Transform:
   m_GameObject: {fileID: 1087074459}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.43, y: 2.01, z: 0}
+  m_LocalPosition: {x: 22.33, y: 2.01, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1023,15 +1023,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   isUsingSkill: 0
-  isSkillReady: 0
-  StateTimer: 0
+  isSkillReady: 1
   DistanceToPlayer: 0
   PlayerPosition: {fileID: 399982679}
   rb: {fileID: 0}
   spriteRenderer: {fileID: 0}
   direction: {x: 0, y: 0}
   animator: {fileID: 0}
-  FelmosBullet: {fileID: 0}
+  FelmosBullet: {fileID: 3042648669547724693, guid: c1f1f44ce5d8a6048aaa25c32a87bc35, type: 3}
+  FirePos: {fileID: 120266554}
 --- !u!95 &1087074465
 Animator:
   serializedVersion: 7
@@ -1064,17 +1064,17 @@ GameObject:
   m_Component:
   - component: {fileID: 1201786447}
   - component: {fileID: 1201786446}
-  - component: {fileID: 1201786445}
-  - component: {fileID: 1201786444}
-  - component: {fileID: 1201786443}
   - component: {fileID: 1201786448}
+  - component: {fileID: 1201786444}
+  - component: {fileID: 1201786449}
+  - component: {fileID: 1201786443}
   m_Layer: 0
   m_Name: Grimlog
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1201786443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1093,7 +1093,6 @@ MonoBehaviour:
     m_Bits: 64
   isUsingSkill: 0
   isSkillReady: 1
-  StateTimer: 0
   DistanceToPlayer: 0
   PlayerPosition: {fileID: 399982679}
   rb: {fileID: 0}
@@ -1126,53 +1125,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 7
---- !u!61 &1201786445
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1201786442}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 5.3333335, y: 5.3333335}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Constraints: 6
 --- !u!212 &1201786446
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1265,6 +1218,43 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!70 &1201786449
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201786442}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 2, y: 3}
+  m_Direction: 0
 --- !u!1 &2008190504
 GameObject:
   m_ObjectHideFlags: 0
