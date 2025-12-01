@@ -14,6 +14,20 @@ public class Player : MonoBehaviour, IDamageable
 
     PlayerMove move;
 
+    public GameObject playerSprite;
+
+    public void DisablePlayerSprite()
+    {
+        if (playerSprite != null)
+        {
+            playerSprite.SetActive(false);
+        }
+    }
+    public void EnablePlayerSprite()
+    {
+        playerSprite.SetActive(true);
+    }
+
     void Awake()
     {
         hp = GetComponent<HP>();
