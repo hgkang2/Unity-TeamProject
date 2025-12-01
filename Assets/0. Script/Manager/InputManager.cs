@@ -51,6 +51,7 @@ public class InputManager : MonoBehaviour
         input.UI.Navigate.canceled += OnUINavigateCanceled;
         input.UI.Confirm.performed += OnUIConfirmPerformed;
         input.UI.Cancel.performed += OnUICancelPerformed;
+        input.UI.Reroll.performed += OnUIRerollPerformed;
 
         //기타 시스템 이벤트
         input.System.LeftClick.performed += OnLeftClick;
@@ -69,6 +70,7 @@ public class InputManager : MonoBehaviour
         input.UI.Navigate.canceled -= OnUINavigateCanceled;
         input.UI.Confirm.performed -= OnUIConfirmPerformed;
         input.UI.Cancel.performed -= OnUICancelPerformed;
+        input.UI.Reroll.performed -= OnUIRerollPerformed;
 
         input.Player.Attack.performed -= OnAttackPerformed;
         input.Player.SpecialAttack.performed -= OnSpecialPerformed;
@@ -131,19 +133,13 @@ public class InputManager : MonoBehaviour
         if (dir == Vector2.zero)
             return;
 
-        if (UINavigateStarted != null)
-        {
-            UINavigateStarted(dir);
-        }
+        UINavigateStarted?.Invoke(dir);
     }
 
     public event Action UINavigateCanceled;
     void OnUINavigateCanceled(InputAction.CallbackContext ctx)
     {
-        if (UINavigateCanceled != null)
-        {
-            UINavigateCanceled();
-        }
+        UINavigateCanceled?.Invoke();
     }
 
     Vector2 NormalizeUINav(Vector2 value)
@@ -161,20 +157,18 @@ public class InputManager : MonoBehaviour
     public event Action UICanceled;
     void OnUICancelPerformed(InputAction.CallbackContext ctx)
     {
-        if (UICanceled != null)
-        {
-            UICanceled.Invoke();
-        }
+        UICanceled?.Invoke();
     }
     public event Action UIConfirmed;
     void OnUIConfirmPerformed(InputAction.CallbackContext ctx)
     {
-        if (UIConfirmed != null)
-        {
-            UIConfirmed.Invoke();
-        }
+        UIConfirmed?.Invoke();
     }
-
+    public event Action UiRerolled;
+    void OnUIRerollPerformed(InputAction.CallbackContext ctx)
+    {
+        UiRerolled?.Invoke();
+    }
     #endregion
 
     #region System Input

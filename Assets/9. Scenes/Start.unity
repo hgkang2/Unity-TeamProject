@@ -4093,6 +4093,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clickVFX: {fileID: 2796253519308722077, guid: ae13613c965215b4b95c43ceccb2eed2, type: 3}
+  vfxCamera: {fileID: 71198103}
 --- !u!4 &2362263048384707990
 Transform:
   m_ObjectHideFlags: 0

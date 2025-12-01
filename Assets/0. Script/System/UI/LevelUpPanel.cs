@@ -3,13 +3,12 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using DG.Tweening;
-using Unity.Mathematics;
 
-public class LevelUpPanel : MonoBehaviour
+public class LevelUpPanel : UIKeyboardHandler
 {
     [SerializeField] SoulManager soulManager;
     SoulPanel[] soulPanels;
-    [SerializeField] Transform rerollIcon;
+    [SerializeField] Button rerollButton;
     [SerializeField] TMP_Text rerollText;
     [Header("리롤할 수 있는 횟수(매번 초기화됨)")]
     [SerializeField] int RerollNum = 2;
@@ -27,6 +26,8 @@ public class LevelUpPanel : MonoBehaviour
         {
             soulPanels_OriginPos[i] = soulPanels[i].transform.position;
         }
+        SubscribeChildEvent();
+        InputManager.Instance.UiRerolled += Reroll;
     }
 
     public void Initialize()
@@ -44,57 +45,15 @@ public class LevelUpPanel : MonoBehaviour
         {
             soulPanels[i].transform.position = soulPanels_OriginPos[i];
         }
+        rerollButton.gameObject.SetActive(false);
         DrawSoul();
         StartAnim();
     }
 
-    void OnEnable()
-    {
-        SubscribeChildEvent();
-    }
-    void OnDisable()
+    void OnDestroy()
     {
         UnSubscribeChildEvent();
-    }
-
-    void Update()
-    {
-        //좌우 방향키로 영성 선택 기능
-        // if (Input.GetKeyDown(KeyCode.LeftArrow))
-        // {
-        //     if (selectIndex == -1)
-        //     {
-        //         HandleSelectSoul(soulPanels[0]);
-        //     }
-        //     else
-        //     {
-        //         //selectIndex - 1이 0보다 작으면 0으로 만들기
-        //         selectIndex = --selectIndex < 0 ? 0 : selectIndex;
-        //         HandleSelectSoul(soulPanels[selectIndex]);
-        //     }
-        // }
-        // else if (Input.GetKeyDown(KeyCode.RightArrow))
-        // {
-        //     int max = soulPanels.Length - 1;
-        //     if (selectIndex == -1)
-        //     {
-        //         HandleSelectSoul(soulPanels[max]);
-        //     }
-        //     else
-        //     {
-        //         //selectIndex + 1이 length-1보다 크면 length-1으로 만들기
-        //         selectIndex = ++selectIndex > max ? max : selectIndex;
-        //         HandleSelectSoul(soulPanels[selectIndex]);
-        //     }
-        // }
-        // else if (Input.GetKeyDown(KeyCode.D))
-        // {
-        //     Reroll();
-        // }
-        // else if (Input.GetKeyDown(KeyCode.F))
-        // {
-        //     EnrollSoul();
-        // }
+        InputManager.Instance.UiRerolled -= Reroll;
     }
 
     #region 영성 anim 시작
@@ -134,12 +93,6 @@ public class LevelUpPanel : MonoBehaviour
         float step = (panelNum > 1) ? (angleRange / (panelNum - 1)) : 0f;
         float centerIndex = (panelNum - 1) * 0.5f;
 
-        //모두 끄고 시작
-        foreach (var panel in soulPanels)
-        {
-            panel.gameObject.SetActive(false);
-        }
-
         // 시퀀스 생성
         Sequence seq = DOTween.Sequence();
         seq.SetUpdate(true);
@@ -156,8 +109,7 @@ public class LevelUpPanel : MonoBehaviour
 
             // --- 초기 상태: 한 점에 겹쳐 있음 + 완전 투명 ---
             cg.alpha = 0f;
-            cg.interactable = false;
-            cg.blocksRaycasts = false;
+            DisableInput();
 
             rect.anchoredPosition = centerPos;          // 전부 같은 위치
 
@@ -230,18 +182,7 @@ public class LevelUpPanel : MonoBehaviour
             cardSeq.AppendCallback(() =>
             {
                 soulPanels[index].visibleContent();
-                //카드가 뒤집힌 상태면 내용물도 같이 뒤집기
-                float yRot = rect.localRotation.eulerAngles.y % 360f;
-
-                // 90° 또는 270° 부근일 때 뒤집기 적용
-                if (Mathf.Abs(yRot - 90f) < 1f)
-                {
-                    soulPanels[index].FlipContent();
-                }
-                else if (Mathf.Abs(yRot - 270f) < 1f)
-                {
-                    soulPanels[index].NoFlipContent();
-                }
+                rect.localRotation = Quaternion.Euler(0f, -90f, 0f);
             });
 
             cardSeq.Append(
@@ -250,8 +191,8 @@ public class LevelUpPanel : MonoBehaviour
 
             ).OnComplete(() =>
                 {
-                    cg.interactable = true;
-                    cg.blocksRaycasts = true;
+                    rerollButton.gameObject.SetActive(true);
+                    EnableInput();
                 });
 
             seq.Join(cardSeq);
@@ -263,6 +204,10 @@ public class LevelUpPanel : MonoBehaviour
     public void Reroll()
     {
         if (remainRerollNum == 0) return;
+
+        RerollButtonAnimation();
+
+        DisableInput();
 
         // 시퀀스 생성
         Sequence seq = DOTween.Sequence();
@@ -282,26 +227,17 @@ public class LevelUpPanel : MonoBehaviour
             int index = i;
             cardSeq.AppendCallback(() =>
             {
-                DrawSoul();
-                //카드가 뒤집힌 상태면 내용물도 같이 뒤집기
-                float yRot = rect.localRotation.eulerAngles.y % 360f;
-
-                // 90° 또는 270° 부근일 때 뒤집기 적용
-                if (Mathf.Abs(yRot - 90f) < 1f)
-                {
-                    soulPanels[index].FlipContent();
-                }
-                else if (Mathf.Abs(yRot - 270f) < 1f)
-                {
-                    soulPanels[index].NoFlipContent();
-                }
+                //90도 돌아가서 안보이는 순간 내용 세팅하기
+                if (index == 0) DrawSoul();
+                //그냥 180도씩 돌리면 내용도 같이 돌려야 하는 등 귀찮아진다.
+                rect.localRotation = Quaternion.Euler(0f, -90f, 0f);
             });
 
             cardSeq.Append(
                 rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
 
-            );
+            ).OnComplete(() => EnableInput());
             seq.Join(cardSeq);
         }
 
@@ -314,6 +250,17 @@ public class LevelUpPanel : MonoBehaviour
         //if(remainRerollNum < RerollNum) PlayRerollIconAnim();
     }
 
+    //리롤 버튼 애니메이션
+    public void RerollButtonAnimation()
+    {
+        Sequence s;
+        s = DOTween.Sequence();
+        s.Append(rerollButton.transform.DOScale(0.95f, 0.25f).SetEase(Ease.OutQuint))
+        .Append(rerollButton.transform.DOScale(1f, 0.25f).SetEase(Ease.InQuart))
+        .SetUpdate(true);
+    }
+
+    //영성 뽑기(현재 활성화된 panel 만큼)
     void DrawSoul()
     {
         HandleDeSelectSoul();
@@ -336,11 +283,20 @@ public class LevelUpPanel : MonoBehaviour
             }
         }
     }
+    
+    //선택한 Soul을 등록
+    public void EnrollSoul()
+    {
+        if (selectedSoulPanel == null) return;
 
+        soulManager.EnrollSoul(selectedSoulPanel.SoulData);
+        SelectSoulCompleted?.Invoke();
+    }
+
+    #region 마우스 입력 이벤트
     //SoulPanel에 마우스 올리면 커짐
     void HandleMouseHoverSoul(SoulPanel panel)
     {
-        //단, 이미 선택한 Panel이 있으면 취소
         panel.ExpandPanelScale();
     }
 
@@ -353,7 +309,7 @@ public class LevelUpPanel : MonoBehaviour
     }
 
     //SoulPanel을 클릭하면 해당 소울을 선택함
-    void HandleSelectSoul(SoulPanel panel)
+    void HandleClickSoul(SoulPanel panel)
     {
         //단, 이미 선택한 Panel이 있었으면 해당 Panel은 선택 취소
         if (selectedSoulPanel != null)
@@ -362,8 +318,7 @@ public class LevelUpPanel : MonoBehaviour
         }
 
         selectedSoulPanel = panel;
-        //이전에 선택된 Panel 때문에 못 커졌으니 지금이라도 커지게 함
-        selectedSoulPanel.ExpandPanelScale();
+        EnrollSoul();
     }
 
     //선택한 Panel 선택 취소
@@ -374,14 +329,13 @@ public class LevelUpPanel : MonoBehaviour
         selectedSoulPanel.OriginPanelScale();
         selectedSoulPanel = null;
     }
+    #endregion
 
-    //선택한 Soul을 등록
-    public void EnrollSoul()
+    void SelectSoul(SoulPanel panel)
     {
-        if (selectedSoulPanel == null) return;
-
-        soulManager.EnrollSoul(selectedSoulPanel.SoulData);
-        SelectSoulCompleted?.Invoke();
+        HandleDeSelectSoul();
+        HandleMouseHoverSoul(panel);
+        selectedSoulPanel = panel;
     }
 
     #region 이벤트 구독
@@ -392,7 +346,7 @@ public class LevelUpPanel : MonoBehaviour
         {
             soulPanel.SoulMouseEntered += HandleMouseHoverSoul;
             soulPanel.SoulMouseExited += HandleMouseExitSoul;
-            soulPanel.SoulMouseClicked += HandleSelectSoul;
+            soulPanel.SoulMouseClicked += HandleClickSoul;
         }
     }
     void UnSubscribeChildEvent()
@@ -401,33 +355,68 @@ public class LevelUpPanel : MonoBehaviour
         {
             soulPanel.SoulMouseEntered -= HandleMouseHoverSoul;
             soulPanel.SoulMouseExited -= HandleMouseExitSoul;
-            soulPanel.SoulMouseClicked -= HandleSelectSoul;
+            soulPanel.SoulMouseClicked -= HandleClickSoul;
         }
     }
     #endregion
 
-
-    #region Dotween animation
-    //리롤 아이콘 딸깍 하는 애니메이션
-    int nowrot = 0;
-    public void PlayRerollIconAnim()
+    bool canInput = false;
+    void EnableInput()
     {
-        // rerollIcon.DOKill();
+        SubscribeChildEvent();
+        rerollButton.GetComponent<Button>().enabled = true;
+        canInput = true;
+    }
+    void DisableInput()
+    {
+        UnSubscribeChildEvent();
+        rerollButton.GetComponent<Button>().enabled = false;
+        canInput = false;
+    }
+    
+    #region 키보드 조작
+    //키보드로 영성 선택
+    int? curIndex = null;
+    protected override void OnUIMove(Vector2 dir)
+    {
+        if(!canInput) return;
 
-        // Sequence seq = DOTween.Sequence().SetUpdate(true); ;
+        // 현재 아무것도 선택되지 않은 상태라면
+        if (curIndex == null)
+        {
+            // 왼쪽/위쪽 → 0번 선택
+            if (dir.x < -0.1f || dir.y > 0.1f) curIndex = 0;
+            // 오른쪽/아래쪽 → 마지막 선택
+            else if (dir.x > 0.1f || dir.y < -0.1f) curIndex = panelNum - 1;
 
-        // seq.Append(rerollIcon.DOScale(originalScale * 0.95f, duration * 0.6f))   // 1. 살짝 줄어듦
+            SelectSoul(soulPanels[(int)curIndex]);
+            return;
+        }
 
-        //    .Join(rerollIcon.DORotate(new Vector3(0, 0, nowrot + -120f), duration * 0.6f) // 2. 오른쪽으로 크게 회전
-        //         .SetEase(Ease.OutBack));
+        //왼쪽 or 위쪽 방향키시 위쪽 방향으로
+        if (dir.x < -0.1f || dir.y > 0.1) curIndex--;
+        //오른쪽 or 아래쪽 방향키시 아래쪽 방향으로
+        else if (dir.x > 0.1f || dir.y < -0.1) curIndex++;
 
-        //    //.Append(rerollIcon.DOScale(originalScale, duration * .4f));          // 3. 원래 크기로 복귀
+        //min, max 처리
+        if (curIndex < 0) curIndex = panelNum - 1;
+        else if (curIndex >= panelNum) curIndex = 0;
 
-        //    //.Join(rerollIcon.DORotate(new Vector3(0, 0, nowrot + 10f), duration * 1f) // 4. 살짝 덜 돌아온 상태로 복귀
-        //    //     .SetEase(Ease.OutBack));
-        //     nowrot -= 120;
+        //강조된 버튼 변경
+        SelectSoul(soulPanels[(int)curIndex]);
     }
 
+    protected override void OnUIConfirm()
+    {
+        if(selectedSoulPanel == null) return;
+        EnrollSoul();
+    }
+
+    protected override void OnUICancel()
+    {
+        curIndex = null;
+        HandleDeSelectSoul();
+    }
     #endregion
 }
 

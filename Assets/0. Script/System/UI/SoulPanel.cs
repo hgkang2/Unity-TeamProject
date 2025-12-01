@@ -4,6 +4,7 @@ using TMPro;
 using System;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using Unity.Android.Gradle.Manifest;
 
 public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
@@ -36,7 +37,7 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         originalScale = rect.localScale;
     }
 
-    void OnDisable()
+    void OnEnable()
     {
         KillTween();
         if (rect != null)
@@ -63,6 +64,7 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         soulDescript.text = data.soulDescript;
         soulData = data;
         OriginPanelScale();
+        Debug.Log($"{data.displayName}");
     }
 
     public void visibleContent()
@@ -73,17 +75,6 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         contentGroup.alpha = 0f;
     }
-    public void FlipContent()
-    {
-        Debug.Log("flipped");
-        contentGroup.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0f, 180f, 0f);
-    }
-    public void NoFlipContent()
-    {
-        Debug.Log("Noflipped");
-        contentGroup.GetComponent<RectTransform>().localRotation = Quaternion.identity;
-    }
-
 
     public void ExpandPanelScale()
     {

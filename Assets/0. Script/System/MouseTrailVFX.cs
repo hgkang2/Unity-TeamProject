@@ -17,6 +17,8 @@ public class MouseTrailVFX : MonoBehaviour
     {
         trailVFX = GetComponent<ParticleSystem>();
 
+        var vfxMain = trailVFX.main;
+        vfxMain.useUnscaledTime = true;
         trailVFX.Play();
 
         lastMousePosition = GetMouseWorldPos();
@@ -40,11 +42,12 @@ public class MouseTrailVFX : MonoBehaviour
 
         if (isMoving)
         {
-            lastMoveTime = Time.time;
+            lastMoveTime = Time.unscaledTime;
         }
 
         // 3. 움직이고 있거나, tailDuration 이내면 계속 뿜기
-        bool shouldEmit = isMoving || (Time.time - lastMoveTime <= tailDuration);
+        float now = Time.unscaledTime;         // ← 그리고 여기
+        bool shouldEmit = isMoving || (now - lastMoveTime <= tailDuration);
 
         // 4. 파티클 위치를 마우스 위치로
         transform.position = currentMousePos;

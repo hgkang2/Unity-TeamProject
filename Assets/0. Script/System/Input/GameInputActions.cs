@@ -337,6 +337,15 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Reroll"",
+                    ""type"": ""Button"",
+                    ""id"": ""decf5392-3041-4594-bb42-93211f1ee4b2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -416,6 +425,17 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Confirm"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2397e8ac-5b8f-4c78-b4fc-47becb4cd6b3"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Reroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -439,6 +459,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
         m_UI_Cancel = m_UI.FindAction("Cancel", throwIfNotFound: true);
         m_UI_Confirm = m_UI.FindAction("Confirm", throwIfNotFound: true);
+        m_UI_Reroll = m_UI.FindAction("Reroll", throwIfNotFound: true);
     }
 
     ~@GameInputActions()
@@ -782,6 +803,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Navigate;
     private readonly InputAction m_UI_Cancel;
     private readonly InputAction m_UI_Confirm;
+    private readonly InputAction m_UI_Reroll;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -805,6 +827,10 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/Confirm".
         /// </summary>
         public InputAction @Confirm => m_Wrapper.m_UI_Confirm;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/Reroll".
+        /// </summary>
+        public InputAction @Reroll => m_Wrapper.m_UI_Reroll;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -840,6 +866,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @Confirm.started += instance.OnConfirm;
             @Confirm.performed += instance.OnConfirm;
             @Confirm.canceled += instance.OnConfirm;
+            @Reroll.started += instance.OnReroll;
+            @Reroll.performed += instance.OnReroll;
+            @Reroll.canceled += instance.OnReroll;
         }
 
         /// <summary>
@@ -860,6 +889,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @Confirm.started -= instance.OnConfirm;
             @Confirm.performed -= instance.OnConfirm;
             @Confirm.canceled -= instance.OnConfirm;
+            @Reroll.started -= instance.OnReroll;
+            @Reroll.performed -= instance.OnReroll;
+            @Reroll.canceled -= instance.OnReroll;
         }
 
         /// <summary>
@@ -993,5 +1025,12 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnConfirm(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Reroll" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnReroll(InputAction.CallbackContext context);
     }
 }

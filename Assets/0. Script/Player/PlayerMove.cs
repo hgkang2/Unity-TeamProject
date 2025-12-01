@@ -142,8 +142,8 @@ public class PlayerMove : MonoBehaviour
             jumpRequested = true;
         }
     }
-        // ---- 이동 / 점프 ----
-        void HandleMove()
+    // ---- 이동 / 점프 ----
+    void HandleMove()
     {
         // 1) 공중 + 공격 중 → 입력 무시, 관성 유지
         if (playerAttack.isAttacking && !isGrounded)
@@ -175,16 +175,17 @@ public class PlayerMove : MonoBehaviour
 
     void HandleJump()
     {
+
         if (!jumpRequested) return;
         jumpRequested = false;
 
         bool canJump = isGrounded || currentJumpCount > 0;
-        if (!canJump)return;
+        if (!canJump) return;
         anim.ResetTrigger("Land");
-        
+
         if (isGrounded)
         {
-            currentJumpCount = maxJumpCount -1;
+            currentJumpCount = maxJumpCount - 1;
         }
         else
         {
@@ -201,6 +202,7 @@ public class PlayerMove : MonoBehaviour
     // ---- 구르기 ----
     void OnDodgePressed()
     {
+        if (PauseManager.IsPaused) return;
         if (Time.time >= cooldownEndTime && !isKnockback && !player.HP.IsDead)
         {
             StartDodge();

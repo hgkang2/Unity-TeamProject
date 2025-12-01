@@ -108,6 +108,7 @@ public class StageUI : MonoBehaviour
         settingPanel.gameObject.SetActive(false);
     }
 
+    
     void HandleLevelUp()
     {
         ShowLevelupPanel();

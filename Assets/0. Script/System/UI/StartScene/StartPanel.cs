@@ -18,7 +18,6 @@ public class StartPanel : UIKeyboardHandler
     Button[] menuButtons;
     [SerializeField] Transform ButtonSelectImage;
     [SerializeField] GameObject exitPanel;
-    int? curIndex = null;
 
     void Awake()
     {
@@ -28,9 +27,6 @@ public class StartPanel : UIKeyboardHandler
         startPanelCanvasGroup.alpha = 0f;
         startPanelCanvasGroup.interactable = false;
         startPanelCanvasGroup.blocksRaycasts = false;
-
-        
-
 
         // 직계 자식 버튼들만 수집
         menuButtons = transform.Cast<Transform>()
@@ -53,7 +49,6 @@ public class StartPanel : UIKeyboardHandler
     {
         openingSequence.Kill();
     }
-
 
     public void OpeningStart()
     {
@@ -104,6 +99,8 @@ public class StartPanel : UIKeyboardHandler
         startPanelCanvasGroup.blocksRaycasts = true;
     }
 
+
+    int? curIndex = null;
     protected override void OnUIMove(Vector2 dir)
     {
         if(isOpeningPhase) return; 
