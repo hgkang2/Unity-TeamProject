@@ -9,7 +9,6 @@ public class LevelUpPanel : MonoBehaviour
 {
     [SerializeField] SoulManager soulManager;
     SoulPanel[] soulPanels;
-    int selectIndex = -1;
     [SerializeField] Transform rerollIcon;
     [SerializeField] TMP_Text rerollText;
     [Header("리롤할 수 있는 횟수(매번 초기화됨)")]
@@ -33,6 +32,7 @@ public class LevelUpPanel : MonoBehaviour
     public void Initialize()
     {
         remainRerollNum = RerollNum+1;
+        rerollText.SetText("{0}", remainRerollNum);
         candidates = null;
 
         //대충 영성 선택지 2~3개 뜨게 하는 로직(임시)
@@ -44,7 +44,7 @@ public class LevelUpPanel : MonoBehaviour
         {
             soulPanels[i].transform.position = soulPanels_OriginPos[i];
         }
-
+        DrawSoul();
         StartAnim();
     }
 
@@ -131,7 +131,6 @@ public class LevelUpPanel : MonoBehaviour
         // 부채꼴 각도 세팅
         float startAngle = -angleRange * 0.5f;
         float step = (panelNum > 1) ? (angleRange / (panelNum - 1)) : 0f;
-
         float centerIndex = (panelNum - 1) * 0.5f;
 
         //모두 끄고 시작
@@ -148,11 +147,11 @@ public class LevelUpPanel : MonoBehaviour
         // 연출 시작
         for (int i = 0; i < panelNum; i++)
         {
-            CanvasGroup cg = soulPanels[i].GetComponent<CanvasGroup>();
-            RectTransform rect = soulPanels[i].GetComponent<RectTransform>();
-
             soulPanels[i].gameObject.SetActive(true);
             soulPanels[i].InvisibleContent();
+
+            CanvasGroup cg = soulPanels[i].GetComponent<CanvasGroup>();
+            RectTransform rect = soulPanels[i].GetComponent<RectTransform>();
 
             // --- 초기 상태: 한 점에 겹쳐 있음 + 완전 투명 ---
             cg.alpha = 0f;
@@ -185,8 +184,9 @@ public class LevelUpPanel : MonoBehaviour
                     .SetEase(Ease.OutCubic)
             );
 
+            float nowY = rect.localRotation.eulerAngles.y;
             cardSeq.Join(
-                rect.DORotate(new Vector3(0f, 0f, angle), 0.5f, RotateMode.Fast)
+                rect.DORotate(new Vector3(0f, nowY, angle), 0.5f, RotateMode.Fast)
                     .SetEase(Ease.OutCubic)
             );
 
@@ -229,7 +229,9 @@ public class LevelUpPanel : MonoBehaviour
             cardSeq.AppendCallback(() =>
             {
                 soulPanels[index].visibleContent();
-                if (rect.localRotation.y == 180)
+                //카드가 뒤집힌 상태면 내용물도 같이 뒤집기
+                float yRot = rect.localRotation.eulerAngles.y % 360f;
+                if (Mathf.Abs(yRot % 180f) < 1f) // 0° 또는 180° (정면)
                     soulPanels[index].NoFlipContent();
                 else
                     soulPanels[index].FlipContent();
@@ -238,12 +240,15 @@ public class LevelUpPanel : MonoBehaviour
             cardSeq.Append(
                 rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration/2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
-                    
-            );
+
+            ).OnComplete(() =>
+                {
+                    cg.interactable = true;
+                    cg.blocksRaycasts = true;
+                });
 
             seq.Join(cardSeq);
         }
-
     }
 
     SoulData[] candidates;
@@ -251,9 +256,20 @@ public class LevelUpPanel : MonoBehaviour
     {
         if (remainRerollNum == 0) return;
         
-        selectIndex = -1;
-        HandleDeSelectSoul();
+        DrawSoul();
 
+        remainRerollNum--;
+
+        //남은 리롤 횟수에 따른 세팅
+        //if (remainRerollNum == 0) rerollText.color = Color.red;
+        //else rerollText.color = Color.white;
+        rerollText.SetText("{0}", remainRerollNum);
+        //if(remainRerollNum < RerollNum) PlayRerollIconAnim();
+    }
+
+    void DrawSoul()
+    {
+        HandleDeSelectSoul();
         candidates = soulManager.GetSouls(candidates, panelNum);
 
         if (candidates == null) Debug.Log("뽑을 수 있는 영성이 없음");
@@ -272,29 +288,20 @@ public class LevelUpPanel : MonoBehaviour
                 soulPanels[i].gameObject.SetActive(false);
             }
         }
-
-        remainRerollNum--;
-
-        //남은 리롤 횟수에 따른 세팅
-        //if (remainRerollNum == 0) rerollText.color = Color.red;
-        //else rerollText.color = Color.white;
-        rerollText.SetText("{0}", remainRerollNum);
-        if(remainRerollNum < RerollNum) PlayRerollIconAnim();
     }
 
     //SoulPanel에 마우스 올리면 커짐
     void HandleMouseHoverSoul(SoulPanel panel)
     {
         //단, 이미 선택한 Panel이 있으면 취소
-        if (selectedSoulPanel != null) return;
         panel.ExpandPanelScale();
     }
 
     //SoulPanel에서 마우스 내리면 원래대로 작아짐
     void HandleMouseExitSoul(SoulPanel panel)
     {
-        //단, 이미 선택한 Panel이 있으면 취소
-        if (selectedSoulPanel != null) return;
+        //단, 이미 선택한 Panel이면 안작아지고 그대로
+        if (selectedSoulPanel == panel) return;
         panel.OriginPanelScale();
     }
 

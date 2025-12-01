@@ -112,6 +112,7 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnPointerClick(PointerEventData e)
     {
+        if(soulData == null) Debug.Log($"클릭한 패널의 soulData 없음");
         SoulMouseClicked?.Invoke(this);
     }
 }
