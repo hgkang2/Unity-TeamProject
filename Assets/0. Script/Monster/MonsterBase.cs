@@ -2,21 +2,23 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public struct MonsterData  // �� ������
+public struct MonsterData  // 
 {
-    public float IdleTime; // ��� �ð�
+    public float IdleTime; // 
 
-    public int MoveDirection;   // �̵� ���� ,-1 = �������� �̵� / 1 = ���������� �̵� 
-    public float PatrolTime;    // ����(�̵�)�� �ð�
-    public float PatrolSpeed;   // ����(�̵�) �ӵ�
+    public int MoveDirection;   // 
+    public float PatrolTime;    // 
+    public float PatrolSpeed;   // 
 
-    public float AggroRange;    // ��׷� ����
+    public float AggroRange;    // 
+
+    public float Skill_Damage;
+
+    public float Skill_Delay;
 
     public float SkillA_ActiveRange;
     public float SkillB_ActiveRange;
     public float SkillC_ActiveRange;
-
-    public float Skill_Damage;
 
     public float SkillA_coolTime;
     public float SkillB_coolTime;
@@ -35,22 +37,22 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public MonsterData monsterData;
     public MonsterStateType currentState = MonsterStateType.Idle;
 
-    [SerializeField]
     public LayerMask PlayerLayermask;
+    public Vector2 boxSize;
+    public Transform boxCenter;
 
     public bool isUsingSkill = false;
     public bool isSkillReady = true;
 
     protected float StateTimer;
-    public float DistanceToPlayer; // 플레이 거리
+    public float DistanceToPlayer; 
 
-    public Transform PlayerPosition; // �÷��̾� ���� ��ġ
+    public Transform PlayerPosition; 
     public Rigidbody2D rb;
     public SpriteRenderer spriteRenderer;
+    public Animator animator;
 
     public Vector2 direction;
-
-    public Animator animator;
 
     public virtual void Awake()
     {
@@ -158,7 +160,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void DetectPlayer()
     {
-        Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
+        //Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
+
+        boxSize = new Vector2(monsterData.AggroRange, 6f);
+        Collider2D detectCollider = Physics2D.OverlapBox(boxCenter.position, boxSize, 0f, PlayerLayermask);
 
         if (detectCollider != null && detectCollider.CompareTag("Player") && !isUsingSkill)
         {
@@ -185,18 +190,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void OnSkillExit() { }
 
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
-    {
-        if(collision.gameObject.CompareTag("Wall"))
-        {
-
-        }
-    }
-
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, monsterData.AggroRange);
+        Gizmos.DrawWireCube(boxCenter.position, boxSize);
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, monsterData.SkillA_ActiveRange);
