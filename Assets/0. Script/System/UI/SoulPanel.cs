@@ -4,7 +4,6 @@ using TMPro;
 using System;
 using UnityEngine.EventSystems;
 using DG.Tweening;
-//using Unity.Android.Gradle.Manifest;
 
 public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {

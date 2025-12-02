@@ -194,6 +194,7 @@ public class PlayerMove : MonoBehaviour
         isGrounded = false;
         anim.SetTrigger("Jump");
         anim.SetBool("IsJumping", true);
+        player.DisablePlayerSprite();
     }
 
     // ---- 구르기 ----

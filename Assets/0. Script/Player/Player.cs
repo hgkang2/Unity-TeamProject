@@ -149,10 +149,7 @@ public class Player : MonoBehaviour, IDamageable
 
     public void DisablePlayerSprite()
     {
-        if (playerSprite != null)
-        {
-            playerSprite.enabled = false;
-        }
+        playerSprite.enabled = false;
     }
     public void EnablePlayerSprite()
     {
