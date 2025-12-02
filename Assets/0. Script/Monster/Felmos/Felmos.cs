@@ -7,6 +7,9 @@ public class Felmos : MonsterBase
     Vector2[] patrolDir = new Vector2[]
     { Vector2.left, Vector2.right, Vector2.up, Vector2.down };
 
+    float retreatRange = 4f;
+    float MinHeight = 3f;
+
     [SerializeField]
     GameObject FelmosBullet;
 
@@ -26,12 +29,10 @@ public class Felmos : MonsterBase
         if (direction.x > 0)
         {
             spriteRenderer.flipX = false;
-            //transform.rotation = Quaternion.Euler(0, 0, 0);
         }
         else if (direction.x < 0)
         {
             spriteRenderer.flipX = true;
-            //transform.rotation = Quaternion.Euler(0, 180, 0);
         }
     }
 
@@ -75,7 +76,15 @@ public class Felmos : MonsterBase
     {
         if (isUsingSkill) return;
 
-        rb.linearVelocity = direction * monsterData.PatrolSpeed;
+        if(DistanceToPlayer <= retreatRange * 1.2f)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+        else
+        {
+            rb.linearVelocity = direction * monsterData.PatrolSpeed;
+        }
+        
 
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
         {
@@ -112,6 +121,11 @@ public class Felmos : MonsterBase
 
             DistanceToPlayer = Mathf.Infinity;
         }
+    }
+
+    void DetectGround()
+    {
+
     }
 
     public override void UseSkill()

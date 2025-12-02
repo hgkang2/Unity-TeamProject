@@ -368,7 +368,7 @@ Transform:
   m_GameObject: {fileID: 120266553}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.59, y: -0.73, z: 0}
+  m_LocalPosition: {x: 0.2, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1153,9 +1153,6 @@ MonoBehaviour:
   animator: {fileID: 0}
   Alert: {fileID: 1524002265}
   direction: {x: 0, y: 0}
-  keepDistance: 6
-  distanceTolerance: 1
-  verticalOffset: 4
   FelmosBullet: {fileID: 3042648669547724693, guid: c1f1f44ce5d8a6048aaa25c32a87bc35, type: 3}
   PlayerPos: {fileID: 399982679}
   FirePos: {fileID: 120266554}
