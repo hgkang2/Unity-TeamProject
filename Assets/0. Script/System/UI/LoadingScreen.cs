@@ -32,7 +32,6 @@ public class LoadingScreen : MonoBehaviour
         {
             // op.progress는 0~0.9 사이까지만 올라감
             float progress = Mathf.Clamp01(op.progress / 0.9f);
-            Debug.Log($"{progress}");
 
             if (progressBar != null)
             {

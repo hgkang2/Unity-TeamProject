@@ -1,5 +1,6 @@
 using System.Linq;
 using DG.Tweening;
+using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -29,14 +30,32 @@ public class StartPanel : UIKeyboardHandler
         startPanelCanvasGroup.blocksRaycasts = false;
 
         // 직계 자식 버튼들만 수집
+        //  menuButtons = transform.Cast<Transform>()
+        //      .Select(t => t.GetComponent<Button>())
+        //      .Where(b => b != null)
+        //      .ToArray();
+        // activate가 비활성화된 버튼들은 수집 안하기
+        int i = 0;
         menuButtons = transform.Cast<Transform>()
-            .Select(t => t.GetComponent<Button>())
+            .Select(t =>
+            {
+                Button button = t.GetComponent<Button>();
+                StartButtonEvent evt = t.GetComponent<StartButtonEvent>();
+
+                if (evt == null) return null;
+                if (!evt.activate) return null;
+
+                evt.SetIndex(i++);
+                evt.onEnter += ButtonMouseEnter;
+                evt.onExit += ButtonMouseExit;
+                return button;
+            })
             .Where(b => b != null)
             .ToArray();
     }
 
     void Start()
-    {   
+    {
         // 오프닝은 보이게
         openingImage.gameObject.SetActive(true);
         exitPanel.SetActive(false);
@@ -48,6 +67,15 @@ public class StartPanel : UIKeyboardHandler
     void OnDestroy()
     {
         openingSequence.Kill();
+
+        for (int i = 0; i < menuButtons.Length; i++)
+        {
+            StartButtonEvent evt = menuButtons[i].GetComponent<StartButtonEvent>();
+            if (evt == null) continue;
+
+            evt.onEnter -= ButtonMouseEnter;
+            evt.onExit -= ButtonMouseExit;
+        }
     }
 
     public void OpeningStart()
@@ -123,8 +151,8 @@ public class StartPanel : UIKeyboardHandler
         else if (dir.x > 0.1f || dir.y < -0.1) curIndex++;
 
         //min, max 처리
-        if (curIndex < 0) curIndex = menuButtons.Length - 1;
-        else if (curIndex >= menuButtons.Length) curIndex = 0;
+        if (curIndex < 0) curIndex = 0;
+        else if (curIndex >= menuButtons.Length) curIndex = menuButtons.Length - 1;
 
         //강조된 버튼 변경
         UpdateHighlight();

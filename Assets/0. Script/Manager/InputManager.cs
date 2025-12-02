@@ -1,7 +1,8 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+
 
 public class InputManager : MonoBehaviour
 {
@@ -11,10 +12,6 @@ public class InputManager : MonoBehaviour
     [SerializeField] Camera mainCamera;
 
     GameInputActions input;
-
-
-
-
 
     void Awake()
     {
@@ -33,54 +30,32 @@ public class InputManager : MonoBehaviour
 
     void OnEnable()
     {
+        if (input == null) return;
         input.Enable();
-
-
-        //Player Move 입력 이벤트
-        input.Player.Move.performed += OnMove;
-        input.Player.Move.canceled += OnMoveCancel;
-        input.Player.Jump.performed += OnJumpPerformed;
-        input.Player.Dodge.performed += OnDodgePerformed;
-
-        //Player Attack 입력 이벤트
-        input.Player.Attack.performed += OnAttackPerformed;
-        input.Player.SpecialAttack.performed += OnSpecialPerformed;
-
-        //UI 키보드 입력 이벤트
-        input.UI.Navigate.performed += OnUINavigatePerformed;
-        input.UI.Navigate.canceled += OnUINavigateCanceled;
-        input.UI.Confirm.performed += OnUIConfirmPerformed;
-        input.UI.Cancel.performed += OnUICancelPerformed;
-        input.UI.Reroll.performed += OnUIRerollPerformed;
-
-        //기타 시스템 이벤트
-        input.System.LeftClick.performed += OnLeftClick;
+        Subscribe();
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        RefreshCameras();
     }
 
     void OnDisable()
     {
-        input.System.LeftClick.performed -= OnLeftClick;
-
-        input.Player.Move.performed -= OnMove;
-        input.Player.Move.canceled -= OnMoveCancel;
-        input.Player.Jump.performed -= OnJumpPerformed;
-        input.Player.Dodge.performed -= OnDodgePerformed;
-
-        input.UI.Navigate.performed -= OnUINavigatePerformed;
-        input.UI.Navigate.canceled -= OnUINavigateCanceled;
-        input.UI.Confirm.performed -= OnUIConfirmPerformed;
-        input.UI.Cancel.performed -= OnUICancelPerformed;
-        input.UI.Reroll.performed -= OnUIRerollPerformed;
-
-        input.Player.Attack.performed -= OnAttackPerformed;
-        input.Player.SpecialAttack.performed -= OnSpecialPerformed;
+        if (input == null) return;
+        UnSubscribe();
         input.Disable();
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void Update()
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // 씬 바뀔 때마다 새 카메라들 다시 물어오기
+        RefreshCameras();
     }
 
+    void RefreshCameras()
+    {
+        if (mainCamera == null || !mainCamera)
+            mainCamera = Camera.main;
+    }
 
 
     #region PlayerMove
@@ -200,4 +175,52 @@ public class InputManager : MonoBehaviour
         worldPos.z = 0f;
         return worldPos;
     }
+
+    #region  이벤트 구독
+    void Subscribe()
+    {
+        if (input == null) return;
+        UnSubscribe();
+
+        //Player Move 입력 이벤트
+        input.Player.Move.performed += OnMove;
+        input.Player.Move.canceled += OnMoveCancel;
+        input.Player.Jump.performed += OnJumpPerformed;
+        input.Player.Dodge.performed += OnDodgePerformed;
+
+        //Player Attack 입력 이벤트
+        input.Player.Attack.performed += OnAttackPerformed;
+        input.Player.SpecialAttack.performed += OnSpecialPerformed;
+
+        //UI 키보드 입력 이벤트
+        input.UI.Navigate.performed += OnUINavigatePerformed;
+        input.UI.Navigate.canceled += OnUINavigateCanceled;
+        input.UI.Confirm.performed += OnUIConfirmPerformed;
+        input.UI.Cancel.performed += OnUICancelPerformed;
+        input.UI.Reroll.performed += OnUIRerollPerformed;
+
+        //기타 시스템 이벤트
+        input.System.LeftClick.performed += OnLeftClick;
+    }
+    void UnSubscribe()
+    {
+        if (input == null) return;
+
+        input.System.LeftClick.performed -= OnLeftClick;
+
+        input.Player.Move.performed -= OnMove;
+        input.Player.Move.canceled -= OnMoveCancel;
+        input.Player.Jump.performed -= OnJumpPerformed;
+        input.Player.Dodge.performed -= OnDodgePerformed;
+
+        input.UI.Navigate.performed -= OnUINavigatePerformed;
+        input.UI.Navigate.canceled -= OnUINavigateCanceled;
+        input.UI.Confirm.performed -= OnUIConfirmPerformed;
+        input.UI.Cancel.performed -= OnUICancelPerformed;
+        input.UI.Reroll.performed -= OnUIRerollPerformed;
+
+        input.Player.Attack.performed -= OnAttackPerformed;
+        input.Player.SpecialAttack.performed -= OnSpecialPerformed;
+    }
+    #endregion
 }

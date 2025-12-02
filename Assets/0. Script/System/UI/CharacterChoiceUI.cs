@@ -7,9 +7,6 @@ public class CharacterChoiceUI : MonoBehaviour
     CharacterChoicePanel[] characterChoicePanels;
     [SerializeField] Transform selectPanel;
     [SerializeField] TMP_Text characterNameText;
-    
-    [Header("이동할 씬 이름")]
-    public string stageSceneName = "Stage1";
 
     void Awake()
     {
@@ -31,9 +28,5 @@ public class CharacterChoiceUI : MonoBehaviour
     public void HideSelectPanel()
     {
         selectPanel.gameObject.SetActive(false);
-    }
-    public void OnStartButtonClick()
-    {
-        SceneLoader.LoadScene(stageSceneName);
     }
 }
