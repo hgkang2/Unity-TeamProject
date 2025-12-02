@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
+    Player player;
     PlayerMove move;
     PlayerStats stats;
 
@@ -26,6 +27,7 @@ public class PlayerAttack : MonoBehaviour
         move = GetComponent<PlayerMove>();
         stats = GetComponent<PlayerStats>();
         animator = GetComponent<Animator>();
+        player = GetComponent<Player>();
     }
     void Start()
     {
@@ -62,6 +64,7 @@ public class PlayerAttack : MonoBehaviour
     void HandleAttackPressed()
     {
         if (isAttacking) return;
+        if (player != null && !player.CanControl) return;
 
         // 1. 공중 + 바닥 너무 가까우면 공격 금지
         if (move != null && !move.isGrounded)
@@ -147,13 +150,13 @@ public class PlayerAttack : MonoBehaviour
     }
 
     // 각 공격 애니메이션의 공격 끝 프레임에 연결
-    public void OnHitboxOff(int attackId)
+    public void OnHitboxOff()
     {
         DisableAllHitboxes();
     }
 
     // 각 공격 애니메이션의 마지막 프레임에 연결
-    public void OnAttackEnd(int attackId)
+    public void OnAttackEnd()
     {
         isAttacking = false;
         currentType = AttackType.None;
@@ -191,5 +194,9 @@ public class PlayerAttack : MonoBehaviour
         if (downHitbox != null) downHitbox.col.enabled = false;
         //if (specialHitbox != null) specialHitbox.enabled = false;
         if (jumpHitbox != null) jumpHitbox.col.enabled = false;
+    }
+    public void InterruptOnHit()
+    {
+        OnAttackEnd();
     }
 }

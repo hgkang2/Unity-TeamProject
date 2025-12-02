@@ -3315,7 +3315,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 247
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -10985,6 +10985,7 @@ GameObject:
   - component: {fileID: 1240395417}
   - component: {fileID: 1240395416}
   - component: {fileID: 1240395418}
+  - component: {fileID: 1240395430}
   - component: {fileID: 1240395426}
   - component: {fileID: 1240395429}
   - component: {fileID: 1240395427}
@@ -11083,7 +11084,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf701f8d195e4ef4c8c6387d011b3904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSprite: {fileID: 0}
+  playerSprite: {fileID: 1240395415}
+  spriteFlash: {fileID: 0}
+  hitStunDuration: 0.15
+  hitInvincibleDuration: 0.5
 --- !u!50 &1240395419
 Rigidbody2D:
   serializedVersion: 5
@@ -11271,6 +11275,23 @@ MonoBehaviour:
   groundRayOffsetX: 0.25
   maxJumpCount: 2
   minGroundDistanceForAirAttack: 0
+--- !u!114 &1240395430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240395415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c7ece7dca49f1244ac4b55434cfc369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderers: []
+  hitColor: {r: 1, g: 1, b: 1, a: 1}
+  hitFlashDuration: 0.05
+  blinkColor: {r: 1, g: 1, b: 1, a: 1}
+  blinkInterval: 0.1
 --- !u!1 &1265240645
 GameObject:
   m_ObjectHideFlags: 0

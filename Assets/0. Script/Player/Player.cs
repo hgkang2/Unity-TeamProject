@@ -12,28 +12,31 @@ public class Player : MonoBehaviour, IDamageable
     PlayerStats stats;
     public PlayerStats Stats { get { return stats; } }
 
-    PlayerMove move;
+    PlayerMove playerMove;
+    PlayerAttack playerAttack;
 
-    public GameObject playerSprite;
+    public SpriteRenderer playerSprite;
+    [SerializeField] SpriteFlash spriteFlash;
 
-    public void DisablePlayerSprite()
+    public bool CanControl
     {
-        if (playerSprite != null)
+        get
         {
-            playerSprite.SetActive(false);
+            // 필요하면 isDead, 컷신 등 같이 묶어서 처리
+            return !isStunned;
         }
     }
-    public void EnablePlayerSprite()
-    {
-        playerSprite.SetActive(true);
-    }
+
 
     void Awake()
     {
         hp = GetComponent<HP>();
         exp = GetComponent<Exp>();
         stats = GetComponent<PlayerStats>();
-        move = GetComponent<PlayerMove>();
+        playerMove = GetComponent<PlayerMove>();
+        playerAttack = GetComponent<PlayerAttack>();
+        playerSprite = GetComponent<SpriteRenderer>();
+        spriteFlash = GetComponent<SpriteFlash>();
     }
 
     void OnEnable()
@@ -46,28 +49,113 @@ public class Player : MonoBehaviour, IDamageable
         hp.OnDied -= HandleDie;
     }
 
-    void HandleDie()
+    void Update()
     {
-        move.HandleDieMotion();
+        UpdateHitStun();
+        UpdateInvincible();
+    }
 
-        Destroy(gameObject, 2f);
+
+
+
+    [Header("피격 경직 시간")]
+    [SerializeField] float hitStunDuration = 0.15f;
+    float stunTimer;
+    bool isStunned;
+    public bool IsStunned => isStunned;
+    void UpdateHitStun()
+    {
+        if (!isStunned)
+            return;
+
+        stunTimer -= Time.deltaTime;
+        if (stunTimer <= 0f)
+        {
+            isStunned = false;
+            stunTimer = 0f;
+        }
+    }
+
+    [Header("피격 무적 시간")]
+    [SerializeField] float hitInvincibleDuration = 0.5f;
+
+    float invincibleTimer;
+    bool isInvincible;
+    public bool IsInvincible => isInvincible;
+
+    void UpdateInvincible()
+    {
+        if (!isInvincible)
+            return;
+
+        invincibleTimer -= Time.deltaTime;
+        if (invincibleTimer <= 0f)
+        {
+            isInvincible = false;
+            invincibleTimer = 0f;
+            spriteFlash.StopInvincibleBlink();
+        }
     }
 
     // IDamageable 기본 버전 (공격자 위치 모를 때)
     public void TakeDamage(float amount)
     {
-        if (HP.IsDead) return;
+        if (isInvincible) return; //경직 무적
+        if (playerMove.IsDodging) return; //구르기 무적
 
         hp.TakeDamage(amount);
-        move.StartKnockbackByFacing();
+
+        // 2. 경직 적용
+        float stunDuration = hitStunDuration;
+        if (stunDuration > 0f)
+        {
+            isStunned = true;
+            stunTimer = stunDuration;
+            InterruptOnHit();
+            // TODO : 경직 모션 추가
+        }
+
+        // 3. 피격 후 무적
+        float invDuration = hitInvincibleDuration;
+        if (invDuration > 0f)
+        {
+            isInvincible = true;
+            invincibleTimer = invDuration;
+            spriteFlash.StartInvincibleBlink();
+        }
+
+        // 4. 넉백 은 일단 보류
+        //move.StartKnockbackByFacing();
+    }
+    void InterruptOnHit()
+    {
+        
     }
 
     // 공격자 위치를 아는 버전
     public void TakeDamage(float amount, Vector2 attackerWorldPosition)
     {
-        if (HP.IsDead) return;
-
         hp.TakeDamage(amount);
-        move.StartKnockbackFromAttacker(attackerWorldPosition);
+        // 넉백 은 일단 보류
+        //move.StartKnockbackFromAttacker(attackerWorldPosition);
+    }
+
+    void HandleDie()
+    {
+        playerMove.HandleDieMotion();
+
+        Destroy(gameObject, 2f);
+    }
+
+    public void DisablePlayerSprite()
+    {
+        if (playerSprite != null)
+        {
+            playerSprite.enabled = false;
+        }
+    }
+    public void EnablePlayerSprite()
+    {
+        playerSprite.enabled = true;
     }
 }

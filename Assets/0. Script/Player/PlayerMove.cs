@@ -29,14 +29,6 @@ public class PlayerMove : MonoBehaviour
     public readonly float dodgeTime = 0.3f;
     public readonly float dodgeCooldown = 1f;
 
-    // ---- 넉백 ----
-    public bool isKnockback;
-    public bool IsKnockback => isKnockback;
-    Coroutine knockRoutine;
-    readonly float knockDur = 0.15f;
-    readonly float knockH = 8f;
-    readonly float knockV = 3f;
-
     // ---- 중력 ----
     float baseGrav;
     public float apexGrav = 0.1f;
@@ -85,9 +77,14 @@ public class PlayerMove : MonoBehaviour
     {
         if (player.HP.IsDead) return;
 
-        ReadInput();
+        //경직 시 행동 불가(입력 막기)
+        if (!player.CanControl)
+        {
+            inputVec = Vector2.zero;
+            return;
+        }
 
-        if (isKnockback) return;
+        ReadInput();
 
         if (isDodging)
         {
@@ -103,7 +100,7 @@ public class PlayerMove : MonoBehaviour
     {
         if (player.HP.IsDead) return;
 
-        bool external = isDodging || isKnockback;
+        bool external = isDodging || !player.CanControl;
         if (!external)
         {
             HandleJump();
@@ -125,7 +122,7 @@ public class PlayerMove : MonoBehaviour
         anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
         anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
 
-        bool external = isDodging || isKnockback;
+        bool external = isDodging || !player.CanControl;;
         if (!external && inputVec.x != 0)
             spr.flipX = inputVec.x < 0;
     }
@@ -137,7 +134,7 @@ public class PlayerMove : MonoBehaviour
     }
     void OnJumpPressed()
     {
-        if (!isDodging && !isKnockback && (isGrounded || currentJumpCount > 0))
+        if (!isDodging && (isGrounded || currentJumpCount > 0))
         {
             jumpRequested = true;
         }
@@ -203,7 +200,7 @@ public class PlayerMove : MonoBehaviour
     void OnDodgePressed()
     {
         if (PauseManager.IsPaused) return;
-        if (Time.time >= cooldownEndTime && !isKnockback && !player.HP.IsDead)
+        if (Time.time >= cooldownEndTime && !player.HP.IsDead)
         {
             StartDodge();
         }
@@ -234,45 +231,11 @@ public class PlayerMove : MonoBehaviour
         if (isDodging) EndDodge();
     }
 
-    // ---- 넉백 ----
-    public void StartKnockbackByFacing()
-    {
-        Vector2 dir = spr.flipX ? Vector2.right : Vector2.left;
-        StartKnockback(dir);
-    }
-
-    public void StartKnockbackFromAttacker(Vector2 attackerPos)
-    {
-        Vector2 dir = rb.position - attackerPos;
-        if (dir.sqrMagnitude < 0.001f)
-            dir = spr.flipX ? Vector2.right : Vector2.left;
-        StartKnockback(dir.normalized);
-    }
-
-    void StartKnockback(Vector2 dir)
-    {
-        if (isDodging) ForceStopDodge();
-        if (knockRoutine != null) StopCoroutine(knockRoutine);
-        knockRoutine = StartCoroutine(Knock(dir));
-    }
-
-    System.Collections.IEnumerator Knock(Vector2 dir)
-    {
-        isKnockback = true;
-        spr.flipX = dir.x > 0.01f; // 오른쪽으로 밀리면 왼쪽 봄
-
-        rb.gravityScale = baseGrav;
-        rb.linearVelocity = new Vector2(dir.x * knockH, knockV);
-
-        float t = 0;
-        while (t < knockDur) { t += Time.deltaTime; yield return null; }
-        isKnockback = false;
-    }
 
     // ---- 중력 / 착지 ----
     void HandleGravity()
     {
-        if (isDodging || isKnockback)
+        if (isDodging)
         {
             rb.gravityScale = baseGrav;
             return;
