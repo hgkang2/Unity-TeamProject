@@ -38,12 +38,13 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public MonsterStateType currentState = MonsterStateType.Idle;
 
     public LayerMask PlayerLayermask;
-    public Vector2 boxSize;
-    public Transform boxCenter;
 
     public bool isUsingSkill = false;
     public bool isSkillReady = true;
 
+    public bool isPlayerDetected;
+    public float lostAggroDuration = 5f;   
+    protected float lostAggroTimer = 0f;
     protected float StateTimer;
     public float DistanceToPlayer; 
 
@@ -51,6 +52,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public Rigidbody2D rb;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
+    public GameObject Alert;
 
     public Vector2 direction;
 
@@ -114,7 +116,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         if (DistanceToPlayer <= monsterData.AggroRange)
         {
-            animator.SetTrigger("Aggro");
+            animator.SetTrigger("Alert");
             ChangeState(MonsterStateType.Aggro);
         }
     }
@@ -132,7 +134,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         if(DistanceToPlayer <= monsterData.AggroRange)
         {
-            animator.SetTrigger("Aggro");
+            animator.SetTrigger("Alert");
             ChangeState(MonsterStateType.Aggro);
         }
     }
@@ -144,15 +146,14 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         rb.linearVelocity = new Vector2(direction.x * monsterData.PatrolSpeed, rb.linearVelocity.y);
 
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
-        {
-            animator.SetTrigger("Idle");
-            ChangeState(MonsterStateType.Idle);
-            return;
+        { 
+            animator.SetTrigger("Idle"); 
+            ChangeState(MonsterStateType.Idle); 
         }
 
         if (DistanceToPlayer <= monsterData.SkillA_ActiveRange && isSkillReady && !isUsingSkill)
         {
-            animator.SetTrigger("Skill");
+            animator.SetTrigger("ReadySkill");
             isUsingSkill = true;
             isSkillReady = false;
         }
@@ -160,10 +161,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void DetectPlayer()
     {
-        //Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
-
-        boxSize = new Vector2(monsterData.AggroRange, 6f);
-        Collider2D detectCollider = Physics2D.OverlapBox(boxCenter.position, boxSize, 0f, PlayerLayermask);
+        Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
 
         if (detectCollider != null && detectCollider.CompareTag("Player") && !isUsingSkill)
         {
@@ -179,7 +177,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         else
         {
             PlayerPosition = null;
-
             DistanceToPlayer = Mathf.Infinity;
         }
     }
@@ -193,7 +190,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(boxCenter.position, boxSize);
+        Gizmos.DrawWireSphere(transform.position, monsterData.AggroRange);
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, monsterData.SkillA_ActiveRange);

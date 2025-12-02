@@ -4,11 +4,6 @@ using DG.Tweening;
 
 public class Grimlog : MonsterBase
 {
-    [SerializeField]
-    GameObject HitBox;
-    [SerializeField]
-    GameObject DetectBox;
-
     public override void Awake()
     {
         base.Awake();
@@ -22,12 +17,10 @@ public class Grimlog : MonsterBase
         if (direction.x > 0)
         {
             spriteRenderer.flipX = true;
-            DetectBox.transform.rotation = Quaternion.Euler(0, 180, 0);
         }
         else if (direction.x < 0)
         {
             spriteRenderer.flipX = false;
-            DetectBox.transform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
 

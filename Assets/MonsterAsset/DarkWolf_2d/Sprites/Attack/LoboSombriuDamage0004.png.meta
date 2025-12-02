@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: 47014682e05c4ca4cb4060542917ba05
-AssetOrigin:
-  serializedVersion: 1
-  productId: 284086
-  packageName: Dark Wolf 2d Animation
-  packageVersion: 1.0
-  assetPath: Assets/MMDevelopers/DarkWolf_2d/Art/Sprites/Damage/LoboSombriuDamage0004.png
-  uploadId: 733738
+guid: d42d649b9e20b3243ae2cae873046a28
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

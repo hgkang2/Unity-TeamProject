@@ -25,13 +25,13 @@ public class Felmos : MonsterBase
 
         if (direction.x > 0)
         {
-            //spriteRenderer.flipX = false;
-            transform.rotation = Quaternion.Euler(0, 0, 0);
+            spriteRenderer.flipX = false;
+            //transform.rotation = Quaternion.Euler(0, 0, 0);
         }
         else if (direction.x < 0)
         {
-            //spriteRenderer.flipX = true;
-            transform.rotation = Quaternion.Euler(0, 180, 0);
+            spriteRenderer.flipX = true;
+            //transform.rotation = Quaternion.Euler(0, 180, 0);
         }
     }
 
@@ -41,7 +41,7 @@ public class Felmos : MonsterBase
         monsterData.PatrolSpeed = 5f;
         monsterData.PatrolTime = 3f;
 
-        monsterData.AggroRange = 10f;
+        monsterData.AggroRange = 12f;
 
         monsterData.Skill_Damage = 1f;
         monsterData.Skill_Delay = 0.5f;
@@ -66,7 +66,7 @@ public class Felmos : MonsterBase
 
         if(DistanceToPlayer <= monsterData.AggroRange)
         {
-            animator.SetTrigger("Aggro");
+            animator.SetTrigger("Alert");
             ChangeState(MonsterStateType.Aggro);
         }
     }
@@ -81,12 +81,11 @@ public class Felmos : MonsterBase
         {
             animator.SetTrigger("Idle");
             ChangeState(MonsterStateType.Idle);
-            return;
         }
 
         if (DistanceToPlayer <= monsterData.SkillA_ActiveRange && isSkillReady && !isUsingSkill)
         {
-            animator.SetTrigger("Skill");
+            animator.SetTrigger("ReadySkill");
             isUsingSkill = true;
             isSkillReady = false;
         }
