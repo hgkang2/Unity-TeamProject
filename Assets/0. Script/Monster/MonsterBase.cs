@@ -66,7 +66,12 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         isUsingSkill = false;
 
-        hp.OnDied += OnDestroy;
+        hp.OnDied += OnDied;
+    }
+
+    public void OnDestroy()
+    {
+        hp.OnDied -= OnDied;
     }
 
     private void Start()
@@ -207,8 +212,8 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         hp.TakeDamage(amount);
     }
 
-    public void OnDestroy()
+    void OnDied()
     {
-        hp.OnDied -= OnDestroy;
+        GameObject.Destroy(this.gameObject);
     }
 }
