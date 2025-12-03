@@ -11,6 +11,9 @@ public struct MonsterData  //
     public float PatrolSpeed;   // 
 
     public float AggroRange;    // 
+    public float AggroSpeed;
+
+    public float Monster_Hp;
 
     public float Skill_Damage;
 
@@ -42,9 +45,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public bool isUsingSkill = false;
     public bool isSkillReady = true;
 
-    public bool isPlayerDetected;
-    public float lostAggroDuration = 5f;   
-    protected float lostAggroTimer = 0f;
     protected float StateTimer;
     public float DistanceToPlayer; 
 
@@ -65,6 +65,13 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         isUsingSkill = false;
+
+        hp.OnDied += OnDied;
+    }
+
+    public void OnDestroy()
+    {
+        hp.OnDied -= OnDied;
     }
 
     private void Start()
@@ -143,7 +150,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         if (isUsingSkill) return;
 
-        rb.linearVelocity = new Vector2(direction.x * monsterData.PatrolSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(direction.x * monsterData.AggroSpeed, rb.linearVelocity.y);
 
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
         { 
@@ -203,5 +210,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     void IDamageable.TakeDamage(float amount, Vector2 attackerWorldPosition)
     {
         hp.TakeDamage(amount);
+    }
+
+    void OnDied()
+    {
+        GameObject.Destroy(this.gameObject);
     }
 }

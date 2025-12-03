@@ -32,7 +32,10 @@ public class Grimlog : MonsterBase
 
         monsterData.MoveDirection = -1;
 
+        monsterData.Monster_Hp = 30f;
+
         monsterData.AggroRange = 13f;
+        monsterData.AggroSpeed = 5f;
 
         monsterData.Skill_Damage = 1f;
         monsterData.Skill_Delay = 3f;

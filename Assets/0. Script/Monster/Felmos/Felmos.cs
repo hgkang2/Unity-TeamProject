@@ -8,10 +8,10 @@ public class Felmos : MonsterBase
     { Vector2.left, Vector2.right, Vector2.up, Vector2.down };
 
     float retreatRange = 4f;
-    float MinHeight = 3f;
+    [SerializeField] float MinHeight = 3f;
+    [SerializeField] bool retreating;
 
-    [SerializeField]
-    GameObject FelmosBullet;
+    [SerializeField] GameObject FelmosBullet;
 
     public Transform PlayerPos;
     public Transform FirePos;
@@ -25,6 +25,8 @@ public class Felmos : MonsterBase
     public override void Update()
     {
         base.Update();
+
+        DetectGround();
 
         if (direction.x > 0)
         {
@@ -43,6 +45,7 @@ public class Felmos : MonsterBase
         monsterData.PatrolTime = 3f;
 
         monsterData.AggroRange = 12f;
+        monsterData.AggroSpeed = 7f;
 
         monsterData.Skill_Damage = 1f;
         monsterData.Skill_Delay = 0.5f;
@@ -74,18 +77,15 @@ public class Felmos : MonsterBase
 
     public override void Aggro()
     {
-        if (isUsingSkill) return;
+        if (isUsingSkill || retreating) return;
 
-        if(DistanceToPlayer <= retreatRange * 1.2f)
-        {
-            rb.linearVelocity = Vector2.zero;
-        }
-        else
-        {
-            rb.linearVelocity = direction * monsterData.PatrolSpeed;
-        }
-        
+        rb.linearVelocity = direction * monsterData.AggroSpeed;
 
+        if (DistanceToPlayer <= retreatRange)
+        {
+            StartCoroutine(Retreat());
+        }
+       
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
         {
             animator.SetTrigger("Idle");
@@ -125,7 +125,17 @@ public class Felmos : MonsterBase
 
     void DetectGround()
     {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, MinHeight);
 
+        Debug.DrawRay(transform.position, Vector2.down * MinHeight, Color.purple);
+
+        if(hit.collider != null)
+        {
+            if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("Player"))
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+            }
+        }
     }
 
     public override void UseSkill()
@@ -155,5 +165,23 @@ public class Felmos : MonsterBase
         yield return new WaitForSeconds(monsterData.SkillA_coolTime);
 
         isSkillReady = true;
+    }
+
+    IEnumerator Retreat()
+    {
+        retreating = true;
+        rb.linearVelocity = Vector2.zero;
+
+        yield return new WaitForSeconds(1f);
+
+        rb.linearVelocity = -direction * monsterData.AggroSpeed;
+
+        yield return new WaitForSeconds(0.5f);
+
+        rb.linearVelocity = Vector2.zero;
+
+        yield return new WaitForSeconds(2f);
+
+        retreating = false;
     }
 }
