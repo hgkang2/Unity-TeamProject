@@ -15,9 +15,10 @@ public class Player : MonoBehaviour, IDamageable
     PlayerMove playerMove;
     PlayerAttack playerAttack;
 
-    public SpriteRenderer playerSprite;
+    SpriteRenderer playerSprite;
     public GameObject playerPartSprite;
-    [SerializeField] SpriteFlash spriteFlash;
+    
+    SpriteFlash spriteFlash;
 
     public bool CanControl
     {

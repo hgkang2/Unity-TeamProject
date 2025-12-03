@@ -61,6 +61,7 @@ public class PlayerAttack : MonoBehaviour
         target.TakeDamage(stats.curDamage);
     }
 
+    // Attack 키를 눌렀을때 반응
     void HandleAttackPressed()
     {
         if (isAttacking) return;
@@ -81,18 +82,18 @@ public class PlayerAttack : MonoBehaviour
 
         AttackType type;
 
-        // 위 방향키 + A
+        // 위 방향키
         if (dir.y > 0.5f)
         {
             type = AttackType.Up;
         }
-        // 아래 방향키 + A
-        else if (dir.y < -0.5f)
+        // 아래 방향키 + 공중일경우만
+        else if (dir.y < -0.5f && !move.isGrounded)
         {
             type = AttackType.Down;
         }
-        // 점프 버튼 + A (눌려있는지 체크)
-        else if (InputManager.Instance.IsJumpHeld)
+        // 점프 버튼 + 공중일경우만
+        else if (InputManager.Instance.IsJumpHeld && !move.isGrounded)
         {
             type = AttackType.Jump;
         }
@@ -123,6 +124,7 @@ public class PlayerAttack : MonoBehaviour
                 break;
             case AttackType.Down: // 3
                 animator.SetTrigger("Attack_Down");
+                move.StartAirDownAttack();
                 break;
             case AttackType.Special: // 4
                 animator.SetTrigger("Attack_Special");

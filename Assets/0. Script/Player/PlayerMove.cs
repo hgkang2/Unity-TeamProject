@@ -103,11 +103,15 @@ public class PlayerMove : MonoBehaviour
     {
         if (player.HP.IsDead) return;
 
-        bool external = isDodging || !player.CanControl;
+        bool external = isDodging || !player.CanControl  || isAirDownAttack;;
         if (!external)
         {
             HandleJump();
             HandleMove();
+        }
+        else
+        {
+            HandleAirDownAttack(); // 외부 제어 상태일 때 다운어택 전용 처리
         }
 
         HandleGroundCheck();
@@ -207,7 +211,6 @@ public class PlayerMove : MonoBehaviour
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
         anim.SetBool("IsJumping", true);
-        
     }
 
     // ---- 구르기 ----
@@ -254,6 +257,73 @@ public class PlayerMove : MonoBehaviour
         if (isDodging) EndDodge();
     }
 
+    // 공중 아래공격
+    [Header("Air Down Attack")]
+    [SerializeField] float airDownPrepareDuration = 0.15f;
+    [SerializeField] float airDownFallSpeed = 20f;
+    [SerializeField] float airDownGravityScale = 5f;
+
+    bool isAirDownAttack;
+    bool isAirDownPrepare;
+    float airDownPrepareEndTime;
+
+    float baseGravityScale;
+    public void StartAirDownAttack()
+    {
+        if (isAirDownAttack) return;
+        if (isGrounded) return; // 공중에서만
+
+        isAirDownAttack = true;
+        isAirDownPrepare = true;
+        airDownPrepareEndTime = Time.time + airDownPrepareDuration;
+
+        // 제자리 고정
+        baseGravityScale = rb.gravityScale;
+        rb.gravityScale = 0f;
+        rb.linearVelocity = Vector2.zero;
+    }
+    void HandleAirDownAttack()
+    {
+        if (!isAirDownAttack)
+            return;
+
+        // 1) 준비 단계: 공중에서 잠깐 멈추는 상태
+        if (isAirDownPrepare)
+        {
+            rb.linearVelocity = Vector2.zero; // 혹시 모를 잔여 속도 제거
+
+            if (Time.time >= airDownPrepareEndTime)
+            {
+                // 준비 끝 → 낙하 시작
+                isAirDownPrepare = false;
+
+                rb.gravityScale = airDownGravityScale;
+                rb.linearVelocity = new Vector2(0f, -airDownFallSpeed);
+
+                // 애니메이션 전환도 여기서
+                // animator.SetTrigger("AirDown_Drop");
+            }
+
+            return;
+        }
+
+        // 2) 낙하 단계: 땅에 닿을 때까지 빠르게 내려가기
+        // isGrounded가 true가 되는 첫 순간에 착지 판정
+        if (isGrounded && rb.linearVelocity.y <= 0f)
+        {
+            OnAirDownLanding();
+        }
+    }
+
+    void OnAirDownLanding()
+    {
+        // 상태 원복
+        isAirDownAttack = false;
+        isAirDownPrepare = false;
+
+        rb.gravityScale = baseGravityScale;
+        rb.linearVelocity = Vector2.zero;
+    }
 
     // ---- 중력 / 착지 ----
     void HandleGravity()
@@ -362,6 +432,4 @@ public class PlayerMove : MonoBehaviour
 
         return dist; // -1이면 바닥 없음
     }
-
-
 }
