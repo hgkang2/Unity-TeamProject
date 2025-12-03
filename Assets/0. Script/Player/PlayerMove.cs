@@ -311,18 +311,20 @@ public class PlayerMove : MonoBehaviour
         // isGrounded가 true가 되는 첫 순간에 착지 판정
         if (isGrounded && rb.linearVelocity.y <= 0f)
         {
-            OnAirDownLanding();
+            rb.gravityScale = baseGravityScale;
+            rb.linearVelocity = Vector2.zero;
         }
     }
 
-    void OnAirDownLanding()
+    [SerializeField] float cameraShakeAmplitude;
+    [SerializeField] float cameraShakeFrequency;
+    [SerializeField] float cameraShakeDuration;
+    void OnAirDownLandingEnd()
     {
         // 상태 원복
         isAirDownAttack = false;
         isAirDownPrepare = false;
-
-        rb.gravityScale = baseGravityScale;
-        rb.linearVelocity = Vector2.zero;
+        CameraManager.Instance.Shake(cameraShakeAmplitude, cameraShakeFrequency, cameraShakeDuration);
     }
 
     // ---- 중력 / 착지 ----
