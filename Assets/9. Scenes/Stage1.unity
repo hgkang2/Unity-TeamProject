@@ -6330,6 +6330,7 @@ GameObject:
   - component: {fileID: 926477993}
   - component: {fileID: 926477995}
   - component: {fileID: 926477996}
+  - component: {fileID: 926477997}
   m_Layer: 0
   m_Name: "\uD56D\uC544\uB9AC"
   m_TagString: Untagged
@@ -6419,11 +6420,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54c99db0916a8224692ac498e65b6283, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 1
   itemPrefabs:
-  - {fileID: 4925392126168169204, guid: 2cc89152dcf4bad4eaf1e01df4b4c851, type: 3}
-  - {fileID: 7961702973272414222, guid: 9ce4c9e818ca68c4e80a20838d6131f6, type: 3}
-  - {fileID: 1588569068214770430, guid: bec14f81c769417419444673800d008a, type: 3}
+  - {fileID: 1157946522709448411, guid: 9c5f2048e7ab56a499113c86e3331742, type: 3}
+  - {fileID: 3562214253192847631, guid: 4f09977d41cc84941bc7033d3639111d, type: 3}
+  - {fileID: 7387059032564988730, guid: 3a1170bf85577194faa08fd0a4a0e9d6, type: 3}
   numberOfItemsDrop: 1
   dropForce: 5
 --- !u!61 &926477996
@@ -6472,6 +6472,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &926477997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926477992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b0cfcb006423844fa0546325608247b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 50
+  armor: 0
+  initializeOnAwake: 1
 --- !u!1 &942661477
 GameObject:
   m_ObjectHideFlags: 0

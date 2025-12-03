@@ -1,19 +1,28 @@
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 public class PotObject : MonoBehaviour, IDamageable
 {
     HP hp ;
-    public int health = 1;
     public List<GameObject> itemPrefabs;
     public int numberOfItemsDrop = 1;
     public float dropForce = 5f;
 
     private bool isBroken = false;
 
+    void Awake()
+    {
+         hp = GetComponent<HP>();
+         if (hp == null)
+        {
+            enabled = false;
+            return;
+        }
+        hp.OnDied += OnDie;
+    }
     public void TakeDamage(float amount)
     {
-        if (isBroken) return;
         hp.TakeDamage(amount);
     }
 
@@ -27,6 +36,7 @@ public class PotObject : MonoBehaviour, IDamageable
 
     void OnDie()
     {
+        if(isBroken) return;
         isBroken = true;
         DropItems();
         Destroy(gameObject);
