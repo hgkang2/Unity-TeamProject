@@ -13,8 +13,6 @@ public struct MonsterData  //
     public float AggroRange;    // 
     public float AggroSpeed;
 
-    public float Monster_Hp;
-
     public float Skill_Damage;
 
     public float Skill_Delay;
@@ -82,6 +80,13 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public virtual void Update()
     {
         MonsterFSM();
+
+        MonsterMovement();
+
+        if (Input.GetKeyDown(KeyCode.A) && name == "Grimlog")
+        {
+            TakeDamage(10f);
+        }
     }
 
     private void FixedUpdate()
@@ -130,8 +135,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void Patrol()
     {
-        rb.linearVelocity = new Vector2(direction.x * monsterData.PatrolSpeed, rb.linearVelocity.y);
-
         if (StateTimer >= monsterData.PatrolTime)
         {
             animator.SetTrigger("Idle");
@@ -149,8 +152,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public virtual void Aggro()
     {
         if (isUsingSkill) return;
-
-        rb.linearVelocity = new Vector2(direction.x * monsterData.AggroSpeed, rb.linearVelocity.y);
 
         if (DistanceToPlayer >= monsterData.AggroRange * 1.2f)
         { 
@@ -188,6 +189,33 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         }
     }
 
+    public virtual void MonsterMovement()
+    {
+        if(currentState == MonsterStateType.Patrol)
+        {
+            rb.linearVelocity = new Vector2(direction.x * monsterData.PatrolSpeed, rb.linearVelocity.y);
+            return;
+        }
+
+        if(currentState == MonsterStateType.Aggro && !isUsingSkill)
+        {
+            rb.linearVelocity = new Vector2(direction.x * monsterData.AggroSpeed, rb.linearVelocity.y);
+            return;
+        }
+
+        if(currentState == MonsterStateType.Take_Damage)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        if(currentState == MonsterStateType.Dead)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+    }
+
     public virtual void UseSkill() { }
 
     public virtual void OnSkillUpdate() { }
@@ -214,6 +242,15 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     void OnDied()
     {
-        GameObject.Destroy(this.gameObject);
+        Debug.Log("dead");
+
+        ChangeState(MonsterStateType.Dead);
+
+        StopAllCoroutines();
+        isUsingSkill = false;
+        foreach (var col in GetComponentsInChildren<Collider2D>())
+            col.enabled = false;
+
+        GameObject.Destroy(this.gameObject, 3f);
     }
 }
