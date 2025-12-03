@@ -15,7 +15,10 @@ public class PlayerMove : MonoBehaviour
     Collider2D col;
     Animator anim;
     SpriteRenderer spr;
-
+    // PlayerSprite Parts
+    [Header("Player Parts")]
+    public SpriteRenderer[] playerPartRender;
+    
     // ---- 입력 / 상태 ----
     public Vector2 inputVec;
     public bool isGrounded = true;
@@ -124,7 +127,17 @@ public class PlayerMove : MonoBehaviour
 
         bool external = isDodging || !player.CanControl;;
         if (!external && inputVec.x != 0)
-            spr.flipX = inputVec.x < 0;
+        {
+            bool shouldFlip  = inputVec.x < 0;
+            spr.flipX = shouldFlip;
+            foreach (SpriteRenderer partRenderer in playerPartRender)
+            {
+                if (partRenderer != null)
+                {
+                partRenderer.flipX  = shouldFlip;
+                }
+            }
+        }
     }
 
     // ---- 입력 ----
@@ -183,6 +196,7 @@ public class PlayerMove : MonoBehaviour
         if (isGrounded)
         {
             currentJumpCount = maxJumpCount - 1;
+            anim.SetTrigger("Jump");
         }
         else
         {
@@ -192,7 +206,6 @@ public class PlayerMove : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
-        anim.SetTrigger("Jump");
         anim.SetBool("IsJumping", true);
         
     }
@@ -214,7 +227,16 @@ public class PlayerMove : MonoBehaviour
         cooldownEndTime = Time.time + dodgeCooldown;
 
         anim.SetTrigger("Dodge");
-        float dir = spr.flipX ? -1f : 1f;
+        bool isFacingLeft = spr.flipX;
+        float dir = isFacingLeft ? -1f : 1f;
+
+        foreach (SpriteRenderer partRenderer in playerPartRender)
+        {
+            if (partRenderer != null)
+            {
+                partRenderer.flipX = isFacingLeft;
+            }
+        }
 
         rb.gravityScale = 0;
         rb.linearVelocity = new Vector2(dir * stats.curMoveSpeed * 2f, 0);

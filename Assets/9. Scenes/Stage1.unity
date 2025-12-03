@@ -9169,6 +9169,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b423e0e571c2af4eba89d254686aeaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPartRender:
+  - {fileID: 647561233}
+  - {fileID: 233699850}
+  - {fileID: 1974017216}
+  - {fileID: 2100859318}
+  - {fileID: 752880140}
+  - {fileID: 266267737}
   inputVec: {x: 0, y: 0}
   isGrounded: 1
   jumpRequested: 0
