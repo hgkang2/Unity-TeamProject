@@ -8958,7 +8958,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.15, y: 1.848}
+  m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
@@ -8993,7 +8993,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf701f8d195e4ef4c8c6387d011b3904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSprite: {fileID: 529891417}
+  playerSprite: {fileID: 1240395416}
+  playerPartSprite: {fileID: 529891417}
   spriteFlash: {fileID: 0}
   hitStunDuration: 0.15
   hitInvincibleDuration: 0.5

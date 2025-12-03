@@ -16,6 +16,7 @@ public class Player : MonoBehaviour, IDamageable
     PlayerAttack playerAttack;
 
     public SpriteRenderer playerSprite;
+    public GameObject playerPartSprite;
     [SerializeField] SpriteFlash spriteFlash;
 
     public bool CanControl
@@ -147,12 +148,16 @@ public class Player : MonoBehaviour, IDamageable
         Destroy(gameObject, 2f);
     }
 
-    public void DisablePlayerSprite()
-    {
-        playerSprite.enabled = false;
-    }
-    public void EnablePlayerSprite()
+    public void UsePlayerSprite()
     {
         playerSprite.enabled = true;
+        playerPartSprite.SetActive (false);
+    
+    }
+    public void UsePartSprite()
+    {
+        playerSprite.enabled = false;
+        playerPartSprite.SetActive (true);
+
     }
 }
