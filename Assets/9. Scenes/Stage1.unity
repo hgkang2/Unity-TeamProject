@@ -8993,9 +8993,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf701f8d195e4ef4c8c6387d011b3904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSprite: {fileID: 1240395416}
   playerPartSprite: {fileID: 529891417}
-  spriteFlash: {fileID: 0}
   hitStunDuration: 0.15
   hitInvincibleDuration: 0.5
 --- !u!50 &1240395419
@@ -9190,7 +9188,10 @@ MonoBehaviour:
   groundRayLength: 0.2
   groundRayOffsetX: 0.25
   maxJumpCount: 2
-  minGroundDistanceForAirAttack: 0
+  airDownPrepareDuration: 0.15
+  airDownFallSpeed: 40
+  airDownGravityScale: 5
+  minGroundDistanceForAirAttack: 1
 --- !u!1 &1259777695
 GameObject:
   m_ObjectHideFlags: 0
