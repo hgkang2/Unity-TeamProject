@@ -6,8 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class InputManager : MonoBehaviour
 {
-    static InputManager inputManager;
-    public static InputManager Instance => inputManager;
+    public static InputManager Instance {get; private set;}
     [SerializeField] VFXManager vfxManager;
     [SerializeField] Camera mainCamera;
 
@@ -22,7 +21,7 @@ public class InputManager : MonoBehaviour
             return;
         }
 
-        inputManager = this;
+        Instance = this;
         DontDestroyOnLoad(gameObject);
 
         input = new GameInputActions();

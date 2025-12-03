@@ -15,17 +15,11 @@ public class PotObject : MonoBehaviour, IDamageable
     {
         if (isBroken) return;
         hp.TakeDamage(amount);
-
-
     }
 
     public void TakeDamage(float amount, Vector2 attackerWorldPosition)
     {
         //비우기
-        if (health <= 0)
-        {
-            OnDie();
-        }
     }
 
 

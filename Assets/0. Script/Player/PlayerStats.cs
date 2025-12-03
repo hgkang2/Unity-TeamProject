@@ -43,22 +43,25 @@ public class PlayerStats : MonoBehaviour
     // 외부에서 추가 보정(소울/버프)이 들어올 때
     Dictionary<PlayerStatType, float> flatBonus = new();
     Dictionary<PlayerStatType, float> percentBonus = new();
+    Dictionary<PlayerStatType, float> bonusBonus = new();
 
     public float MoveSpeed { get; internal set; }
 
-    public void AddStat(PlayerStatType type, float flat, float percent = 0f)
+    public void AddStat(PlayerStatType type, float flat = 0, float percent = 0f, float bonus = 0)
     {
         if (!flatBonus.ContainsKey(type))
         {
             flatBonus[type] = 0;
             percentBonus[type] = 0;
+            bonusBonus[type] = 0;
         }
 
         flatBonus[type] += flat;
         percentBonus[type] += percent;
+        bonusBonus[type] += bonus;
 
         float baseVal = GetBaseValue(type);
-        float final = (baseVal + flatBonus[type]) * (1 + percentBonus[type] * 0.01f);
+        float final = (baseVal + flatBonus[type]) * (1 + percentBonus[type] * 0.01f) + bonusBonus[type];
         SetCurValue(type, final);
     }
 

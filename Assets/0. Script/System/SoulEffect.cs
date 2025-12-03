@@ -1,5 +1,6 @@
 using UnityEngine;
 using NaughtyAttributes;
+using UnityEditor.Build;
 
 [System.Serializable]
 public class SoulEffect
@@ -23,6 +24,11 @@ public class SoulEffect
     [Label("퍼센트 증가량(%)")]
     public int percentValue;
 
+    [ShowIf("ShowBonusValue")]
+    [AllowNesting]
+    [Label("보너스 증가량")]
+    public int bonusValue;
+
     [ShowIf("ShowSkillToLearn")]
     [AllowNesting]
     [Label("습득 스킬")]
@@ -40,16 +46,19 @@ public class SoulEffect
 
 
     #region 영성 적용 함수
-    public void ApplyOnce(Player player, int stackDelta = 1)
+    public void ApplyOnce(Player player)
     {
         switch (type)
         {
             case SoulEffectType.StatFlat:
-                player.Stats.AddStat(targetStat, flatValue, 0);
+                player.Stats.AddStat(targetStat, flatValue, 0, 0);
                 break;
 
             case SoulEffectType.StatPercent:
-                player.Stats.AddStat(targetStat,0, percentValue);
+                player.Stats.AddStat(targetStat, 0, percentValue, 0);
+                break;
+            case SoulEffectType.StatBonus:
+                player.Stats.AddStat(targetStat, 0, 0, bonusValue);
                 break;
 
             case SoulEffectType.LearnSkill:
@@ -57,7 +66,7 @@ public class SoulEffect
                 break;
 
             case SoulEffectType.HealHP:
-                player.HP.Heal(healAmount * stackDelta);
+                player.HP.Heal(healAmount);
                 break;
 
             case SoulEffectType.IncreaseJumpNum:
@@ -76,7 +85,8 @@ public class SoulEffect
     bool ShowTargetStat()
     {
         return type == SoulEffectType.StatFlat
-            || type == SoulEffectType.StatPercent;
+            || type == SoulEffectType.StatPercent
+            || type == SoulEffectType.StatBonus;
     }
 
     bool ShowFlatValue()
@@ -87,6 +97,11 @@ public class SoulEffect
     bool ShowPercentValue()
     {
         return type == SoulEffectType.StatPercent;
+    }
+
+    bool ShowBonusValue()
+    {
+        return type == SoulEffectType.StatBonus;
     }
 
     bool ShowSkillToLearn()

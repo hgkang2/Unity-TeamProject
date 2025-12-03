@@ -14,11 +14,21 @@ public class SoulManager : MonoBehaviour
     List<SoulInstance> curSouls = new List<SoulInstance>();
     public List<SoulInstance> CurSouls => curSouls;
 
+    public static SoulManager Instance {get; private set;}
     void Awake()
-    {// Resources/SoulDatas 폴더
+    {   // Resources/SoulDatas 폴더
         SoulData[] loaded = Resources.LoadAll<SoulData>("SoulDatas");
-
         allSouls = loaded.ToList();
+
+        // 싱글톤
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     public void EnrollSoul(SoulData data)
@@ -36,7 +46,7 @@ public class SoulManager : MonoBehaviour
                 inst.stack++;
 
                 // 이번에 추가된 스택 1개분만 효과 적용
-                ApplySoulDataEffectsOnce(data, player, 1);
+                ApplySoulDataEffectsOnce(data.effects);
             }
             // 더 이상 쌓을 수 없으면 무시
             return;
@@ -47,21 +57,21 @@ public class SoulManager : MonoBehaviour
         curSouls.Add(newInst);
 
         // 새로 얻은 1개분 효과 적용
-        ApplySoulDataEffectsOnce(data, player, 1);
+        ApplySoulDataEffectsOnce(data.effects);
     }
 
     /// SoulData 안에 있는 모든 SoulEffect를 한 번씩 실행
     /// (실제 로직은 SoulEffect 쪽에 있음)
-    void ApplySoulDataEffectsOnce(SoulData data, Player player, int stackDelta)
+    public void ApplySoulDataEffectsOnce(SoulEffect[] effects)
     {
-        if (data.effects == null) return;
+        if (effects == null || effects.Length == 0) return;
 
-        for (int i = 0; i < data.effects.Length; i++)
+        for (int i = 0; i < effects.Length; i++)
         {
-            SoulEffect effect = data.effects[i];
+            SoulEffect effect = effects[i];
             if (effect != null)
             {
-                effect.ApplyOnce(player, stackDelta);
+                effect.ApplyOnce(player);
             }
         }
     }
