@@ -197,7 +197,7 @@ public class PlayerMove : MonoBehaviour
         if (!canJump) return;
         anim.ResetTrigger("Land");
 
-        if (isGrounded)
+        if (isGrounded && !anim.GetBool("IsJumping"))
         {
             currentJumpCount = maxJumpCount - 1;
             anim.SetTrigger("Jump");
