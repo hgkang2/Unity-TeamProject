@@ -25,7 +25,7 @@ public class Player : MonoBehaviour, IDamageable
         get
         {
             // 필요하면 isDead, 컷신 등 같이 묶어서 처리
-            return !isStunned;
+            return !isStunned && !playerMove.IsDodging;
         }
     }
 
@@ -65,6 +65,18 @@ public class Player : MonoBehaviour, IDamageable
     float stunTimer;
     bool isStunned;
     public bool IsStunned => isStunned;
+
+    void StartHitStun()
+    {
+        // 경직 적용
+        float stunDuration = hitStunDuration;
+        if (stunDuration > 0f)
+        {
+            isStunned = true;
+            stunTimer = stunDuration;
+            // TODO : 경직 모션 추가
+        }
+    }
     void UpdateHitStun()
     {
         if (!isStunned)
@@ -84,6 +96,18 @@ public class Player : MonoBehaviour, IDamageable
     float invincibleTimer;
     bool isInvincible;
     public bool IsInvincible => isInvincible;
+
+    void StartInvincible()
+    {
+        // 피격 후 무적
+        float invDuration = hitInvincibleDuration;
+        if (invDuration > 0f)
+        {
+            isInvincible = true;
+            invincibleTimer = invDuration;
+            spriteFlash.StartInvincibleBlink();
+        }
+    }
 
     void UpdateInvincible()
     {
@@ -107,31 +131,11 @@ public class Player : MonoBehaviour, IDamageable
 
         hp.TakeDamage(amount);
 
-        // 2. 경직 적용
-        float stunDuration = hitStunDuration;
-        if (stunDuration > 0f)
-        {
-            isStunned = true;
-            stunTimer = stunDuration;
-            InterruptOnHit();
-            // TODO : 경직 모션 추가
-        }
-
-        // 3. 피격 후 무적
-        float invDuration = hitInvincibleDuration;
-        if (invDuration > 0f)
-        {
-            isInvincible = true;
-            invincibleTimer = invDuration;
-            spriteFlash.StartInvincibleBlink();
-        }
+        StartHitStun();
+        StartInvincible();
 
         // 4. 넉백 은 일단 보류
         //move.StartKnockbackByFacing();
-    }
-    void InterruptOnHit()
-    {
-        
     }
 
     // 공격자 위치를 아는 버전
@@ -145,8 +149,14 @@ public class Player : MonoBehaviour, IDamageable
     void HandleDie()
     {
         playerMove.HandleDieMotion();
-
+        // + 기타 사망 연출
         Destroy(gameObject, 2f);
+    }
+
+    //사망 후 처리 (애니메이션 프레임 이벤트로 호출)
+    public void OnEndDieAnimation()
+    {
+        SceneLoader.LoadScene("Start");
     }
 
     public void UsePlayerSprite()

@@ -38,7 +38,7 @@ public class SceneLoader : MonoBehaviour
         // 로딩 화면 씬으로 먼저 이동
         SceneManager.LoadScene("Loading");
     }
-    public void NoLoadingScene(string targetSceneName){
+    public static void NoLoadingScene(string targetSceneName){
         SceneManager.LoadScene(targetSceneName);
     }
 }

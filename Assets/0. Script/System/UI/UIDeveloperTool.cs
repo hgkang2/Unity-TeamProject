@@ -27,6 +27,15 @@ public class UIDeveloperTool : MonoBehaviour
         getExpValueText.text = ((int)(getExpSlider.value)).ToString();
     }
 
+        //Change TimeScale
+    [SerializeField] Slider getTimeScaleSlider;
+    [SerializeField] TMP_Text getTimeScaleText;
+    public void ChangeTimeScaleValueText()
+    {
+        getTimeScaleText.text = ((getTimeScaleSlider.value)).ToString();
+        TimeManager.SetTimeScale(getTimeScaleSlider.value);
+    }
+
     [SerializeField] Player player;
 
     void Start()

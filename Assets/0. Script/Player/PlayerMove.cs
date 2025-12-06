@@ -21,15 +21,13 @@ public class PlayerMove : MonoBehaviour
     
     // ---- 입력 / 상태 ----
     public Vector2 inputVec;
-    public bool isGrounded = true;
-    public bool jumpRequested;
+    public bool isGrounded = false;
+    public bool jumpRequested = false;
 
     // ---- 구르기 ----
-    public bool isDodging;
+    public bool isDodging = false;
     public bool IsDodging => isDodging;
-    float dodgeEndTime;
     float cooldownEndTime;
-    public readonly float dodgeTime = 0.3f;
     public readonly float dodgeCooldown = 1f;
 
     // ---- 중력 ----
@@ -88,12 +86,6 @@ public class PlayerMove : MonoBehaviour
         }
 
         ReadInput();
-
-        if (isDodging)
-        {
-            if (Time.time >= dodgeEndTime) EndDodge();
-            return;
-        }
     }
 
     // -------------------------------
@@ -124,10 +116,14 @@ public class PlayerMove : MonoBehaviour
     // -------------------------------
     void LateUpdate()
     {
-        if (PauseManager.IsPaused) return;
+        if (TimeManager.IsPaused) return;
 
         anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
         anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
+        anim.SetBool("IsMoving", Mathf.Abs(rb.linearVelocity.x) > 0.01f);
+
+        anim.SetBool("IsJumping", !isGrounded);
+        
 
         bool external = isDodging || !player.CanControl;;
         if (!external && inputVec.x != 0)
@@ -200,7 +196,8 @@ public class PlayerMove : MonoBehaviour
         if (isGrounded && !anim.GetBool("IsJumping"))
         {
             currentJumpCount = maxJumpCount - 1;
-            anim.SetTrigger("Jump");
+            // 맨 처음 점프할 때만 도약 모션.
+            anim.SetTrigger("Jump"); 
         }
         else
         {
@@ -210,24 +207,22 @@ public class PlayerMove : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
-        anim.SetBool("IsJumping", true);
     }
 
     // ---- 구르기 ----
     void OnDodgePressed()
     {
-        if (PauseManager.IsPaused) return;
-        if (Time.time >= cooldownEndTime && !player.HP.IsDead)
-        {
-            StartDodge();
-        }
+        if (TimeManager.IsPaused) return;
+        if (Time.time < cooldownEndTime || !player.CanControl) return;
+        StartDodge();
     }
 
     void StartDodge()
     {
         isDodging = true;
-        dodgeEndTime = Time.time + dodgeTime;
         cooldownEndTime = Time.time + dodgeCooldown;
+
+        playerAttack.EndAttack();
 
         anim.SetTrigger("Dodge");
         bool isFacingLeft = spr.flipX;
@@ -273,6 +268,8 @@ public class PlayerMove : MonoBehaviour
         if (isAirDownAttack) return;
         if (isGrounded) return; // 공중에서만
 
+        isDodging = true; //무적 판정!!
+
         isAirDownAttack = true;
         isAirDownPrepare = true;
         airDownPrepareEndTime = Time.time + airDownPrepareDuration;
@@ -313,6 +310,7 @@ public class PlayerMove : MonoBehaviour
         {
             rb.gravityScale = baseGravityScale;
             rb.linearVelocity = Vector2.zero;
+            CameraManager.Instance.Shake(cameraShakeAmplitude, cameraShakeFrequency, cameraShakeDuration);
         }
     }
 
@@ -324,7 +322,7 @@ public class PlayerMove : MonoBehaviour
         // 상태 원복
         isAirDownAttack = false;
         isAirDownPrepare = false;
-        CameraManager.Instance.Shake(cameraShakeAmplitude, cameraShakeFrequency, cameraShakeDuration);
+        isDodging = false;
     }
 
     // ---- 중력 / 착지 ----
@@ -382,7 +380,6 @@ public class PlayerMove : MonoBehaviour
         if (landedThisFrame)
         {
             currentJumpCount = maxJumpCount;
-            anim.SetBool("IsJumping", false);
 
             // 공중 공격 상태로 내려온 경우엔 Land 스킵
             if (!playerAttack.isAttacking)

@@ -88,6 +88,8 @@ public class StageUI : MonoBehaviour
 
     public void ShowEscPanel()
     {
+        TimeManager.Pause();
+
         escpanel.gameObject.SetActive(true);
     }
 
@@ -95,6 +97,8 @@ public class StageUI : MonoBehaviour
     {
         escpanel.gameObject.SetActive(false);
         HideSettingPanel();
+
+        TimeManager.Resume();
     }
 
     //버튼 연결 이벤트
@@ -115,14 +119,16 @@ public class StageUI : MonoBehaviour
     }
     public void ShowLevelupPanel()
     {
-        PauseManager.Pause();
+        TimeManager.Pause();
+
         levelUpPanel.gameObject.SetActive(true);
         levelUpPanel.Initialize();
     }
     public void HideLevelupPanel()
     {
         levelUpPanel.gameObject.SetActive(false);
-        PauseManager.Resume();
+
+        TimeManager.Resume();
     }
     //버튼 연결 이벤트
     public void GoToCharacterChoiceScene()

@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerAttack : MonoBehaviour
 {
     Player player;
-    PlayerMove move;
+    PlayerMove playerMove;
     PlayerStats stats;
 
     Animator animator;
@@ -24,7 +24,7 @@ public class PlayerAttack : MonoBehaviour
 
     void Awake()
     {
-        move = GetComponent<PlayerMove>();
+        playerMove = GetComponent<PlayerMove>();
         stats = GetComponent<PlayerStats>();
         animator = GetComponent<Animator>();
         player = GetComponent<Player>();
@@ -57,8 +57,21 @@ public class PlayerAttack : MonoBehaviour
 
     void HandleHit(IDamageable target)
     {
-        Debug.Log($"{stats.curDamage}");
         target.TakeDamage(stats.curDamage);
+
+
+        // 적 타격 시 Hit Stop
+        switch (currentType)
+        {
+            case AttackType.Special:
+                // 궁극기 시전시 평타보다 좀 더 느려지게
+                // TimeManager.SlowForMoment(0.1f, 0.05f, 0.15f);
+            break;
+            default:
+                // 평타 시전시 약간 느려지게
+                TimeManager.SlowForMoment(0, 0, 0.05f);
+            break;
+        }
     }
 
     // Attack 키를 눌렀을때 반응
@@ -68,32 +81,32 @@ public class PlayerAttack : MonoBehaviour
         if (player != null && !player.CanControl) return;
 
         // 1. 공중 + 바닥 너무 가까우면 공격 금지
-        if (move != null && !move.isGrounded)
+        if (playerMove != null && !playerMove.isGrounded)
         {
-            float dist = move.GetGroundDistance();
-            if (dist >= 0f && dist < move.minGroundDistanceForAirAttack)
+            float dist = playerMove.GetGroundDistance();
+            if (dist >= 0f && dist < playerMove.minGroundDistanceForAirAttack)
             {
                 return;
             }
         }
 
         // 2. 현재 방향/점프 상태에 따라 AttackType 결정
-        Vector2 dir = InputManager.Instance.Move;
+        Vector2 inputDir = InputManager.Instance.Move;
 
         AttackType type;
 
         // 위 방향키
-        if (dir.y > 0.5f)
+        if (inputDir.y > 0.5f)
         {
             type = AttackType.Up;
         }
         // 아래 방향키 + 공중일경우만
-        else if (dir.y < -0.5f && !move.isGrounded)
+        else if (inputDir.y < -0.5f && !playerMove.isGrounded)
         {
             type = AttackType.Down;
         }
         // 점프 버튼 + 공중일경우만
-        else if (InputManager.Instance.IsJumpHeld && !move.isGrounded)
+        else if (InputManager.Instance.IsJumpHeld && !playerMove.isGrounded)
         {
             type = AttackType.Jump;
         }
@@ -124,7 +137,7 @@ public class PlayerAttack : MonoBehaviour
                 break;
             case AttackType.Down: // 3
                 animator.SetTrigger("Attack_Down");
-                move.StartAirDownAttack();
+                playerMove.StartAirDownAttack();
                 break;
             case AttackType.Special: // 4
                 animator.SetTrigger("Attack_Special");
@@ -158,7 +171,7 @@ public class PlayerAttack : MonoBehaviour
     }
 
     // 각 공격 애니메이션의 마지막 프레임에 연결
-    public void OnAttackEnd()
+    public void EndAttack()
     {
         isAttacking = false;
         currentType = AttackType.None;
@@ -196,9 +209,5 @@ public class PlayerAttack : MonoBehaviour
         if (downHitbox != null) downHitbox.col.enabled = false;
         //if (specialHitbox != null) specialHitbox.enabled = false;
         if (jumpHitbox != null) jumpHitbox.col.enabled = false;
-    }
-    public void InterruptOnHit()
-    {
-        OnAttackEnd();
     }
 }
