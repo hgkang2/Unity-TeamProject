@@ -6,7 +6,6 @@ public class PotObject : MonoBehaviour, IDamageable
 {
     HP hp ;
     public List<GameObject> itemPrefabs;
-    public int numberOfItemsDrop = 1;
     public float dropForce = 5f;
 
     private bool isBroken = false;
@@ -48,21 +47,22 @@ public class PotObject : MonoBehaviour, IDamageable
         {
             return;
         }
-        for (int i = 0; i < numberOfItemsDrop; i++)
+        Vector2 dropPosition = transform.position + new Vector3(0,0.5f,0);
+        int ItemsDrop = Random.Range(1,6);
+        for (int i = 0; i < ItemsDrop; i++)
         {
             int randomIndex = Random.Range(0, itemPrefabs.Count);
             GameObject selectedItem = itemPrefabs[randomIndex];
-            GameObject droppedItem = Instantiate(selectedItem,transform.position,Quaternion.identity);
-            Rigidbody rb = droppedItem.GetComponent<Rigidbody>();
+            GameObject droppedItem = Instantiate(selectedItem,dropPosition,Quaternion.identity);
+            Rigidbody2D rb = droppedItem.GetComponent<Rigidbody2D>();
             if(rb != null)
             {
-                Vector3 randomDirection = new Vector3
+                Vector2 randomDirection = new Vector2
                 (
                     Random.Range(-1f, 1f),
-                    Random.Range(0.5f, 1f),
-                    Random.Range(-1f,1f)
+                    Random.Range(0.5f, 1f)
                 ).normalized;
-                rb.AddForce(randomDirection * dropForce,ForceMode.Impulse);
+                rb.AddForce(randomDirection * dropForce,ForceMode2D.Impulse);
             }
         }
     }

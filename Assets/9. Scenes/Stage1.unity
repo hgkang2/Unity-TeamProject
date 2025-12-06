@@ -5851,9 +5851,9 @@ GameObject:
   m_Component:
   - component: {fileID: 926477994}
   - component: {fileID: 926477993}
+  - component: {fileID: 926477997}
   - component: {fileID: 926477995}
   - component: {fileID: 926477996}
-  - component: {fileID: 926477997}
   m_Layer: 0
   m_Name: "\uD56D\uC544\uB9AC"
   m_TagString: Untagged
@@ -5925,7 +5925,7 @@ Transform:
   m_GameObject: {fileID: 926477992}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.87, y: -2.25, z: 0}
+  m_LocalPosition: {x: 2.87, y: -2.89, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5947,7 +5947,6 @@ MonoBehaviour:
   - {fileID: 1157946522709448411, guid: 9c5f2048e7ab56a499113c86e3331742, type: 3}
   - {fileID: 3562214253192847631, guid: 4f09977d41cc84941bc7033d3639111d, type: 3}
   - {fileID: 7387059032564988730, guid: 3a1170bf85577194faa08fd0a4a0e9d6, type: 3}
-  numberOfItemsDrop: 1
   dropForce: 5
 --- !u!61 &926477996
 BoxCollider2D:
