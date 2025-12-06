@@ -120,6 +120,15 @@ AnimationClip:
     classID: 212
     script: {fileID: 0}
     flags: 2
+  - serializedVersion: 2
+    curve:
+    - time: 0
+      value: {fileID: 21300000, guid: 42762496de2a92b47b744f7c1fb4e05a, type: 3}
+    attribute: m_Sprite
+    path: 
+    classID: 212
+    script: {fileID: 0}
+    flags: 2
   m_SampleRate: 5
   m_WrapMode: 0
   m_Bounds:
@@ -208,6 +217,15 @@ AnimationClip:
       isPPtrCurve: 1
       isIntCurve: 0
       isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 0
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 212
+      customType: 23
+      isPPtrCurve: 1
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
     pptrCurveMapping:
     - {fileID: 21300000, guid: be5ca6c573d6f23459b739fc5ac96342, type: 3}
     - {fileID: 21300000, guid: 68ea5bc2c546366408714a614fbd0e60, type: 3}
@@ -215,6 +233,7 @@ AnimationClip:
     - {fileID: 21300000, guid: eade8f1411741134b8474002d62fca7c, type: 3}
     - {fileID: 21300000, guid: e9f268d02f48ac84a9a442c037b9d2a3, type: 3}
     - {fileID: 21300000, guid: da363503fd5a5124e8ed49bac2b6ab23, type: 3}
+    - {fileID: 21300000, guid: 42762496de2a92b47b744f7c1fb4e05a, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -430,7 +449,7 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0
-    functionName: UsePartSprite
+    functionName: UsePlayerSprite
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

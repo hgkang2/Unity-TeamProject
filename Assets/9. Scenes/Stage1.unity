@@ -8886,6 +8886,8 @@ MonoBehaviour:
   takeDamageValueText: {fileID: 1297122218}
   getExpSlider: {fileID: 1226534064}
   getExpValueText: {fileID: 760179811}
+  getTimeScaleSlider: {fileID: 0}
+  getTimeScaleText: {fileID: 0}
   player: {fileID: 1240395418}
 --- !u!4 &1281964087
 Transform:
@@ -19457,6 +19459,14 @@ PrefabInstance:
     - target: {fileID: 6568192216305126023, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8061272880331229367, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_Size.x
+      value: 2.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 8061272880331229367, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_Size.y
+      value: 2.56
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
