@@ -128,6 +128,9 @@ public class PlayerMove : MonoBehaviour
         bool external = isDodging || !player.CanControl;;
         if (!external && inputVec.x != 0)
         {
+            float direction = inputVec.x < 0 ? -1f : 1f;
+            transform.localScale = new Vector3(direction, 1f, 1f);
+            /*
             bool shouldFlip  = inputVec.x < 0;
             spr.flipX = shouldFlip;
             foreach (SpriteRenderer partRenderer in playerPartRender)
@@ -137,6 +140,7 @@ public class PlayerMove : MonoBehaviour
                 partRenderer.flipX  = shouldFlip;
                 }
             }
+            */
         }
     }
 
