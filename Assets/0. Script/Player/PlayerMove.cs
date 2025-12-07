@@ -196,8 +196,15 @@ public class PlayerMove : MonoBehaviour
         if (isGrounded && !anim.GetBool("IsJumping"))
         {
             currentJumpCount = maxJumpCount - 1;
+            if(Mathf.Abs(inputVec.x) > 0.1f)
+            {
+                anim.SetTrigger("JumpSide");
+            }
+            else
+            {
             // 맨 처음 점프할 때만 도약 모션.
             anim.SetTrigger("Jump"); 
+            }
         }
         else
         {
