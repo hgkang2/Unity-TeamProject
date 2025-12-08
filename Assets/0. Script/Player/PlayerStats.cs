@@ -3,18 +3,22 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
+    HP hp;
+
     // === Base (변하지 않는 스탯) ===
     [Header("Base Stats")]
+    [SerializeField] float baseMaxHP = 100f;
     [SerializeField] float baseDamage = 10f;
     [SerializeField] float baseDefense = 1f;
     [SerializeField] float baseAttackSpeed = 1f;
     [SerializeField] float baseMoveSpeed = 10f;
     [SerializeField] float baseCooldown = 1f;
     [SerializeField] float baseLifeSteal = 1f;
-    [SerializeField] float baseJumpForce = 5f;
+    [SerializeField] float baseJumpForce = 10f;
 
     // === Current (버프/소울 적용된 현재 값) ===
     [Header("Current Stats")]
+    public float curMaxHP;
     public float curDamage;
     public float curDefense;
     public float curAttackSpeed;
@@ -25,12 +29,14 @@ public class PlayerStats : MonoBehaviour
 
     void Awake()
     {
+        hp = GetComponent<HP>();
         ResetToBaseStats(); // 초기값 세팅
     }
 
-    // “현재 스탯” 계산 (획득 효과를 누적 반영)
     public void ResetToBaseStats()
     {
+        curMaxHP = baseMaxHP; 
+        hp.SetMaxHP(curMaxHP, false);
         curDamage = baseDamage;
         curDefense = baseDefense;
         curAttackSpeed = baseAttackSpeed;
@@ -76,6 +82,7 @@ public class PlayerStats : MonoBehaviour
             PlayerStatType.SkillCooldown => baseCooldown,
             PlayerStatType.LifeSteal => baseLifeSteal,
             PlayerStatType.JumpForce => baseJumpForce,
+            PlayerStatType.MaxHP => baseMaxHP,
             _ => 0f
         };
     }
@@ -91,6 +98,10 @@ public class PlayerStats : MonoBehaviour
             case PlayerStatType.SkillCooldown: curCooldown = value; break;
             case PlayerStatType.LifeSteal: curLifeSteal = value; break;
             case PlayerStatType.JumpForce: curJumpForce = value; break;
+            case PlayerStatType.MaxHP:
+                curMaxHP = value;
+                if (hp != null) hp.SetMaxHP(curMaxHP, false);
+                break;
         }
     }
 }

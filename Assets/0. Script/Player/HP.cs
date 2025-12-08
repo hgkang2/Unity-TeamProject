@@ -42,6 +42,7 @@ public class HP : MonoBehaviour
             newMax = 0f;
         }
 
+        float differMaxHP = newMax - maxHP;
         maxHP = newMax;
 
         if (fillToMax)
@@ -50,10 +51,9 @@ public class HP : MonoBehaviour
         }
         else
         {
-            if (curHP > maxHP)
-            {
-                curHP = maxHP;
-            }
+            //MaxHp가 늘어난 만큼 curHp도 증가
+            //그럴 일은 없겠지만 maxHp가 줄어들면 curHp도 최대 maxHP만큼만
+            curHP = Mathf.Min(curHP + Mathf.Max(differMaxHP, 0f), maxHP);
         }
 
         RaiseHPChanged();

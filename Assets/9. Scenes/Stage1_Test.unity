@@ -2367,8 +2367,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: maxJumpCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: cameraShakeDuration
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: fallGravityMultiplier
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7436586581079057000, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: baseJumpForce
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -12,7 +12,7 @@ public class Player : MonoBehaviour, IDamageable
     PlayerStats stats;
     public PlayerStats Stats { get { return stats; } }
 
-    PlayerMove playerMove;
+    public PlayerMove playerMove;
     PlayerAttack playerAttack;
 
     SpriteRenderer playerSprite;

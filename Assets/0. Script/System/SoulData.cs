@@ -71,7 +71,8 @@ public class SoulData : ScriptableObject
 
             case SoulNeedType.LevelNeed:
                 return player.Exp.CurLevel >= levelConstrains;
-
+            case SoulNeedType.DoubleJumpGained:
+                return player.playerMove.maxJumpCount == 1;
                 //case SoulNeedType.MustHaveSkill:
                 //    return player.HasSkill(requiredSkill);
 

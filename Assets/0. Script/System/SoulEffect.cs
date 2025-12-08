@@ -68,7 +68,7 @@ public class SoulEffect
                 break;
 
             case SoulEffectType.IncreaseJumpNum:
-                //player.jumpnum++;
+                player.playerMove.maxJumpCount++;
                 break;
             // case SoulEffectType.ETC:
             //     //나중에 ETC가 필요해질 만큼 많이 생기면 적용

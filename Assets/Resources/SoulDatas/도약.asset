@@ -19,15 +19,16 @@ MonoBehaviour:
   soulEffectText: "\uC810\uD504 \uD69F\uC218 \uC99D\uAC00"
   soulDescript: "\uC810\uD504\uB97C \uD55C \uBC88 \uB354 \uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   effects:
-  - type: 4
+  - type: 5
     targetStat: 0
     flatValue: 0
     percentValue: 0
+    bonusValue: 0
     skillToLearn: 0
     soulEtcEffect: 0
     healAmount: 0
   soulCharacterType: 0
-  soulNeedType: 0
+  soulNeedType: 2
   levelConstrains: 0
   maxStack: 3
   isDisposable: 0

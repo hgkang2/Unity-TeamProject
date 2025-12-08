@@ -39,7 +39,7 @@ public class PlayerMove : MonoBehaviour
     float cooldownEndTime;
 
     // ---- 중력 ----
-    float baseGrav;
+    float baseGrav = 9.81f;
     public float apexGrav = 0.1f;
     public float apexThreshold = 0.7f;
     public float fallGravityMultiplier = 2.0f; // 2~3 정도

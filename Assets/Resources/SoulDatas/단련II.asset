@@ -24,11 +24,12 @@ MonoBehaviour:
     targetStat: 1
     flatValue: 40
     percentValue: 0
+    bonusValue: 0
     skillToLearn: 0
     soulEtcEffect: 0
     healAmount: 0
   soulCharacterType: 0
-  soulNeedType: 0
+  soulNeedType: 1
   levelConstrains: 5
   maxStack: 9999
   isDisposable: 0
