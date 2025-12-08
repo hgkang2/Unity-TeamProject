@@ -1,6 +1,4 @@
-using UnityEngine;
 using NaughtyAttributes;
-using UnityEditor.Build;
 
 [System.Serializable]
 public class SoulEffect

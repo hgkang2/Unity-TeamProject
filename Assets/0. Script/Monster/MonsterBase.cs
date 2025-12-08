@@ -1,7 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Android.Gradle.Manifest;
 
 public struct MonsterData  // 
 {
