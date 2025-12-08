@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MouseTrailVFX : MonoBehaviour
 {
@@ -26,43 +27,40 @@ public class MouseTrailVFX : MonoBehaviour
 
     void Update()
     {
+        
         if (!initialized)
         {
             return;
         }
 
-        // 1. 현재 마우스 월드 위치 읽기
-        Vector3 currentMousePos = GetMouseWorldPos();
+        // 1. 마우스 이동량 (픽셀 단위) 읽기
+        Vector2 delta = Mouse.current.delta.ReadValue();
+        bool isMoving = delta.sqrMagnitude > moveThreshold * moveThreshold;
 
-        // 2. 이전 프레임과 거리 차이
-        float deltaSqr = (currentMousePos - lastMousePosition).sqrMagnitude;
-        bool isMoving = deltaSqr > moveThreshold * moveThreshold;
 
         if (isMoving)
         {
             lastMoveTime = Time.unscaledTime;
         }
 
-        // 3. 움직이고 있거나, tailDuration 이내면 계속 뿜기
+        // 2. 움직이고 있거나, tailDuration 이내면 계속 뿜기
         float now = Time.unscaledTime;         // ← 그리고 여기
         bool shouldEmit = isMoving || (now - lastMoveTime <= tailDuration);
 
-        // 4. 파티클 위치를 마우스 위치로
-        transform.position = currentMousePos;
+        // 3. 파티클 위치를 마우스 위치로
+        transform.position = GetMouseWorldPos();
 
-        // 5. Emission On/Off
+        // 4. Emission On/Off
         ParticleSystem.EmissionModule emission = trailVFX.emission;
         emission.enabled = shouldEmit;
-
-        // 6. 마지막 위치 갱신 (제일 마지막!)
-        lastMousePosition = currentMousePos;
     }
     Vector3 GetMouseWorldPos()
     {
         // 화면 좌표 → VFXCamera 기준 월드 좌표
-        Vector3 mouseScreen = InputManager.Instance.GetMouseOriginPos();
+        Vector2 screenPos = Mouse.current.position.ReadValue();
         // 카메라 앞쪽 얼마만큼 떨어뜨릴지 (Orthographic이면 그냥 양수면 됨)
-        mouseScreen.z = 10f;
-        return VFXManager.Instance.VFXCamera.ScreenToWorldPoint(mouseScreen);
+
+        Vector3 pos = new Vector3(screenPos.x, screenPos.y, 10f);
+        return VFXManager.Instance.VFXCamera.ScreenToWorldPoint(pos);
     }
 }
