@@ -94,9 +94,11 @@ MonoBehaviour:
   - {fileID: 2926433054494360179}
   - {fileID: 1651791367390675055}
   - {fileID: 844352992556499619}
+  - {fileID: 4196689503586296982}
   inputVec: {x: 0, y: 0}
   isGrounded: 1
   jumpRequested: 0
+  isRightFacing: 1
   isDodging: 0
   apexGrav: 0.1
   apexThreshold: 0.7
@@ -114,7 +116,7 @@ MonoBehaviour:
   cameraShakeAmplitude: 0
   cameraShakeFrequency: 0
   cameraShakeDuration: 0
-  minGroundDistanceForAirAttack: 1
+  minGroundDistanceForAirAttack: 0.3
 --- !u!114 &7436586581079057000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,7 +222,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.56, y: 2.56}
+  m_Size: {x: 1.67, y: 1.84}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
@@ -610,7 +612,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.6082585, y: -0.25574505}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -620,7 +622,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.6635547, y: 0.4885099}
   m_EdgeRadius: 0
 --- !u!1 &2089963589152777586
 GameObject:
@@ -1287,7 +1289,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5290539213164127824
 Transform:
   m_ObjectHideFlags: 0
