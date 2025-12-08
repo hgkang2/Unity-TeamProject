@@ -18,5 +18,4 @@ public class PlayerHitBox : MonoBehaviour
             OnHit?.Invoke(damageable);
         }
     }
-
 }

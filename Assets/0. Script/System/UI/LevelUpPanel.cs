@@ -16,11 +16,13 @@ public class LevelUpPanel : UIKeyboardHandler
     int panelNum = 2;
     SoulPanel selectedSoulPanel;
 
+    RectTransform rect;
     public event Action SelectSoulCompleted;
 
     Vector3[] soulPanels_OriginPos = new Vector3[3];
     void Awake()
     {
+        rect = GetComponent<RectTransform>();
         soulPanels = GetComponentsInChildren<SoulPanel>();
         for (int i = 0; i < 3; i++)
         {
@@ -84,9 +86,16 @@ public class LevelUpPanel : UIKeyboardHandler
 
     void StartAnim()
     {
-        // 기준이 되는 중심 위치 (첫 패널 위치를 기준으로)
-        RectTransform centerRect = soulPanels[1].GetComponent<RectTransform>();
-        Vector2 centerPos = centerRect.anchoredPosition;
+        // 1️⃣ 캔버스 내 화면 중앙의 스크린 좌표를 구함
+        Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+
+        // 2️⃣ 스크린 좌표 → 현재 캔버스(RectTransform) 기준 로컬 좌표로 변환
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            rect,               // 변환 기준 (부모 캔버스 or 현재 패널)
+            screenCenter,       // 스크린상의 중앙
+            rect.GetComponentInParent<Canvas>().worldCamera, // Screen Space - Camera일 경우 반드시 카메라 전달
+            out Vector2 centerPos
+        );
 
         // 부채꼴 각도 세팅
         float startAngle = -angleRange * 0.5f;
@@ -101,6 +110,7 @@ public class LevelUpPanel : UIKeyboardHandler
         // 연출 시작
         for (int i = 0; i < panelNum; i++)
         {
+            soulPanels[i].transform.localPosition = centerPos;
             soulPanels[i].gameObject.SetActive(true);
             soulPanels[i].InvisibleContent();
 
