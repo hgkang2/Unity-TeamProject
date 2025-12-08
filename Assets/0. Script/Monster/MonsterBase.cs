@@ -266,7 +266,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         if (isDead) return;
 
-        OnHit(transform.position - Vector3.right); // �ӽ÷� ���� ���⿡�� �ǰݴ���
+        OnHit(transform.position - Vector3.right);
     }
 
     void IDamageable.TakeDamage(float amount, Vector2 attackerWorldPosition)
@@ -295,7 +295,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public virtual void OnDied()
     {
         if (isDead) return;
-
 
         isDead = true;
 

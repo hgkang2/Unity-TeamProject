@@ -8,7 +8,7 @@ public class HitSMB : MonsterStateSMB
         monsterBase.MonsterHitBox.enabled = false;
         monsterBase.isUsingSkill = false;
         monsterBase.spriteRenderer.color = Color.red;
-        monsterBase.rb.linearVelocity = Vector2.zero;
+        //monsterBase.rb.linearVelocity = Vector2.zero;
     }
 
     public override void OnExit()
