@@ -16,13 +16,11 @@ public class LevelUpPanel : UIKeyboardHandler
     int panelNum = 2;
     SoulPanel selectedSoulPanel;
 
-    RectTransform rect;
     public event Action SelectSoulCompleted;
 
     Vector3[] soulPanels_OriginPos = new Vector3[3];
     void Awake()
     {
-        rect = GetComponent<RectTransform>();
         soulPanels = GetComponentsInChildren<SoulPanel>();
         for (int i = 0; i < 3; i++)
         {
@@ -86,16 +84,6 @@ public class LevelUpPanel : UIKeyboardHandler
 
     void StartAnim()
     {
-        // 1️⃣ 캔버스 내 화면 중앙의 스크린 좌표를 구함
-        Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-
-        // 2️⃣ 스크린 좌표 → 현재 캔버스(RectTransform) 기준 로컬 좌표로 변환
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            rect,               // 변환 기준 (부모 캔버스 or 현재 패널)
-            screenCenter,       // 스크린상의 중앙
-            rect.GetComponentInParent<Canvas>().worldCamera, // Screen Space - Camera일 경우 반드시 카메라 전달
-            out Vector2 centerPos
-        );
 
         // 부채꼴 각도 세팅
         float startAngle = -angleRange * 0.5f;
@@ -110,7 +98,7 @@ public class LevelUpPanel : UIKeyboardHandler
         // 연출 시작
         for (int i = 0; i < panelNum; i++)
         {
-            soulPanels[i].transform.localPosition = centerPos;
+            soulPanels[i].transform.localPosition = Vector3.zero;
             soulPanels[i].gameObject.SetActive(true);
             soulPanels[i].InvisibleContent();
 
@@ -121,7 +109,7 @@ public class LevelUpPanel : UIKeyboardHandler
             cg.alpha = 0f;
             DisableInput();
 
-            rect.anchoredPosition = centerPos;          // 전부 같은 위치
+            rect.anchoredPosition = Vector3.zero;          // 전부 같은 위치
 
 
             Sequence cardSeq = DOTween.Sequence();
@@ -136,7 +124,7 @@ public class LevelUpPanel : UIKeyboardHandler
             float t = i - centerIndex;       // -1, 0, 1 같은 상대 인덱스
             float xOffset = radius * t;      // radius를 가로 간격처럼 사용
 
-            Vector2 targetPos = new Vector2(centerPos.x + xOffset, centerPos.y);
+            Vector2 targetPos = new Vector2(Vector3.zero.x + xOffset, Vector3.zero.y);
 
             // 회전 각도: -angleRange/2 ~ +angleRange/2
             float angle = -(startAngle + step * i);
