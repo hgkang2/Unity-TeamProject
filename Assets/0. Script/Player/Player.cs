@@ -123,6 +123,11 @@ public class Player : MonoBehaviour, IDamageable
         }
     }
 
+    public void Heal(float amount)
+    {
+        hp.Heal(amount);
+    }
+
     // IDamageable 기본 버전 (공격자 위치 모를 때)
     public void TakeDamage(float amount)
     {
@@ -133,6 +138,8 @@ public class Player : MonoBehaviour, IDamageable
 
         StartHitStun();
         StartInvincible();
+
+        //spriteFlash.PlayHitFlash();
 
         // 4. 넉백 은 일단 보류
         //move.StartKnockbackByFacing();
@@ -169,6 +176,5 @@ public class Player : MonoBehaviour, IDamageable
     {
         playerSprite.enabled = false;
         playerPartSprite.SetActive (true);
-
     }
 }

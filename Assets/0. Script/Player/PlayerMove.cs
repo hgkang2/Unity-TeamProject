@@ -1,3 +1,5 @@
+using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 [RequireComponent(typeof(Player))]
@@ -23,6 +25,7 @@ public class PlayerMove : MonoBehaviour
     public Vector2 inputVec;
     public bool isGrounded = false;
     public bool jumpRequested = false;
+    public bool isRightFacing = true;
 
     // ---- 구르기 ----
     public bool isDodging = false;
@@ -85,6 +88,12 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
+        // 플레이어가 입력 가능할 때만 방향 바꿀 수 있도록
+        if (player.CanControl && Mathf.Abs(inputVec.x) > 0.1f)
+        {
+            isRightFacing = inputVec.x > 0;
+        }
+
         ReadInput();
     }
 
@@ -120,28 +129,16 @@ public class PlayerMove : MonoBehaviour
 
         anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
         anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
-        anim.SetBool("IsMoving", Mathf.Abs(rb.linearVelocity.x) > 0.01f);
+        anim.SetBool("IsMoving", Mathf.Abs(rb.linearVelocity.x) > 0.1f);
 
         anim.SetBool("IsJumping", !isGrounded);
         
-
-        bool external = isDodging || !player.CanControl;;
-        if (!external && inputVec.x != 0)
-        {
-            float direction = inputVec.x < 0 ? -1f : 1f;
-            transform.localScale = new Vector3(direction, 1f, 1f);
-            /*
-            bool shouldFlip  = inputVec.x < 0;
-            spr.flipX = shouldFlip;
-            foreach (SpriteRenderer partRenderer in playerPartRender)
-            {
-                if (partRenderer != null)
-                {
-                partRenderer.flipX  = shouldFlip;
-                }
-            }
-            */
-        }
+        if(playerAttack.isAttacking) return;
+        //방향 바꾸기
+        float dir = isRightFacing ? 1 : -1;
+        Vector3 scale = transform.localScale;
+        scale.x = dir;
+        transform.localScale = scale;
     }
 
     // ---- 입력 ----
@@ -236,18 +233,10 @@ public class PlayerMove : MonoBehaviour
         playerAttack.EndAttack();
 
         anim.SetTrigger("Dodge");
-        bool isFacingLeft = spr.flipX;
-        float dir = isFacingLeft ? -1f : 1f;
-
-        foreach (SpriteRenderer partRenderer in playerPartRender)
-        {
-            if (partRenderer != null)
-            {
-                partRenderer.flipX = isFacingLeft;
-            }
-        }
 
         rb.gravityScale = 0;
+
+        float dir = isRightFacing ? 1 : -1;
         rb.linearVelocity = new Vector2(dir * stats.curMoveSpeed * 2f, 0);
     }
 

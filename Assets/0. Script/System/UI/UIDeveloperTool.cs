@@ -49,11 +49,11 @@ public class UIDeveloperTool : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            player.HP.Heal(HealSlider.value);
+            player.Heal(HealSlider.value);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            player.HP.TakeDamage(takeDamageSlider.value);
+            player.TakeDamage(takeDamageSlider.value);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
