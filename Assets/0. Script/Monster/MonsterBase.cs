@@ -129,7 +129,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         currentState = nextState;
         StateTimer = 0f;
-        rb.linearVelocity = new Vector2(0, -9.81f);
+        
     }
 
     public virtual void Idle()

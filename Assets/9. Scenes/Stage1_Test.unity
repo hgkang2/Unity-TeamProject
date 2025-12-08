@@ -2294,6 +2294,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2586156128623321068, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_Size.x
+      value: 3.4133334
+      objectReference: {fileID: 0}
+    - target: {fileID: 2586156128623321068, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_Size.y
+      value: 3.4133334
+      objectReference: {fileID: 0}
+    - target: {fileID: 2586156128623321068, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 5d6fc05e90b5500498094523ab76adb2, type: 3}
+    - target: {fileID: 2586156128623321068, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3541449839363612310, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4333207113835227846, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5736378371773769488, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.006
+      objectReference: {fileID: 0}
+    - target: {fileID: 5736378371773769488, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.104
+      objectReference: {fileID: 0}
     - target: {fileID: 6568192216305126023, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: m_LocalPosition.x
       value: -13.91
@@ -2334,10 +2366,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: cameraShakeDuration
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4333207113835227846, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 378233625}
   m_SourcePrefab: {fileID: 100100000, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
 --- !u!114 &324364301 stripped
 MonoBehaviour:
@@ -2564,6 +2603,26 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2007638276521564051, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
   m_PrefabInstance: {fileID: 1223679989}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &378233622 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4333207113835227846, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+  m_PrefabInstance: {fileID: 324364300}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &378233625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378233622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c67f7c46788750c4aa8d64c67e23b41c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minScale: 0.8
+  maxScale: 1.2
+  delay: 0.05
 --- !u!1 &391567070
 GameObject:
   m_ObjectHideFlags: 0
@@ -5178,6 +5237,10 @@ PrefabInstance:
     - target: {fileID: 2597532013085451368, guid: 858b8bf8bf1594b4db090e2514b4e0ac, type: 3}
       propertyPath: m_AllowMSAA
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2597532013085451368, guid: 858b8bf8bf1594b4db090e2514b4e0ac, type: 3}
+      propertyPath: orthographic size
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7772850409967082193, guid: 858b8bf8bf1594b4db090e2514b4e0ac, type: 3}
       propertyPath: m_LocalPosition.x
@@ -11053,6 +11116,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Grimlog
       objectReference: {fileID: 0}
+    - target: {fileID: 8776228013463675604, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -15437,6 +15504,7 @@ MonoBehaviour:
   maxHP: 10
   armor: 0
   initializeOnAwake: 1
+  curHP: 0
 --- !u!114 &1718258742
 MonoBehaviour:
   m_ObjectHideFlags: 0

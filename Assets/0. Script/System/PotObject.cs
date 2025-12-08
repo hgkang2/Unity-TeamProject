@@ -47,12 +47,12 @@ public class PotObject : MonoBehaviour, IDamageable
         {
             return;
         }
+        int randomIndex = Random.Range(0,itemPrefabs.Count);
+        GameObject selectedItem = itemPrefabs[randomIndex];
         Vector2 dropPosition = transform.position + new Vector3(0,0.5f,0);
         int ItemsDrop = Random.Range(1,6);
         for (int i = 0; i < ItemsDrop; i++)
         {
-            int randomIndex = Random.Range(0, itemPrefabs.Count);
-            GameObject selectedItem = itemPrefabs[randomIndex];
             GameObject droppedItem = Instantiate(selectedItem,dropPosition,Quaternion.identity);
             Rigidbody2D rb = droppedItem.GetComponent<Rigidbody2D>();
             if(rb != null)
