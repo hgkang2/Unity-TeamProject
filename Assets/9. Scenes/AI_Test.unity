@@ -495,7 +495,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!50 &399982676
 Rigidbody2D:
   serializedVersion: 5
@@ -1135,7 +1135,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8776228013463675604, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1161,10 +1161,6 @@ PrefabInstance:
     - target: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: m_Name
       value: Felmos
-      objectReference: {fileID: 0}
-    - target: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7213174648725036300, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: m_LocalPosition.x

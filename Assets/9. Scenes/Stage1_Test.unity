@@ -15450,7 +15450,10 @@ MonoBehaviour:
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   Alert: {fileID: 0}
+  MonsterHitBox: {fileID: 0}
+  SkillCol: {fileID: 0}
   direction: {x: 0, y: 0}
+  lastHitFrom: {x: 0, y: 0}
 --- !u!1 &1724118766
 GameObject:
   m_ObjectHideFlags: 0

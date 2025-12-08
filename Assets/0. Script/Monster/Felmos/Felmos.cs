@@ -19,6 +19,8 @@ public class Felmos : MonsterBase
     public override void Awake()
     {
         base.Awake();
+
+        PlayerPos = GameObject.Find("Player").transform;
         direction.x = 1;
     }
 
@@ -47,11 +49,14 @@ public class Felmos : MonsterBase
         monsterData.AggroRange = 12f;
         monsterData.AggroSpeed = 7f;
 
-        monsterData.Skill_Damage = 1f;
+        monsterData.Skill_Damage = 100f;
         monsterData.Skill_Delay = 0.5f;
 
         monsterData.SkillA_ActiveRange = 8f;
         monsterData.SkillA_coolTime = 10f;
+
+        monsterData.HitStunTime = 0.5f;
+        monsterData.KnockbackPower = 5f;
     }
 
     public override void Patrol()
@@ -131,7 +136,7 @@ public class Felmos : MonsterBase
 
         if(hit.collider != null)
         {
-            if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("Player"))
+            if (hit.collider.CompareTag("Ground"))
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             }
@@ -148,8 +153,9 @@ public class Felmos : MonsterBase
         var ShootSkill = Instantiate(FelmosBullet, FirePos.position, Quaternion.identity);
 
         Vector2 dir = PlayerPos.position - FirePos.position;
+        float damage = monsterData.Skill_Damage;
 
-        ShootSkill.GetComponent<FelmosBullet>().Initialize(dir);
+        ShootSkill.GetComponent<FelmosBullet>().Initialize(dir, damage);
 
         StartCoroutine(SkillCooldown());
     }
@@ -183,5 +189,10 @@ public class Felmos : MonsterBase
         yield return new WaitForSeconds(2f);
 
         retreating = false;
+    }
+
+    public override void MonsterMovement()
+    {
+        // 이 몹은 Patrol/Aggro에서 직접 rb.linearVelocity 관리하니까 여기서는 아무것도 안 함
     }
 }

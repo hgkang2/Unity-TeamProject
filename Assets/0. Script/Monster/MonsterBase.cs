@@ -214,6 +214,11 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
                 animator.SetTrigger("Aggro");
                 ChangeState(MonsterStateType.Aggro);
             }
+            else
+            {
+                animator.SetTrigger("Idle");
+                ChangeState(MonsterStateType.Idle);
+            }
         }
     }
 

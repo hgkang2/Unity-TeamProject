@@ -8,14 +8,20 @@ public class FelmosBullet : MonoBehaviour
 
     MonsterBase monster;
 
+    float damage;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         cd = GetComponent<Collider2D>();
+
+        //player = FindObjectOfType<Player>();
     }
 
-    public void Initialize(Vector2 direction)
+    public void Initialize(Vector2 direction, float dmg)
     {
+        this.damage = dmg;
+
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction.normalized * 20f, ForceMode2D.Impulse);
 
@@ -26,10 +32,9 @@ public class FelmosBullet : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Player"))
         {
-            float damage = monster.monsterData.Skill_Damage;
-            player.TakeDamage(damage);
+            var player = collision.gameObject.GetComponent<Player>();
 
-            Destroy(this.gameObject, 0.5f);
+            player.TakeDamage(damage);
         }
 
         if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground"))
