@@ -1,5 +1,6 @@
 using System;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Player))]
@@ -28,10 +29,14 @@ public class PlayerMove : MonoBehaviour
     public bool isRightFacing = true;
 
     // ---- 구르기 ----
+    [SerializeField] GameObject dodgeEffectSprite;
     public bool isDodging = false;
-    public bool IsDodging => isDodging;
+    public bool IsDodging => isDodging;    
+    
+    public float dodgeDuration = 1f;
+    float dodgeEndTime;
+    public float dodgeCooldown = 2f;
     float cooldownEndTime;
-    public readonly float dodgeCooldown = 1f;
 
     // ---- 중력 ----
     float baseGrav;
@@ -81,6 +86,12 @@ public class PlayerMove : MonoBehaviour
     {
         if (player.HP.IsDead) return;
 
+        // 회피 종료 판단
+        if (isDodging && Time.time >= dodgeEndTime)
+        {
+            EndDodge();
+        }
+        
         //경직 시 행동 불가(입력 막기)
         if (!player.CanControl)
         {
@@ -93,6 +104,7 @@ public class PlayerMove : MonoBehaviour
         {
             isRightFacing = inputVec.x > 0;
         }
+
 
         ReadInput();
     }
@@ -228,11 +240,14 @@ public class PlayerMove : MonoBehaviour
     void StartDodge()
     {
         isDodging = true;
+
+        dodgeEndTime = Time.time + dodgeDuration;
         cooldownEndTime = Time.time + dodgeCooldown;
 
         playerAttack.EndAttack();
 
         anim.SetTrigger("Dodge");
+        dodgeEffectSprite.SetActive(true);
 
         rb.gravityScale = 0;
 
@@ -242,6 +257,8 @@ public class PlayerMove : MonoBehaviour
 
     void EndDodge()
     {
+        anim.SetTrigger("OnDodgeEnd");
+        dodgeEffectSprite.SetActive(false);
         isDodging = false;
         rb.gravityScale = baseGrav;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
@@ -268,7 +285,7 @@ public class PlayerMove : MonoBehaviour
         if (isAirDownAttack) return;
         if (isGrounded) return; // 공중에서만
 
-        isDodging = true; //무적 판정!!
+        player.isInvincible = true; //무적 판정!!
 
         isAirDownAttack = true;
         isAirDownPrepare = true;
@@ -322,7 +339,7 @@ public class PlayerMove : MonoBehaviour
         // 상태 원복
         isAirDownAttack = false;
         isAirDownPrepare = false;
-        isDodging = false;
+        player.isInvincible = false; //무적 판정!!
     }
 
     // ---- 중력 / 착지 ----

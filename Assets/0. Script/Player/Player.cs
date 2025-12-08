@@ -94,7 +94,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] float hitInvincibleDuration = 0.5f;
 
     float invincibleTimer;
-    bool isInvincible;
+    public bool isInvincible;
     public bool IsInvincible => isInvincible;
 
     void StartInvincible()
