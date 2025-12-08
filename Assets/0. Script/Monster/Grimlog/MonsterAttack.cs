@@ -4,12 +4,11 @@ using System;
 public class MonsterAttack : MonoBehaviour
 {
     private MonsterBase monster;
-    [SerializeField] SkillHitBox hitBox; // À§ ÄÚµå°¡ ºÙ¾î ÀÖ´Â ½ºÅ©¸³Æ®
+    [SerializeField] SkillHitBox hitBox; // ï¿½ï¿½ ï¿½Úµå°¡ ï¿½Ù¾ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½Å©ï¿½ï¿½Æ®
 
     private void Awake()
-    {
-        if (hitBox == null)
-            hitBox = GetComponent<SkillHitBox>();
+    {   
+        monster = GetComponent<Grimlog>();
     }
 
     private void OnEnable()
@@ -26,7 +25,7 @@ public class MonsterAttack : MonoBehaviour
     {
         float damage = monster.monsterData.Skill_Damage;
 
-        Debug.Log("[MonsterAttack] HandleHit È£Ãâ, µ¥¹ÌÁö:" + damage);
+        Debug.Log("[MonsterAttack] HandleHit È£ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:" + damage);
         target.TakeDamage(damage);
     }
 }

@@ -10,7 +10,7 @@ public class HP : MonoBehaviour
     [Header("시작 시 풀피로 시작할지 여부")]
     [SerializeField] bool initializeOnAwake = true;
 
-    float curHP;
+    [SerializeField] float curHP;
     bool isDead;
 
     public float CurHP { get { return curHP; } }

@@ -3,11 +3,13 @@ using UnityEngine;
 using DG.Tweening;
 
 public class Grimlog : MonsterBase
-{
+{   
+    Vector3 originScale;
     public override void Awake()
     {
         base.Awake();
         direction.x = 1;
+        originScale = transform.localScale;
     }
 
     public override void Update()
@@ -16,16 +18,18 @@ public class Grimlog : MonsterBase
 
         if (direction.x > 0)
         {
-            spriteRenderer.flipX = true;
+            transform.localScale = new Vector3(-1*originScale.x,originScale.y,originScale.z);
         }
         else if (direction.x < 0)
         {
-            spriteRenderer.flipX = false;
+            transform.localScale = originScale;
         }
     }
 
     public override void MonsterDataSetting()
     {
+        monsterData.exp = 12;
+
         monsterData.IdleTime = 3f;
         monsterData.PatrolSpeed = 3f;
         monsterData.PatrolTime = 3f;
@@ -35,7 +39,9 @@ public class Grimlog : MonsterBase
         monsterData.AggroRange = 13f;
         monsterData.AggroSpeed = 5f;
 
-        monsterData.Skill_Damage = 200f;
+        monsterData.Collde_Damage = 10f;
+
+        monsterData.Skill_Damage = 50f;
         monsterData.Skill_Delay = 3f;
 
         monsterData.SkillA_ActiveRange = 6f;

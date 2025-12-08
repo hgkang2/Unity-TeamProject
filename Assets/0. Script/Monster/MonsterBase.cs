@@ -1,9 +1,11 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Android.Gradle.Manifest;
 
 public struct MonsterData  // 
 {
+    public int exp;
     public float IdleTime; // 
 
     public int MoveDirection;   // 
@@ -26,8 +28,8 @@ public struct MonsterData  //
     public float SkillB_coolTime;
     public float SkillC_coolTime;
 
-    public float HitStunTime;    // ÇÇ°Ý ÈÄ °æÁ÷ À¯Áö ½Ã°£
-    public float KnockbackPower; // ³Ë¹é ¼¼±â
+    public float HitStunTime;    // ï¿½Ç°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
+    public float KnockbackPower; // ï¿½Ë¹ï¿½ ï¿½ï¿½ï¿½ï¿½
 }
 
 public enum MonsterStateType { Idle, Patrol, Aggro, Take_Damage, Dead }
@@ -35,7 +37,6 @@ public enum MonsterStateType { Idle, Patrol, Aggro, Take_Damage, Dead }
 public abstract class MonsterBase : MonoBehaviour, IDamageable
 {
     HP hp;
-    Player player;
 
     public float Damage { get { return monsterData.Skill_Damage; } }
 
@@ -68,7 +69,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         rb = GetComponent<Rigidbody2D>();
         hp = GetComponent<HP>();
-        player = GetComponent<Player>();
         animator = GetComponentInChildren<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         MonsterHitBox = GetComponent<Collider2D>();
@@ -91,7 +91,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if(TimeManager.IsPaused) return;
+        if(isDead) return;
+
+        if (Input.GetKeyDown(KeyCode.F1))
         {
             TakeDamage(10f);
         }
@@ -103,6 +106,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     private void FixedUpdate()
     {
+        if(TimeManager.IsPaused) return;
         DetectPlayer();
     }
 
@@ -111,8 +115,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public virtual void MonsterFSM()
     {
         StateTimer += Time.deltaTime;
-
-        Debug.Log($"{gameObject.name} ({GetInstanceID()}) State: {currentState}");
 
         switch (currentState)
         {
@@ -130,7 +132,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         currentState = nextState;
         StateTimer = 0f;
-        rb.linearVelocity = Vector2.zero;
+        rb.linearVelocity = new Vector2(0, -9.81f);
     }
 
     public virtual void Idle()
@@ -227,7 +229,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         if (currentState == MonsterStateType.Take_Damage ||
         currentState == MonsterStateType.Dead)
         {
-            rb.linearVelocity = Vector2.zero;
+            rb.linearVelocity = new Vector2(0, -9.81f);
             return;
         }
 
@@ -267,7 +269,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         if (isDead) return;
 
-        OnHit(transform.position - Vector3.right); // ÀÓ½Ã·Î ¿ÞÂÊ ¹æÇâ¿¡¼­ ÇÇ°Ý´çÇÔ
+        OnHit(transform.position - Vector3.right); // ï¿½Ó½Ã·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¿¡ï¿½ï¿½ ï¿½Ç°Ý´ï¿½ï¿½ï¿½
     }
 
     void IDamageable.TakeDamage(float amount, Vector2 attackerWorldPosition)
@@ -297,7 +299,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         if (isDead) return;
 
-        Debug.Log("dead");
+
         isDead = true;
 
         ChangeState(MonsterStateType.Dead);
@@ -307,17 +309,22 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         StopAllCoroutines();
         isUsingSkill = false;
 
-        foreach (var col in GetComponentsInChildren<Collider2D>())
-            col.enabled = false;
+        GetComponent<Collider2D>().enabled = false;
+
+        FindFirstObjectByType<Player>().Exp.AddExp(monsterData.exp);
 
         GameObject.Destroy(this.gameObject, 3f);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
-            player.TakeDamage(monsterData.Collde_Damage);
+            Player player = collision.gameObject.GetComponent<Player>();
+            if(player != null)
+            {
+                player.TakeDamage(monsterData.Collde_Damage);
+            }
         }
     }
 }

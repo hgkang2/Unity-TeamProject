@@ -84,6 +84,7 @@ public class PlayerMove : MonoBehaviour
     // -------------------------------
     void Update()
     {
+        if(TimeManager.IsPaused) return;
         if (player.HP.IsDead) return;
 
         // 회피 종료 판단
@@ -337,9 +338,12 @@ public class PlayerMove : MonoBehaviour
     void OnAirDownLandingEnd()
     {
         // 상태 원복
+        isGrounded = true;
+        anim.ResetTrigger("Land");
+        anim.SetBool("IsJumping", false);
         isAirDownAttack = false;
         isAirDownPrepare = false;
-        player.isInvincible = false; //무적 판정!!
+        player.isInvincible = false;
     }
 
     // ---- 중력 / 착지 ----

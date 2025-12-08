@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: 3732372594089069875}
   - component: {fileID: 7239913965431233772}
   - component: {fileID: 4763804607924707048}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -346,7 +346,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6386387516130476832}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -382,7 +382,7 @@ GameObject:
   - component: {fileID: 8781915482151360314}
   - component: {fileID: 4931711516456578153}
   - component: {fileID: 3877415255260369509}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AttackCollider_UP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -474,7 +474,7 @@ GameObject:
   - component: {fileID: 2916428111951849968}
   - component: {fileID: 1864714764398149594}
   - component: {fileID: 3650000608852181626}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AttackCollider_Jump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -566,7 +566,7 @@ GameObject:
   - component: {fileID: 2120038638170687583}
   - component: {fileID: 3068524302203164029}
   - component: {fileID: 2004041468604935311}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AttackCollider_Normal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -657,7 +657,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6363665696520771809}
   - component: {fileID: 844352992556499619}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uC785"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -744,7 +744,7 @@ GameObject:
   m_Component:
   - component: {fileID: 561609599497031824}
   - component: {fileID: 4196689503586296982}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -830,7 +830,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7545007637514635383}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Effects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -865,7 +865,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4709780940411707527}
   - component: {fileID: 5517252693495351933}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -951,7 +951,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6689008790115035298}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HitBoxes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -987,7 +987,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5736378371773769488}
   - component: {fileID: 2586156128623321068}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uD68C\uD53C \uC774\uD399\uD2B8"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1074,7 +1074,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2525405131174006942}
   - component: {fileID: 2926433054494360179}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uB4B7\uBA38\uB9AC"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1161,7 +1161,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8323488788725152002}
   - component: {fileID: 586657386253754965}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uBCA0\uAE30 \uC774\uD399\uD2B8"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1249,7 +1249,7 @@ GameObject:
   - component: {fileID: 7109447599913408614}
   - component: {fileID: 7484912635782620706}
   - component: {fileID: 145603574781130016}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AttackCollider_Down
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1340,7 +1340,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4932549478841118615}
   - component: {fileID: 3890710060053832031}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uCC0C\uB974\uAE30 \uC774\uD399\uD2B8"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1427,7 +1427,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3847850910378658514}
   - component: {fileID: 2184884200822861622}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uC55E\uBA38\uB9AC"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1514,7 +1514,7 @@ GameObject:
   m_Component:
   - component: {fileID: 777696475457548130}
   - component: {fileID: 1651791367390675055}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uB208"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1601,7 +1601,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5290539213164127824}
   - component: {fileID: 1228956059678188056}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}

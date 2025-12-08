@@ -53,6 +53,7 @@ public class Player : MonoBehaviour, IDamageable
 
     void Update()
     {
+        if(TimeManager.IsPaused) return;
         UpdateHitStun();
         UpdateInvincible();
     }
