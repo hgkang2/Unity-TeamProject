@@ -131,13 +131,13 @@ public class LevelUpPanel : UIKeyboardHandler
 
             // fadeDuration 이후에 위치/회전 트윈 시작
             cardSeq.Append(
-                rect.DOAnchorPos(targetPos, 0.5f)
+                rect.DOAnchorPos(targetPos, 0.3f)
                     .SetEase(Ease.OutCubic)
             );
 
             float nowY = rect.localRotation.eulerAngles.y;
             cardSeq.Join(
-                rect.DORotate(new Vector3(0f, nowY, angle), 0.5f, RotateMode.Fast)
+                rect.DORotate(new Vector3(0f, nowY, angle), 0.3f, RotateMode.Fast)
                     .SetEase(Ease.OutCubic)
             );
 

@@ -63,7 +63,6 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         soulDescript.text = data.soulDescript;
         soulData = data;
         OriginPanelScale();
-        Debug.Log($"{data.displayName}");
     }
 
     public void visibleContent()
