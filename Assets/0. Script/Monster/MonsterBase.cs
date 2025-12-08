@@ -14,6 +14,7 @@ public struct MonsterData  //
     public float AggroSpeed;
 
     public float Skill_Damage;
+    public float Collde_Damage;
 
     public float Skill_Delay;
 
@@ -24,9 +25,12 @@ public struct MonsterData  //
     public float SkillA_coolTime;
     public float SkillB_coolTime;
     public float SkillC_coolTime;
+
+    public float HitStunTime;    // 피격 후 경직 유지 시간
+    public float KnockbackPower; // 넉백 세기
 }
 
-public enum MonsterStateType { Idle, Patrol, Aggro, Take_Damage,Dead }
+public enum MonsterStateType { Idle, Patrol, Aggro, Take_Damage, Dead }
 
 public abstract class MonsterBase : MonoBehaviour, IDamageable
 {
@@ -40,6 +44,8 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public LayerMask PlayerLayermask;
 
+    bool isDead;
+
     public bool isUsingSkill = false;
     public bool isSkillReady = true;
 
@@ -51,8 +57,12 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public SpriteRenderer spriteRenderer;
     public Animator animator;
     public GameObject Alert;
+    public Collider2D MonsterHitBox;
+    public GameObject SkillCol;
 
     public Vector2 direction;
+
+    public Vector2 lastHitFrom;
 
     public virtual void Awake()
     {
@@ -61,8 +71,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         player = GetComponent<Player>();
         animator = GetComponentInChildren<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        MonsterHitBox = GetComponent<Collider2D>();
 
         isUsingSkill = false;
+        isDead = false;
 
         hp.OnDied += OnDied;
     }
@@ -79,14 +91,14 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void Update()
     {
-        MonsterFSM();
-
-        MonsterMovement();
-
-        if (Input.GetKeyDown(KeyCode.A) && name == "Grimlog")
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             TakeDamage(10f);
         }
+
+        MonsterFSM();
+
+        MonsterMovement();
     }
 
     private void FixedUpdate()
@@ -107,11 +119,15 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             case MonsterStateType.Idle: Idle(); break;
             case MonsterStateType.Patrol: Patrol();  break;
             case MonsterStateType.Aggro: Aggro(); break;
+            case MonsterStateType.Take_Damage: TakeDamageState(); break;
         }
     }
 
     public virtual void ChangeState(MonsterStateType nextState)
     {
+        if (isDead && nextState != MonsterStateType.Dead)
+            return;
+
         currentState = nextState;
         StateTimer = 0f;
         rb.linearVelocity = Vector2.zero;
@@ -189,9 +205,28 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         }
     }
 
+    public virtual void TakeDamageState()
+    {
+        if (StateTimer >= monsterData.HitStunTime)
+        {
+            if (DistanceToPlayer <= monsterData.AggroRange)
+            {
+                animator.SetTrigger("Aggro");
+                ChangeState(MonsterStateType.Aggro);
+            }
+        }
+    }
+
     public virtual void MonsterMovement()
     {
-        if(currentState == MonsterStateType.Patrol)
+        if (currentState == MonsterStateType.Take_Damage ||
+        currentState == MonsterStateType.Dead)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        if (currentState == MonsterStateType.Patrol)
         {
             rb.linearVelocity = new Vector2(direction.x * monsterData.PatrolSpeed, rb.linearVelocity.y);
             return;
@@ -200,18 +235,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         if(currentState == MonsterStateType.Aggro && !isUsingSkill)
         {
             rb.linearVelocity = new Vector2(direction.x * monsterData.AggroSpeed, rb.linearVelocity.y);
-            return;
-        }
-
-        if(currentState == MonsterStateType.Take_Damage)
-        {
-            rb.linearVelocity = Vector2.zero;
-            return;
-        }
-
-        if(currentState == MonsterStateType.Dead)
-        {
-            rb.linearVelocity = Vector2.zero;
             return;
         }
     }
@@ -231,26 +254,65 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         Gizmos.DrawWireSphere(transform.position, monsterData.SkillA_ActiveRange);
     }
 
-    public void TakeDamage(float amount){
+    public void TakeDamage(float amount)
+    {
+        if (hp == null) return;
+
         hp.TakeDamage(amount);
+
+        if (isDead) return;
+
+        OnHit(transform.position - Vector3.right); // 임시로 왼쪽 방향에서 피격당함
     }
 
     void IDamageable.TakeDamage(float amount, Vector2 attackerWorldPosition)
     {
+        if (hp == null) return; 
+
         hp.TakeDamage(amount);
+
+        if (isDead) return;
+
+        lastHitFrom = attackerWorldPosition;
+        OnHit(attackerWorldPosition);
     }
 
-    void OnDied()
+    public virtual void OnHit(Vector2 attackerWorldPosition)
     {
+        ChangeState(MonsterStateType.Take_Damage);
+        animator.SetTrigger("Hit");
+
+        Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
+
+        float knockback = monsterData.KnockbackPower;
+        rb.linearVelocity = new Vector2(dir.x * knockback, rb.linearVelocity.y);
+    }
+
+    public virtual void OnDied()
+    {
+        if (isDead) return;
+
         Debug.Log("dead");
+        isDead = true;
 
         ChangeState(MonsterStateType.Dead);
 
+        animator.SetTrigger("Dead");
+
         StopAllCoroutines();
         isUsingSkill = false;
+
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
 
         GameObject.Destroy(this.gameObject, 3f);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.CompareTag("Player"))
+        {
+            player.TakeDamage(monsterData.Collde_Damage);
+        }
     }
 }
