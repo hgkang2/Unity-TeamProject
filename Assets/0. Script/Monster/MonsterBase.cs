@@ -101,11 +101,11 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         MonsterMovement();
     }
 
-    private void FixedUpdate()
-    {
-        if(TimeManager.IsPaused) return;
-        DetectPlayer();
-    }
+    //private void FixedUpdate()
+    //{
+    //    if(TimeManager.IsPaused) return;
+    //    DetectPlayer();
+    //}
 
     public abstract void MonsterDataSetting();
 
@@ -182,27 +182,27 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         }
     }
 
-    public virtual void DetectPlayer()
-    {
-        Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
+    //public virtual void DetectPlayer()
+    //{
+    //    Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
 
-        if (detectCollider != null && detectCollider.CompareTag("Player") && !isUsingSkill)
-        {
-            PlayerPosition = detectCollider.transform;
+    //    if (detectCollider != null && detectCollider.CompareTag("Player") && !isUsingSkill)
+    //    {
+    //        PlayerPosition = detectCollider.transform;
 
-            Vector2 playerPos = new Vector2(PlayerPosition.position.x, transform.position.y);
-            Vector2 myPos = new Vector2(transform.position.x, transform.position.y);
+    //        Vector2 playerPos = new Vector2(PlayerPosition.position.x, transform.position.y);
+    //        Vector2 myPos = new Vector2(transform.position.x, transform.position.y);
 
-            direction = (playerPos - myPos).normalized;
+    //        direction = (playerPos - myPos).normalized;
 
-            DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
-        }
-        else
-        {
-            PlayerPosition = null;
-            DistanceToPlayer = Mathf.Infinity;
-        }
-    }
+    //        DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
+    //    }
+    //    else
+    //    {
+    //        PlayerPosition = null;
+    //        DistanceToPlayer = Mathf.Infinity;
+    //    }
+    //}
 
     public virtual void TakeDamageState()
     {
@@ -249,14 +249,14 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void OnSkillExit() { }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, monsterData.AggroRange);
+    //void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawWireSphere(transform.position, monsterData.AggroRange);
 
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, monsterData.SkillA_ActiveRange);
-    }
+    //    Gizmos.color = Color.blue;
+    //    Gizmos.DrawWireSphere(transform.position, monsterData.SkillA_ActiveRange);
+    //}
 
     public void TakeDamage(float amount)
     {

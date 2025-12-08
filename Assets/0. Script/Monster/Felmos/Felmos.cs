@@ -105,28 +105,28 @@ public class Felmos : MonsterBase
         }
     }
 
-    public override void DetectPlayer()
-    {
-        Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
+    //public override void DetectPlayer()
+    //{
+    //    Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, monsterData.AggroRange, PlayerLayermask);
 
-        if (detectCollider != null && detectCollider.CompareTag("Player") && !isUsingSkill)
-        {
-            PlayerPosition = detectCollider.transform;
+    //    if (detectCollider != null && detectCollider.CompareTag("Player") && !isUsingSkill)
+    //    {
+    //        PlayerPosition = detectCollider.transform;
 
-            Vector2 playerPos = new Vector2(PlayerPosition.position.x, PlayerPosition.position.y);
-            Vector2 myPos = new Vector2(transform.position.x, transform.position.y);
+    //        Vector2 playerPos = new Vector2(PlayerPosition.position.x, PlayerPosition.position.y);
+    //        Vector2 myPos = new Vector2(transform.position.x, transform.position.y);
 
-            direction = (playerPos - myPos).normalized;
+    //        direction = (playerPos - myPos).normalized;
 
-            DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
-        }
-        else
-        {
-            PlayerPosition = null;
+    //        DistanceToPlayer = Vector2.Distance(transform.position, PlayerPosition.position);
+    //    }
+    //    else
+    //    {
+    //        PlayerPosition = null;
 
-            DistanceToPlayer = Mathf.Infinity;
-        }
-    }
+    //        DistanceToPlayer = Mathf.Infinity;
+    //    }
+    //}
 
     void DetectGround()
     {
