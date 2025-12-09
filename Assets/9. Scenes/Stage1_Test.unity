@@ -1218,7 +1218,7 @@ GameObject:
   - component: {fileID: 130119065}
   - component: {fileID: 130119064}
   - component: {fileID: 130119063}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall (6)
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -2294,38 +2294,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 2586156128623321068, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: m_Size.x
-      value: 3.4133334
-      objectReference: {fileID: 0}
-    - target: {fileID: 2586156128623321068, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: m_Size.y
-      value: 3.4133334
-      objectReference: {fileID: 0}
-    - target: {fileID: 2586156128623321068, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 5d6fc05e90b5500498094523ab76adb2, type: 3}
-    - target: {fileID: 2586156128623321068, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: m_WasSpriteAssigned
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3541449839363612310, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4333207113835227846, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5736378371773769488, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1.006
-      objectReference: {fileID: 0}
-    - target: {fileID: 5736378371773769488, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1.104
-      objectReference: {fileID: 0}
     - target: {fileID: 6568192216305126023, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: m_LocalPosition.x
       value: -13.91
@@ -2366,42 +2334,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: maxJumpCount
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: cameraShakeDuration
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: fallGravityMultiplier
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7436586581079057000, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      propertyPath: baseJumpForce
-      value: 7
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 21353070434239750, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      insertIndex: 8
-      addedObject: {fileID: 1312789033}
-    - targetCorrespondingSourceObject: {fileID: 21353070434239750, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1312789032}
-    - targetCorrespondingSourceObject: {fileID: 4333207113835227846, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 378233625}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
 --- !u!114 &324364301 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 228340499222622191, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
   m_PrefabInstance: {fileID: 324364300}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 722979540}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf701f8d195e4ef4c8c6387d011b3904, type: 3}
@@ -2621,26 +2564,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2007638276521564051, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
   m_PrefabInstance: {fileID: 1223679989}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &378233622 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4333207113835227846, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-  m_PrefabInstance: {fileID: 324364300}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &378233625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 378233622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c67f7c46788750c4aa8d64c67e23b41c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  minScale: 0.8
-  maxScale: 1.2
-  delay: 0.05
 --- !u!1 &391567070
 GameObject:
   m_ObjectHideFlags: 0
@@ -3616,7 +3539,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 255
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -3686,7 +3609,7 @@ GameObject:
   - component: {fileID: 521445371}
   - component: {fileID: 521445373}
   - component: {fileID: 521445372}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall (8)
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -5975,11 +5898,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!1 &722979540 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 21353070434239750, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
-  m_PrefabInstance: {fileID: 324364300}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &723017298
 GameObject:
   m_ObjectHideFlags: 0
@@ -8202,7 +8120,7 @@ GameObject:
   - component: {fileID: 942370134}
   - component: {fileID: 942370133}
   - component: {fileID: 942370132}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall (4)
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -10784,7 +10702,7 @@ GameObject:
   - component: {fileID: 1188299811}
   - component: {fileID: 1188299810}
   - component: {fileID: 1188299809}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -12068,146 +11986,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3246203202638581411, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
   m_PrefabInstance: {fileID: 324364300}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 722979540}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1975b857ce72bd142a191f6ba33d2625, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!82 &1312789032
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 722979540}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
---- !u!114 &1312789033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 722979540}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14228a4477c63424cbf234832b2c23b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sounds:
-  - key: MoveDefault
-    clips:
-    - {fileID: 8300000, guid: 1a1fcf5227f563e47bec9b960ca1c1e9, type: 3}
-    volume: 1
-    pitchMin: 1
-    pitchMax: 1
-  - key: 
-    clips:
-    - {fileID: 8300000, guid: e5f884e4db72e0b4a950b7a871711248, type: 3}
-    volume: 1
-    pitchMin: 1
-    pitchMax: 1
-  - key: MoveGrass
-    clips:
-    - {fileID: 8300000, guid: e18cc95cf667b7140ad3cf96abc60ea6, type: 3}
-    volume: 1
-    pitchMin: 1
-    pitchMax: 1
-  - key: MoveDirt
-    clips:
-    - {fileID: 8300000, guid: a701b7c8bfb5102449af994b0c51b633, type: 3}
-    volume: 1
-    pitchMin: 1
-    pitchMax: 1
 --- !u!1 &1316732433
 GameObject:
   m_ObjectHideFlags: 0
@@ -12219,7 +12003,7 @@ GameObject:
   - component: {fileID: 1316732436}
   - component: {fileID: 1316732435}
   - component: {fileID: 1316732434}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall (3)
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -15434,7 +15218,7 @@ GameObject:
   - component: {fileID: 1684263371}
   - component: {fileID: 1684263370}
   - component: {fileID: 1684263369}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall (2)
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -15701,7 +15485,7 @@ GameObject:
   - component: {fileID: 1724118769}
   - component: {fileID: 1724118768}
   - component: {fileID: 1724118767}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall (5)
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -16281,7 +16065,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1768154146}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Walls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22832,7 +22616,7 @@ GameObject:
   - component: {fileID: 2004574310}
   - component: {fileID: 2004574309}
   - component: {fileID: 2004574308}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall (1)
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -24373,7 +24157,7 @@ GameObject:
   - component: {fileID: 2118944826}
   - component: {fileID: 2118944825}
   - component: {fileID: 2118944824}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wall (7)
   m_TagString: Wall
   m_Icon: {fileID: 0}

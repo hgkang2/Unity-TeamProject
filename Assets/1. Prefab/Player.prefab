@@ -16,10 +16,12 @@ GameObject:
   - component: {fileID: 8508408560950462055}
   - component: {fileID: 3246203202638581411}
   - component: {fileID: 6733278554063955151}
+  - component: {fileID: 115294010333658088}
   - component: {fileID: 8061272880331229367}
   - component: {fileID: 3732372594089069875}
   - component: {fileID: 7239913965431233772}
   - component: {fileID: 4763804607924707048}
+  - component: {fileID: 5678952461101037606}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -57,6 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf701f8d195e4ef4c8c6387d011b3904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerMove: {fileID: 0}
   playerPartSprite: {fileID: 542362729140075842}
   hitStunDuration: 0.15
   hitInvincibleDuration: 0.5
@@ -108,20 +111,29 @@ MonoBehaviour:
   dodgeCooldown: 1
   apexGrav: 0.1
   apexThreshold: 0.7
-  fallGravityMultiplier: 2
+  fallGravityMultiplier: 3
   airControlLerp: 6
   groundMask:
     serializedVersion: 2
     m_Bits: 128
   groundRayLength: 0.2
   groundRayOffsetX: 0.25
-  maxJumpCount: 2
+  maxJumpCount: 1
+  isWallGrabbing: 0
+  isWallSliding: 0
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 264
+  wallCheckDistance: 0.5
+  wallSlideSpeed: 2
+  wallJumpForceX: 10
+  wallJumpForceY: 15
   airDownPrepareDuration: 0.15
   airDownFallSpeed: 40
   airDownGravityScale: 5
   cameraShakeAmplitude: 1.2
   cameraShakeFrequency: 1.5
-  cameraShakeDuration: 0.15
+  cameraShakeDuration: 0.2
   minGroundDistanceForAirAttack: 0.3
 --- !u!114 &7436586581079057000
 MonoBehaviour:
@@ -135,13 +147,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35d9c9eb63b059646a7fbdc000aa27cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseMaxHP: 100
   baseDamage: 10
   baseDefense: 1
   baseAttackSpeed: 1
   baseMoveSpeed: 10
   baseCooldown: 1
   baseLifeSteal: 1
-  baseJumpForce: 5
+  baseJumpForce: 7
+  curMaxHP: 0
   curDamage: 0
   curDefense: 0
   curAttackSpeed: 0
@@ -197,6 +211,47 @@ MonoBehaviour:
   armor: 0
   initializeOnAwake: 1
   curHP: 0
+--- !u!114 &115294010333658088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21353070434239750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14228a4477c63424cbf234832b2c23b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - key: MoveDefault
+    clips:
+    - {fileID: 8300000, guid: 1a1fcf5227f563e47bec9b960ca1c1e9, type: 3}
+    volume: 1
+    loopable: 0
+    pitchMin: 1
+    pitchMax: 1
+  - key: 
+    clips:
+    - {fileID: 8300000, guid: e5f884e4db72e0b4a950b7a871711248, type: 3}
+    volume: 1
+    loopable: 0
+    pitchMin: 1
+    pitchMax: 1
+  - key: MoveGrass
+    clips:
+    - {fileID: 8300000, guid: e18cc95cf667b7140ad3cf96abc60ea6, type: 3}
+    volume: 1
+    loopable: 0
+    pitchMin: 1
+    pitchMax: 1
+  - key: MoveDirt
+    clips:
+    - {fileID: 8300000, guid: a701b7c8bfb5102449af994b0c51b633, type: 3}
+    volume: 1
+    loopable: 0
+    pitchMin: 1
+    pitchMax: 1
 --- !u!212 &8061272880331229367
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -338,6 +393,103 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!82 &5678952461101037606
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21353070434239750}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &542362729140075842
 GameObject:
   m_ObjectHideFlags: 0
@@ -988,6 +1140,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5736378371773769488}
   - component: {fileID: 2586156128623321068}
+  - component: {fileID: 130438568900273989}
   m_Layer: 6
   m_Name: "\uD68C\uD53C \uC774\uD399\uD2B8"
   m_TagString: Untagged
@@ -1004,7 +1157,7 @@ Transform:
   m_GameObject: {fileID: 4333207113835227846}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.31, y: -0.29, z: 0}
+  m_LocalPosition: {x: 1.006, y: -1.104, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1054,17 +1207,32 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 5784555859762629662, guid: 5d6fc05e90b5500498094523ab76adb2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5d6fc05e90b5500498094523ab76adb2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.99215686}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 6.14, y: 4.92}
+  m_Size: {x: 3.4133334, y: 3.4133334}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &130438568900273989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4333207113835227846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c67f7c46788750c4aa8d64c67e23b41c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minScale: 0.8
+  maxScale: 1.2
+  delay: 0.05
 --- !u!1 &5659160439569186166
 GameObject:
   m_ObjectHideFlags: 0

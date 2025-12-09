@@ -1,4 +1,5 @@
 using System;
+using NUnit.Framework;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -54,6 +55,15 @@ public class PlayerMove : MonoBehaviour
     // --- 점프 횟수 관리 ---
     public int maxJumpCount = 2;
     int currentJumpCount;
+    
+    // --- 벽잡기 / 벽 슬라이딩 ---
+    public bool isWallGrabbing = false;
+    public bool isWallSliding  = false;
+    public LayerMask wallMask;
+    [SerializeField] float wallCheckDistance = 0.5f;
+    [SerializeField] float wallSlideSpeed = 2f;
+    [SerializeField] float wallJumpForceX = 10f;
+    [SerializeField] float wallJumpForceY = 15f;
 
     void Awake()
     {
@@ -116,8 +126,11 @@ public class PlayerMove : MonoBehaviour
     void FixedUpdate()
     {
         if (player.HP.IsDead) return;
+        
+        HandleWallCheck();
+        HandleWallAction();
 
-        bool external = isDodging || !player.CanControl  || isAirDownAttack;;
+        bool external = isDodging || !player.CanControl  || isAirDownAttack || isWallGrabbing || isWallSliding;
         if (!external)
         {
             HandleJump();
@@ -145,8 +158,8 @@ public class PlayerMove : MonoBehaviour
         anim.SetBool("IsMoving", Mathf.Abs(rb.linearVelocity.x) > 0.1f);
 
         anim.SetBool("IsJumping", !isGrounded);
-        
-        if(playerAttack.isAttacking) return;
+        anim.SetBool("IsWallGrabbing", isWallGrabbing || isWallSliding);
+        if(playerAttack.isAttacking || isWallGrabbing || isWallSliding) return;
         //방향 바꾸기
         float dir = isRightFacing ? 1 : -1;
         Vector3 scale = transform.localScale;
@@ -203,6 +216,12 @@ public class PlayerMove : MonoBehaviour
         if (!jumpRequested) return;
         jumpRequested = false;
 
+        if (isWallGrabbing || isWallSliding)
+        {
+            HandleWallJump();
+            return;
+        }
+
         bool canJump = isGrounded || currentJumpCount > 0;
         if (!canJump) return;
         anim.ResetTrigger("Land");
@@ -228,6 +247,18 @@ public class PlayerMove : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
+    }
+    void HandleWallJump()
+    {
+        isWallGrabbing = false;
+        isWallSliding = false;
+        rb.gravityScale = baseGrav;
+        float jumpDir = isRightFacing ? -1 : 1;
+        isRightFacing = !isRightFacing;
+        rb.linearVelocity = Vector2.zero;
+        Vector2 wallJumpVec = new Vector2(wallJumpForceX * jumpDir, wallJumpForceY);
+        rb.AddForce(wallJumpVec, ForceMode2D.Impulse);
+        currentJumpCount --;
     }
 
     // ---- 구르기 ----
@@ -451,5 +482,67 @@ public class PlayerMove : MonoBehaviour
 #endif
 
         return dist; // -1이면 바닥 없음
+    }
+     void HandleWallCheck()
+        {
+            if (isGrounded || isDodging)
+            {
+                isWallGrabbing = false;
+                isWallSliding = false;
+                return;
+            }
+            Vector2 rayOrigin = transform.position;
+            Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin,rayDirection,wallCheckDistance,wallMask);
+            bool isTouchingWall = (hit.collider != null);
+            bool inputTowardWall = (isRightFacing && inputVec.x > 0.01f) || (!isRightFacing && inputVec.x < -0.01f);
+            if (isTouchingWall && !isGrounded && rb.linearVelocity.y < 0)
+            {
+                if (inputTowardWall)
+                {
+                    isWallGrabbing = true;
+                    isWallSliding = false;
+                }
+                else
+                {
+                    isWallSliding = true;
+                    isWallGrabbing = false;
+                }
+            }
+            else
+            {
+                isWallGrabbing = false;
+                isWallSliding = false;
+            }
+        }
+        float originGravityScale;
+        void HandleWallAction()
+    {
+        if(isWallGrabbing)
+        {
+            if (rb.gravityScale != 0f)
+            {
+                originGravityScale = rb.gravityScale;
+                rb.gravityScale = 0f;
+            }
+            rb.velocity = Vector2.zero;
+            currentJumpCount = maxJumpCount;
+        }
+        else if (isWallSliding)
+        {
+            if(rb.gravityScale != originGravityScale)
+            {
+                rb.gravityScale = originGravityScale;
+            }
+            rb.velocity = new Vector2(0f, Mathf.Max(rb.velocity.y, -wallSlideSpeed));
+            currentJumpCount = maxJumpCount;
+        }
+        else
+        {
+            if (rb.gravityScale != baseGrav && !isDodging && !isAirDownAttack)
+            {
+                rb.gravityScale = baseGrav;
+            }
+        }
     }
 }
