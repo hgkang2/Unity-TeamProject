@@ -6,7 +6,6 @@ public class PlayerAttack : MonoBehaviour
     Player player;
     PlayerMove playerMove;
     PlayerStats stats;
-
     Animator animator;
 
     //Player 아래에 각 공격 범위 별로 히트박스 만들기 후 
@@ -14,9 +13,9 @@ public class PlayerAttack : MonoBehaviour
     [Header("각 공격별 히트박스")]
     [SerializeField] PlayerHitBox normalHitbox;
     [SerializeField] PlayerHitBox upHitbox;
+    [SerializeField] PlayerHitBox jumpHitbox;
     [SerializeField] PlayerHitBox downHitbox;
     //[SerializeField] PlayerHitBox specialHitbox;
-    [SerializeField] PlayerHitBox jumpHitbox;
 
     public bool isAttacking;
     AttackType currentType = AttackType.None;
@@ -33,25 +32,25 @@ public class PlayerAttack : MonoBehaviour
     {
         DisableAllHitboxes();
     }
-    
+
     void OnEnable()
     {
         normalHitbox.OnHit += HandleHit;
         upHitbox.OnHit += HandleHit;
+        jumpHitbox.OnHit += HandleHit;
         downHitbox.OnHit += HandleHit;
         //specialHitbox.OnHit += HandleHit;
-        jumpHitbox.OnHit += HandleHit;
-                InputManager.Instance.AttackPressed  += HandleAttackPressed;
+        InputManager.Instance.AttackPressed += HandleAttackPressed;
         InputManager.Instance.SpecialAttackPressed += HandleSpecialAttackPressed;
     }
     void OnDisable()
     {
         normalHitbox.OnHit -= HandleHit;
         upHitbox.OnHit -= HandleHit;
+        jumpHitbox.OnHit -= HandleHit;
         downHitbox.OnHit -= HandleHit;
         //specialHitbox.OnHit -= HandleHit;
-        jumpHitbox.OnHit -= HandleHit;
-                InputManager.Instance.AttackPressed  -= HandleAttackPressed;
+        InputManager.Instance.AttackPressed -= HandleAttackPressed;
         InputManager.Instance.SpecialAttackPressed -= HandleSpecialAttackPressed;
     }
 
@@ -59,18 +58,17 @@ public class PlayerAttack : MonoBehaviour
     {
         target.TakeDamage(stats.curDamage);
 
-
         // 적 타격 시 Hit Stop
         switch (currentType)
         {
             case AttackType.Special:
                 // 궁극기 시전시 평타보다 좀 더 느려지게
                 // TimeManager.SlowForMoment(0.1f, 0.05f, 0.15f);
-            break;
+                break;
             default:
                 // 평타 시전시 약간 느려지게
                 TimeManager.SlowForMoment(0, 0, 0.05f);
-            break;
+                break;
         }
     }
 
@@ -124,17 +122,15 @@ public class PlayerAttack : MonoBehaviour
         //StartAttack(AttackType.Special);
     }
 
-    //Animator에 각 Trigger Parameter 추가하기(오타주의)
     public void StartAttack(AttackType type)
     {
-        animator.SetTrigger("Attack");
-        animator.SetInteger("AttackType", (int)type);
-
-
         if (type == AttackType.Down)
         {
-            playerMove.StartAirDownAttack();
+            player.ExecuteAirDownAttack();
         }
+
+        animator.SetTrigger("Attack");
+        animator.SetInteger("AttackType", (int)type);
 
         isAttacking = true;
     }
@@ -180,11 +176,11 @@ public class PlayerAttack : MonoBehaviour
             case AttackType.Up:
                 if (upHitbox != null) upHitbox.col.enabled = true;
                 break;
+            case AttackType.Jump:
+                if (jumpHitbox != null) jumpHitbox.col.enabled = true;
+                break;
             case AttackType.Down:
                 if (downHitbox != null) downHitbox.col.enabled = true;
-                break;
-            case AttackType.Jump:
-                if(jumpHitbox != null) jumpHitbox.col.enabled = true;
                 break;
             case AttackType.Special:
                 //if (specialHitbox != null) specialHitbox.enabled = true;
@@ -197,7 +193,7 @@ public class PlayerAttack : MonoBehaviour
         if (normalHitbox != null) normalHitbox.col.enabled = false;
         if (upHitbox != null) upHitbox.col.enabled = false;
         if (downHitbox != null) downHitbox.col.enabled = false;
-        //if (specialHitbox != null) specialHitbox.enabled = false;
         if (jumpHitbox != null) jumpHitbox.col.enabled = false;
+        //if (specialHitbox != null) specialHitbox.enabled = false;
     }
 }

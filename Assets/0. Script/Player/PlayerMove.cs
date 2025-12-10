@@ -9,10 +9,10 @@ public class PlayerMove : MonoBehaviour
     Collider2D col;
     Animator anim;
     SpriteRenderer spr;
-    
+
     [Header("PlayerSprite Parts")]
     public SpriteRenderer[] playerPartRender;
-    
+
     // ---- 입력 / 상태 ----
     public Vector2 inputVec;
     public bool isGrounded = false;
@@ -46,13 +46,11 @@ public class PlayerMove : MonoBehaviour
     void OnEnable()
     {
         InputManager.Instance.JumpPressed += OnJumpPressed;
-        InputManager.Instance.DodgePressed += OnDodgePressed;
     }
 
     void OnDisable()
     {
         InputManager.Instance.JumpPressed -= OnJumpPressed;
-        InputManager.Instance.DodgePressed -= OnDodgePressed;
     }
     #endregion
 
@@ -61,15 +59,9 @@ public class PlayerMove : MonoBehaviour
     // -------------------------------
     void Update()
     {
-        if(TimeManager.IsPaused) return;
+        if (TimeManager.IsPaused) return;
         if (player.HP.IsDead) return;
 
-        // 회피 종료 판단
-        if (isDodging && Time.time >= dodgeEndTime)
-        {
-            EndDodge();
-        }
-        
         //경직 시 행동 불가(입력 막기)
         if (!player.CanControl)
         {
@@ -93,11 +85,11 @@ public class PlayerMove : MonoBehaviour
     void FixedUpdate()
     {
         if (player.HP.IsDead) return;
-        
+
         HandleWallCheck();
         HandleWallAction();
 
-        bool external = isDodging || !player.CanControl  || isAirDownAttack || isWallGrabbing || isWallSliding;
+        bool external = player.isDodging || !player.CanControl || player.isAirDownAttack || isWallGrabbing || isWallSliding;
         if (!external)
         {
             HandleJump();
@@ -105,7 +97,9 @@ public class PlayerMove : MonoBehaviour
         }
         else
         {
-            HandleAirDownAttack(); // 외부 제어 상태일 때 다운어택 전용 처리
+            // 제어 불가 상태에서 자체 이동 효과
+            if (player.isDodging) DodgeMovement();
+            else if (player.isAirDownAttack) AirDownMovement();
         }
 
         HandleGroundCheck();
@@ -125,7 +119,7 @@ public class PlayerMove : MonoBehaviour
 
         anim.SetBool("IsGrounded", isGrounded);
         anim.SetBool("IsWallGrabbing", isWallGrabbing || isWallSliding);
-        if(playerAttack.isAttacking || isWallGrabbing || isWallSliding) return;
+        if (playerAttack.isAttacking || isWallGrabbing || isWallSliding) return;
         //방향 바꾸기
         float dir = isRightFacing ? 1 : -1;
         Vector3 scale = transform.localScale;
@@ -140,7 +134,7 @@ public class PlayerMove : MonoBehaviour
     }
     void OnJumpPressed()
     {
-        if (!isDodging && (isGrounded || currentJumpCount > 0))
+        if (!player.isDodging && (isGrounded || currentJumpCount > 0))
         {
             jumpRequested = true;
         }
@@ -199,7 +193,7 @@ public class PlayerMove : MonoBehaviour
         if (isGrounded)
         {
             currentJumpCount = maxJumpCount - 1;
-            anim.SetTrigger("Jump"); 
+            anim.SetTrigger("Jump");
         }
         else
         {
@@ -221,135 +215,43 @@ public class PlayerMove : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         Vector2 wallJumpVec = new Vector2(wallJumpForceX * jumpDir, wallJumpForceY);
         rb.AddForce(wallJumpVec, ForceMode2D.Impulse);
-        currentJumpCount --;
+        currentJumpCount--;
     }
     #endregion
 
-    #region 구르기
-    [SerializeField] GameObject dodgeEffectSprite;
-    public bool isDodging = false;
-    public bool IsDodging => isDodging;    
-    
-    public float dodgeDuration = 1f;
-    float dodgeEndTime;
-    public float dodgeCooldown = 2f;
-    float cooldownEndTime;
-
-    void OnDodgePressed()
+    #region 회피
+    void DodgeMovement()
     {
-        if (TimeManager.IsPaused) return;
-        if (Time.time < cooldownEndTime || !player.CanControl) return;
-        StartDodge();
-    }
-
-    void StartDodge()
-    {
-        isDodging = true;
-
-        dodgeEndTime = Time.time + dodgeDuration;
-        cooldownEndTime = Time.time + dodgeCooldown;
-
-        playerAttack.EndAttack();
-
-        anim.SetTrigger("Dodge");
-        dodgeEffectSprite.SetActive(true);
-
         rb.gravityScale = 0;
-
         float dir = isRightFacing ? 1 : -1;
         rb.linearVelocity = new Vector2(dir * stats.curMoveSpeed * 2f, 0);
     }
 
-    void EndDodge()
+    public void EndDodge()
     {
-        anim.SetTrigger("OnDodgeEnd");
-        dodgeEffectSprite.SetActive(false);
-        isDodging = false;
         rb.gravityScale = baseGrav;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
     }
-
-    public void ForceStopDodge()
-    {
-        if (isDodging) EndDodge();
-    }
-
     #endregion
 
+    //PlayerMove
     #region  착지 공격
-    [Header("Air Down Attack")]
-    [SerializeField] float airDownPrepareDuration = 0.15f;
     [SerializeField] float airDownFallSpeed = 20f;
     [SerializeField] float airDownGravityScale = 5f;
-
-    bool isAirDownAttack;
-    bool isAirDownPrepare;
-    float airDownPrepareEndTime;
-
-    float baseGravityScale;
-    public void StartAirDownAttack()
+    void AirDownMovement()
     {
-        if (isAirDownAttack) return;
-        if (isGrounded) return; // 공중에서만
-
-        player.isInvincible = true; //무적 판정!!
-
-        isAirDownAttack = true;
-        isAirDownPrepare = true;
-        airDownPrepareEndTime = Time.time + airDownPrepareDuration;
-
-        // 제자리 고정
-        baseGravityScale = rb.gravityScale;
-        rb.gravityScale = 0f;
-        rb.linearVelocity = Vector2.zero;
-    }
-    void HandleAirDownAttack()
-    {
-        if (!isAirDownAttack)
-            return;
-
-        // 1) 준비 단계: 공중에서 잠깐 멈추는 상태
-        if (isAirDownPrepare)
+        // 착지 준비 시간 동안 멈춰 있기
+        if (player.isAirDownPrepare)
         {
-            rb.linearVelocity = Vector2.zero; // 혹시 모를 잔여 속도 제거
-
-            if (Time.time >= airDownPrepareEndTime)
-            {
-                // 준비 끝 → 낙하 시작
-                isAirDownPrepare = false;
-
-                rb.gravityScale = airDownGravityScale;
-                rb.linearVelocity = new Vector2(0f, -airDownFallSpeed);
-
-                // 애니메이션 전환도 여기서
-                // animator.SetTrigger("AirDown_Drop");
-            }
-
-            return;
-        }
-
-        // 2) 낙하 단계: 땅에 닿을 때까지 빠르게 내려가기
-        // isGrounded가 true가 되는 첫 순간에 착지 판정
-        if (isGrounded && rb.linearVelocity.y <= 0f)
-        {
-            rb.gravityScale = baseGravityScale;
             rb.linearVelocity = Vector2.zero;
-            CameraManager.Instance.Shake(cameraShakeAmplitude, cameraShakeFrequency, cameraShakeDuration);
+            rb.gravityScale = 0f;
         }
-    }
-
-    [SerializeField] float cameraShakeAmplitude;
-    [SerializeField] float cameraShakeFrequency;
-    [SerializeField] float cameraShakeDuration;
-    void OnAirDownLandingEnd()
-    {
-        // 상태 원복
-        isGrounded = true;
-        anim.ResetTrigger("Land");
-        anim.SetBool("IsJumping", false);
-        isAirDownAttack = false;
-        isAirDownPrepare = false;
-        player.isInvincible = false;
+        // 착지 준비가 끝나면 땅에 내려꽂히기
+        else
+        {
+            rb.gravityScale = airDownGravityScale;
+            rb.linearVelocity = new Vector2(0f, -airDownFallSpeed);
+        }
     }
     #endregion
 
@@ -360,12 +262,6 @@ public class PlayerMove : MonoBehaviour
     public float fallGravityMultiplier = 2.0f; // 2~3 정도
     void HandleGravity()
     {
-        if (isDodging)
-        {
-            rb.gravityScale = baseGrav;
-            return;
-        }
-
         if (!isGrounded)
         {
             if (rb.linearVelocity.y < 0) // 떨어지는 중
@@ -457,48 +353,48 @@ public class PlayerMove : MonoBehaviour
 
     #region 벽타기
     public bool isWallGrabbing = false;
-    public bool isWallSliding  = false;
+    public bool isWallSliding = false;
     public LayerMask wallMask;
     [SerializeField] float wallCheckDistance = 0.5f;
     [SerializeField] float wallSlideSpeed = 2f;
     [SerializeField] float wallJumpForceX = 10f;
     [SerializeField] float wallJumpForceY = 15f;
-     void HandleWallCheck()
+    void HandleWallCheck()
+    {
+        if (isGrounded || player.isDodging)
         {
-            if (isGrounded || isDodging)
+            isWallGrabbing = false;
+            isWallSliding = false;
+            return;
+        }
+        Vector2 rayOrigin = transform.position;
+        Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, wallCheckDistance, wallMask);
+        bool isTouchingWall = (hit.collider != null);
+        bool inputTowardWall = (isRightFacing && inputVec.x > 0.01f) || (!isRightFacing && inputVec.x < -0.01f);
+        if (isTouchingWall && !isGrounded && rb.linearVelocity.y < 0)
+        {
+            if (inputTowardWall)
             {
-                isWallGrabbing = false;
+                isWallGrabbing = true;
                 isWallSliding = false;
-                return;
-            }
-            Vector2 rayOrigin = transform.position;
-            Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
-            RaycastHit2D hit = Physics2D.Raycast(rayOrigin,rayDirection,wallCheckDistance,wallMask);
-            bool isTouchingWall = (hit.collider != null);
-            bool inputTowardWall = (isRightFacing && inputVec.x > 0.01f) || (!isRightFacing && inputVec.x < -0.01f);
-            if (isTouchingWall && !isGrounded && rb.linearVelocity.y < 0)
-            {
-                if (inputTowardWall)
-                {
-                    isWallGrabbing = true;
-                    isWallSliding = false;
-                }
-                else
-                {
-                    isWallSliding = true;
-                    isWallGrabbing = false;
-                }
             }
             else
             {
+                isWallSliding = true;
                 isWallGrabbing = false;
-                isWallSliding = false;
             }
         }
-        float originGravityScale;
-        void HandleWallAction()
+        else
+        {
+            isWallGrabbing = false;
+            isWallSliding = false;
+        }
+    }
+    float originGravityScale;
+    void HandleWallAction()
     {
-        if(isWallGrabbing)
+        if (isWallGrabbing)
         {
             if (rb.gravityScale != 0f)
             {
@@ -510,7 +406,7 @@ public class PlayerMove : MonoBehaviour
         }
         else if (isWallSliding)
         {
-            if(rb.gravityScale != originGravityScale)
+            if (rb.gravityScale != originGravityScale)
             {
                 rb.gravityScale = originGravityScale;
             }
@@ -519,7 +415,7 @@ public class PlayerMove : MonoBehaviour
         }
         else
         {
-            if (rb.gravityScale != baseGrav && !isDodging && !isAirDownAttack)
+            if (rb.gravityScale != baseGrav && !player.isDodging && !player.isAirDownAttack)
             {
                 rb.gravityScale = baseGrav;
             }

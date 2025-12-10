@@ -10,6 +10,16 @@ public static class TimeManager
 
     public static event System.Action<float> OnTimeScaleChanged;
 
+    const int TargetFPS = 60;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void Initialize()
+    {
+        Application.targetFrameRate = TargetFPS;
+        QualitySettings.vSyncCount = 0; // 수직 동기화(VSync) 비활성화 (프레임 강제 제어를 위함)
+    }
+
+
     /// <summary>
     /// 시간 완전 정지
     /// </summary>
