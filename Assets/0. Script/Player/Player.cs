@@ -20,15 +20,18 @@ public class Player : MonoBehaviour, IDamageable
     public GameObject playerPartSprite;
 
     Animator anim;
-    
+
     SpriteFlash spriteFlash;
 
     public bool CanControl
     {
         get
         {
-            // 필요하면 isDead, 컷신 등 같이 묶어서 처리
-            return !isStunned && !isDodging;
+            if (HP.IsDead) return false;
+            if (isStunned) return false;
+            if (isDodging) return false;
+            if (isKnockback) return false; // 필요 시 별도 구분
+            return true;
         }
     }
 
@@ -60,11 +63,17 @@ public class Player : MonoBehaviour, IDamageable
     void Update()
     {
         if(TimeManager.IsPaused) return;
-        UpdateHitStun();
-        UpdateInvincible();
+    }
+    #region 넉백
+    public bool isKnockback;
+    public void ApplyKnockback(float force, Vector2? attackerPos = null)
+    {
+        playerMove.ApplyKnockbackImpulse(force, attackerPos);
     }
 
-    #region 구르기
+    #endregion
+
+    #region 회피
     [SerializeField] GameObject dodgeEffectSprite;
     public bool isDodging = false;
     public float dodgeDuration = 1f;
@@ -122,7 +131,6 @@ public class Player : MonoBehaviour, IDamageable
     }
     #endregion
 
-    //Player
     #region 착지 공격
     [Header("Air Down Attack")]
     [SerializeField] float airDownPrepareDuration = 0.15f;
@@ -177,68 +185,128 @@ public class Player : MonoBehaviour, IDamageable
     }
     #endregion
 
+    #region 경직
     [Header("피격 경직 시간")]
     [SerializeField] float hitStunDuration = 0.15f;
-    float stunTimer;
     bool isStunned;
     public bool IsStunned => isStunned;
+    Coroutine stunCoroutine;
 
-    void StartHitStun()
+    void StartHitStun(float duration)
     {
+        // 이미 경직 중이라면 리셋
+        if (stunCoroutine != null)
+        {
+            StopCoroutine(stunCoroutine);
+            stunCoroutine = null;
+        }
+
         // 경직 적용
-        float stunDuration = hitStunDuration;
-        if (stunDuration > 0f)
+        if (hitStunDuration > 0f)
         {
-            isStunned = true;
-            stunTimer = stunDuration;
-            // TODO : 경직 모션 추가
+            stunCoroutine = StartCoroutine(HitStunRoutine(duration));
         }
     }
-    void UpdateHitStun()
+
+    IEnumerator HitStunRoutine(float duration)
     {
-        if (!isStunned)
-            return;
+        isStunned = true;
+        //anim.SetTrigger("Stun");
 
-        stunTimer -= Time.deltaTime;
-        if (stunTimer <= 0f)
-        {
-            isStunned = false;
-            stunTimer = 0f;
-        }
+        yield return new WaitForSeconds(duration);
+
+        isStunned = false;
+        stunCoroutine = null;
     }
+    #endregion
 
+    #region 피격 무적
     [Header("피격 무적 시간")]
     [SerializeField] float hitInvincibleDuration = 0.5f;
 
-    float invincibleTimer;
     public bool isInvincible;
     public bool IsInvincible => isInvincible;
 
-    void StartInvincible()
+    Coroutine invincibleCoroutine;
+
+    // 무적 시작 (시간 제한 없음, 수동으로 EndInvincible 호출해야 종료)
+    public void BeginInvincible()
     {
-        // 피격 후 무적
-        float invDuration = hitInvincibleDuration;
-        if (invDuration > 0f)
+        if (isInvincible) return;
+            
+        // 혹시 이전에 돌던 제한시간 코루틴이 있으면 정리
+        if (invincibleCoroutine != null)
         {
-            isInvincible = true;
-            invincibleTimer = invDuration;
+            StopCoroutine(invincibleCoroutine);
+            invincibleCoroutine = null;
+        }
+
+        isInvincible = true;
+
+        if (spriteFlash != null)
+        {
             spriteFlash.StartInvincibleBlink();
         }
     }
 
-    void UpdateInvincible()
+    // 무적 종료 (수동 종료/코루틴 종료 둘 다 여기 사용)
+    public void EndInvincible()
     {
-        if (!isInvincible)
-            return;
+        if (!isInvincible && invincibleCoroutine == null) return;
+            
+        isInvincible = false;
 
-        invincibleTimer -= Time.deltaTime;
-        if (invincibleTimer <= 0f)
+        if (spriteFlash != null)
         {
-            isInvincible = false;
-            invincibleTimer = 0f;
             spriteFlash.StopInvincibleBlink();
         }
+
+        // 수동 종료 시, 혹시 남아 있을 수 있는 코루틴도 끊기
+        if (invincibleCoroutine != null)
+        {
+            StopCoroutine(invincibleCoroutine);
+            invincibleCoroutine = null;
+        }
     }
+
+    // 인스펙터에 설정된 기본 시간만큼 무적 유지
+    public void StartInvincibleForDuration()
+    {
+        StartInvincibleForDuration(hitInvincibleDuration);
+    }
+
+    // 지정한 시간 동안만 무적 유지 (Begin/End 내부적으로 사용)
+    public void StartInvincibleForDuration(float duration)
+    {
+        if (duration <= 0f)
+        {
+            EndInvincible();
+            return;
+        }
+
+        // 기존 제한시간 코루틴이 있으면 리셋
+        if (invincibleCoroutine != null)
+        {
+            StopCoroutine(invincibleCoroutine);
+            invincibleCoroutine = null;
+        }
+
+        // 무적 시작
+        BeginInvincible();
+        invincibleCoroutine = StartCoroutine(InvincibleDurationRoutine(duration));
+    }
+
+    IEnumerator InvincibleDurationRoutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        // 코루틴 참조 먼저 비우고
+        invincibleCoroutine = null;
+
+        // 그리고 무적 종료
+        EndInvincible();
+    }
+    #endregion
 
     public void Heal(float amount)
     {
@@ -246,28 +314,23 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // IDamageable 기본 버전 (공격자 위치 모를 때)
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, Vector2? attackerWorldPosition = null)
     {
-        if (isInvincible) return; //경직 무적
-        if (isDodging) return; //구르기 무적
+        // --- 방어 조건 ---
+        if (isInvincible) return;  // 경직 무적
+        if (isDodging) return;     // 회피 무적
+        if (HP.IsDead) return;     // 사망 시 무시
 
+        // --- 데미지 반영 ---
         hp.TakeDamage(amount);
 
-        StartHitStun();
-        StartInvincible();
+        // --- 리액션 처리 ---
+        ApplyKnockback(10f, attackerWorldPosition);
+        StartHitStun(0.15f);
+        StartInvincibleForDuration();
 
-        //spriteFlash.PlayHitFlash();
-
-        // 4. 넉백 은 일단 보류
-        //move.StartKnockbackByFacing();
-    }
-
-    // 공격자 위치를 아는 버전
-    public void TakeDamage(float amount, Vector2 attackerWorldPosition)
-    {
-        hp.TakeDamage(amount);
-        // 넉백 은 일단 보류
-        //move.StartKnockbackFromAttacker(attackerWorldPosition);
+        // --- 비주얼 피드백 ---
+        spriteFlash.PlayHitFlash();
     }
 
     void HandleDie()

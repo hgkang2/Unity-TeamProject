@@ -20,14 +20,9 @@ public class PotObject : MonoBehaviour, IDamageable
         }
         hp.OnDied += OnDie;
     }
-    public void TakeDamage(float amount)
+    void IDamageable.TakeDamage(float amount, Vector2? attackerWorldPosition)
     {
         hp.TakeDamage(amount);
-    }
-
-    public void TakeDamage(float amount, Vector2 attackerWorldPosition)
-    {
-        //비우기
     }
 
 
@@ -76,4 +71,5 @@ public class PotObject : MonoBehaviour, IDamageable
     {
         
     }
+
 }

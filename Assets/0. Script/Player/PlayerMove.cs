@@ -216,6 +216,30 @@ public class PlayerMove : MonoBehaviour
     }
     #endregion
 
+    #region 넉백
+    public void ApplyKnockbackImpulse(float force, Vector2? attackerPos = null)
+    {
+        // 기존 속도 리셋
+        rb.linearVelocity = Vector2.zero;
+
+        Vector2 dir;
+
+        if (attackerPos.HasValue)
+        {
+            // 공격자 → 플레이어 방향의 반대쪽
+            dir = ((Vector2)transform.position - attackerPos.Value).normalized;
+        }
+        else
+        {
+            // 공격자 정보가 없으면 바라보는 반대쪽으로 튕기기
+            float dirX = isRightFacing ? -1f : 1f;
+            dir = new Vector2(dirX, 0.3f).normalized;
+        }
+
+        rb.AddForce(dir * force, ForceMode2D.Impulse);
+    }
+    #endregion
+
     #region 회피
     void DodgeMovement()
     {
@@ -231,7 +255,6 @@ public class PlayerMove : MonoBehaviour
     }
     #endregion
 
-    //PlayerMove
     #region  착지 공격
     [SerializeField] float airDownFallSpeed = 20f;
     [SerializeField] float airDownGravityScale = 5f;

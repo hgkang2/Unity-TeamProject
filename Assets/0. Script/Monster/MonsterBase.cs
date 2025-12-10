@@ -269,16 +269,16 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         OnHit(transform.position - Vector3.right);
     }
 
-    void IDamageable.TakeDamage(float amount, Vector2 attackerWorldPosition)
+    void IDamageable.TakeDamage(float amount, Vector2? attackerWorldPosition)
     {
-        if (hp == null) return; 
+        if (hp == null) return;
 
         hp.TakeDamage(amount);
 
         if (isDead) return;
 
-        lastHitFrom = attackerWorldPosition;
-        OnHit(attackerWorldPosition);
+        lastHitFrom = (Vector2)attackerWorldPosition;
+        OnHit((Vector2)attackerWorldPosition);
     }
 
     public virtual void OnHit(Vector2 attackerWorldPosition)
