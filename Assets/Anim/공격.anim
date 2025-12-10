@@ -20,27 +20,18 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0.2, y: -0.072, z: 0}
-        inSlope: {x: Infinity, y: Infinity, z: Infinity}
-        outSlope: {x: Infinity, y: Infinity, z: Infinity}
+        value: {x: -0.039, y: 0.256, z: 0}
+        inSlope: {x: 0, y: 0, z: Infinity}
+        outSlope: {x: 0, y: 0, z: Infinity}
         tangentMode: 0
         weightedMode: 0
         inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
-        time: 0.16666667
-        value: {x: 1.1, y: -0.072, z: 0}
-        inSlope: {x: Infinity, y: Infinity, z: Infinity}
-        outSlope: {x: Infinity, y: Infinity, z: Infinity}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
-        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
-      - serializedVersion: 3
-        time: 0.22222222
-        value: {x: 1.15, y: -0.072, z: 0}
-        inSlope: {x: Infinity, y: Infinity, z: Infinity}
-        outSlope: {x: Infinity, y: Infinity, z: Infinity}
+        time: 0.125
+        value: {x: 0.512, y: 0.239, z: 0}
+        inSlope: {x: 0, y: 0, z: Infinity}
+        outSlope: {x: 0, y: 0, z: Infinity}
         tangentMode: 0
         weightedMode: 0
         inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
@@ -48,7 +39,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: PlayerSprite/Weapon
+    path: PlayerSpriteParts/Weapon
   m_ScaleCurves: []
   m_FloatCurves: []
   m_PPtrCurves:
@@ -56,12 +47,10 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: 21300000, guid: 80304d042496bb94796fd48e035340ce, type: 3}
-    - time: 0.16666667
-      value: {fileID: 21300000, guid: ff3f74fecc9a819498ec7efdfb3b3a39, type: 3}
-    - time: 0.2777778
+    - time: 0.125
       value: {fileID: 21300000, guid: ff3f74fecc9a819498ec7efdfb3b3a39, type: 3}
     attribute: m_Sprite
-    path: PlayerSprite/Body
+    path: PlayerSpriteParts/Body
     classID: 212
     script: {fileID: 0}
     flags: 2
@@ -69,16 +58,14 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: 21300000, guid: 143460070ba758442869f4d6a427a1bc, type: 3}
-    - time: 0.16666667
-      value: {fileID: 21300000, guid: 342967a15b234ed499f81461ad54232d, type: 3}
-    - time: 0.2777778
+    - time: 0.125
       value: {fileID: 21300000, guid: 342967a15b234ed499f81461ad54232d, type: 3}
     attribute: m_Sprite
-    path: PlayerSprite/Weapon
+    path: PlayerSpriteParts/Weapon
     classID: 212
     script: {fileID: 0}
     flags: 2
-  m_SampleRate: 18
+  m_SampleRate: 8
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -86,7 +73,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 1003252446
+      path: 2457386216
       attribute: 1
       script: {fileID: 0}
       typeID: 4
@@ -95,7 +82,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 645869753
+      path: 858255860
       attribute: 0
       script: {fileID: 0}
       typeID: 212
@@ -104,7 +91,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1003252446
+      path: 2457386216
       attribute: 0
       script: {fileID: 0}
       typeID: 212
@@ -115,16 +102,14 @@ AnimationClip:
     pptrCurveMapping:
     - {fileID: 21300000, guid: 80304d042496bb94796fd48e035340ce, type: 3}
     - {fileID: 21300000, guid: ff3f74fecc9a819498ec7efdfb3b3a39, type: 3}
-    - {fileID: 21300000, guid: ff3f74fecc9a819498ec7efdfb3b3a39, type: 3}
     - {fileID: 21300000, guid: 143460070ba758442869f4d6a427a1bc, type: 3}
-    - {fileID: 21300000, guid: 342967a15b234ed499f81461ad54232d, type: 3}
     - {fileID: 21300000, guid: 342967a15b234ed499f81461ad54232d, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.33333334
+    m_StopTime: 0.25
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -146,28 +131,19 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.2
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 1
+        value: -0.039
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.16666667
-        value: 1.1
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 1
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.22222222
-        value: 1.15
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 1
+        time: 0.125
+        value: 0.512
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
@@ -175,7 +151,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.x
-    path: PlayerSprite/Weapon
+    path: PlayerSpriteParts/Weapon
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -185,28 +161,19 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -0.072
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 1
+        value: 0.256
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.16666667
-        value: -0.072
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 1
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.22222222
-        value: -0.072
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 1
+        time: 0.125
+        value: 0.239
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
@@ -214,7 +181,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.y
-    path: PlayerSprite/Weapon
+    path: PlayerSpriteParts/Weapon
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -227,25 +194,16 @@ AnimationClip:
         value: 0
         inSlope: Infinity
         outSlope: Infinity
-        tangentMode: 1
+        tangentMode: 103
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.16666667
+        time: 0.125
         value: 0
         inSlope: Infinity
         outSlope: Infinity
-        tangentMode: 1
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.22222222
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 1
+        tangentMode: 103
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
@@ -253,7 +211,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.z
-    path: PlayerSprite/Weapon
+    path: PlayerSpriteParts/Weapon
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -275,21 +233,21 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.16666667
+  - time: 0.125
     functionName: OnHitboxOn
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1
     messageOptions: 0
-  - time: 0.2777778
+  - time: 0.25
     functionName: OnHitboxOff
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1
     messageOptions: 0
-  - time: 0.33333334
+  - time: 0.25
     functionName: EndAttack
     data: 
     objectReferenceParameter: {fileID: 0}

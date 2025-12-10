@@ -73,11 +73,15 @@ public class HP : MonoBehaviour
             curHP = 0f;
         }
 
-        RaiseHPChanged();
+        
 
         if (curHP <= 0f)
         {
             HandleDeath();
+        }
+        else
+        {
+            RaiseHPChanged();
         }
     }
 

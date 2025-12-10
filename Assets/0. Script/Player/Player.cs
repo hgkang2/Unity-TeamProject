@@ -69,6 +69,7 @@ public class Player : MonoBehaviour, IDamageable
     public void ApplyKnockback(float force, Vector2? attackerPos = null)
     {
         playerMove.ApplyKnockbackImpulse(force, attackerPos);
+        anim.SetTrigger("Hit");
     }
 
     #endregion
@@ -323,11 +324,13 @@ public class Player : MonoBehaviour, IDamageable
 
         // --- 데미지 반영 ---
         hp.TakeDamage(amount);
+        if(hp.IsDead) return;
 
         // --- 리액션 처리 ---
         ApplyKnockback(10f, attackerWorldPosition);
         StartHitStun(0.15f);
         StartInvincibleForDuration();
+
 
         // --- 비주얼 피드백 ---
         spriteFlash.PlayHitFlash();
@@ -357,4 +360,5 @@ public class Player : MonoBehaviour, IDamageable
         playerSprite.enabled = false;
         playerPartSprite.SetActive (true);
     }
+  
 }
