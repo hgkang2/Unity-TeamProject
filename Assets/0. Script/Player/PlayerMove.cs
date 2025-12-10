@@ -227,7 +227,7 @@ public class PlayerMove : MonoBehaviour
 
         if (attackerPos.HasValue)
         {
-            // 공격자 → 플레이어 방향의 반대쪽
+            // 맞은 방향의 반대쪽
             dir = ((Vector2)transform.position - attackerPos.Value).normalized;
         }
         else
