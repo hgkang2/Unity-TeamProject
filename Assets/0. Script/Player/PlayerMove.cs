@@ -10,9 +10,6 @@ public class PlayerMove : MonoBehaviour
     Animator anim;
     SpriteRenderer spr;
 
-    [Header("PlayerSprite Parts")]
-    public SpriteRenderer[] playerPartRender;
-
     // ---- 입력 / 상태 ----
     public Vector2 inputVec;
     public bool isGrounded = false;

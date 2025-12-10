@@ -16,7 +16,7 @@ public class Player : MonoBehaviour, IDamageable
     public PlayerMove playerMove;
     PlayerAttack playerAttack;
 
-    SpriteRenderer playerSprite;
+    public SpriteRenderer playerSprite;
     public GameObject playerPartSprite;
 
     Animator anim;
@@ -40,7 +40,6 @@ public class Player : MonoBehaviour, IDamageable
         stats = GetComponent<PlayerStats>();
         playerMove = GetComponent<PlayerMove>();
         playerAttack = GetComponent<PlayerAttack>();
-        playerSprite = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         spriteFlash = GetComponent<SpriteFlash>();
         
