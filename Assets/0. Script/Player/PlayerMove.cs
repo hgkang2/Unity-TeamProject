@@ -1,15 +1,5 @@
-using System;
-using NUnit.Framework;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 
-[RequireComponent(typeof(Player))]
-[RequireComponent(typeof(PlayerStats))]
-[RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(SpriteRenderer))]
-[RequireComponent(typeof(Collider2D))]
 public class PlayerMove : MonoBehaviour
 {
     Player player;
@@ -19,8 +9,8 @@ public class PlayerMove : MonoBehaviour
     Collider2D col;
     Animator anim;
     SpriteRenderer spr;
-    // PlayerSprite Parts
-    [Header("Player Parts")]
+    
+    [Header("PlayerSprite Parts")]
     public SpriteRenderer[] playerPartRender;
     
     // ---- 입력 / 상태 ----
@@ -29,21 +19,6 @@ public class PlayerMove : MonoBehaviour
     public bool jumpRequested = false;
     public bool isRightFacing = true;
 
-    // ---- 구르기 ----
-    [SerializeField] GameObject dodgeEffectSprite;
-    public bool isDodging = false;
-    public bool IsDodging => isDodging;    
-    
-    public float dodgeDuration = 1f;
-    float dodgeEndTime;
-    public float dodgeCooldown = 2f;
-    float cooldownEndTime;
-
-    // ---- 중력 ----
-    float baseGrav = 9.81f;
-    public float apexGrav = 0.1f;
-    public float apexThreshold = 0.7f;
-    public float fallGravityMultiplier = 2.0f; // 2~3 정도
 
     // 공중 제어 보간 속도
     [SerializeField] float airControlLerp = 8f;
@@ -52,19 +27,9 @@ public class PlayerMove : MonoBehaviour
     public LayerMask groundMask;    // 인스펙터에서 "Ground" 레이어 할당
     public float groundRayLength = 0.2f; // 레이 길이
     public float groundRayOffsetX = 0.25f; // 좌우로 얼마나 벌려 쏠지
-    // --- 점프 횟수 관리 ---
-    public int maxJumpCount = 2;
-    int currentJumpCount;
-    
-    // --- 벽잡기 / 벽 슬라이딩 ---
-    public bool isWallGrabbing = false;
-    public bool isWallSliding  = false;
-    public LayerMask wallMask;
-    [SerializeField] float wallCheckDistance = 0.5f;
-    [SerializeField] float wallSlideSpeed = 2f;
-    [SerializeField] float wallJumpForceX = 10f;
-    [SerializeField] float wallJumpForceY = 15f;
 
+
+    #region 초기화(awake)
     void Awake()
     {
         player = GetComponent<Player>();
@@ -89,6 +54,8 @@ public class PlayerMove : MonoBehaviour
         InputManager.Instance.JumpPressed -= OnJumpPressed;
         InputManager.Instance.DodgePressed -= OnDodgePressed;
     }
+    #endregion
+
     // -------------------------------
     // Update : 입력 및 상태 판단
     // -------------------------------
@@ -155,9 +122,8 @@ public class PlayerMove : MonoBehaviour
 
         anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
         anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
-        anim.SetBool("IsMoving", Mathf.Abs(rb.linearVelocity.x) > 0.1f);
 
-        anim.SetBool("IsJumping", !isGrounded);
+        anim.SetBool("IsGrounded", isGrounded);
         anim.SetBool("IsWallGrabbing", isWallGrabbing || isWallSliding);
         if(playerAttack.isAttacking || isWallGrabbing || isWallSliding) return;
         //방향 바꾸기
@@ -179,7 +145,7 @@ public class PlayerMove : MonoBehaviour
             jumpRequested = true;
         }
     }
-    // ---- 이동 / 점프 ----
+    #region 이동
     void HandleMove()
     {
         // 1) 공중 + 공격 중 → 입력 무시, 관성 유지
@@ -209,7 +175,11 @@ public class PlayerMove : MonoBehaviour
 
         rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
     }
+    #endregion
 
+    #region 점프
+    public int maxJumpCount = 2;
+    int currentJumpCount;
     void HandleJump()
     {
 
@@ -226,18 +196,10 @@ public class PlayerMove : MonoBehaviour
         if (!canJump) return;
         anim.ResetTrigger("Land");
 
-        if (isGrounded && !anim.GetBool("IsJumping"))
+        if (isGrounded)
         {
             currentJumpCount = maxJumpCount - 1;
-            if(Mathf.Abs(inputVec.x) > 0.1f)
-            {
-                anim.SetTrigger("JumpSide");
-            }
-            else
-            {
-            // 맨 처음 점프할 때만 도약 모션.
             anim.SetTrigger("Jump"); 
-            }
         }
         else
         {
@@ -248,6 +210,7 @@ public class PlayerMove : MonoBehaviour
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
     }
+
     void HandleWallJump()
     {
         isWallGrabbing = false;
@@ -260,8 +223,18 @@ public class PlayerMove : MonoBehaviour
         rb.AddForce(wallJumpVec, ForceMode2D.Impulse);
         currentJumpCount --;
     }
+    #endregion
 
-    // ---- 구르기 ----
+    #region 구르기
+    [SerializeField] GameObject dodgeEffectSprite;
+    public bool isDodging = false;
+    public bool IsDodging => isDodging;    
+    
+    public float dodgeDuration = 1f;
+    float dodgeEndTime;
+    public float dodgeCooldown = 2f;
+    float cooldownEndTime;
+
     void OnDodgePressed()
     {
         if (TimeManager.IsPaused) return;
@@ -301,7 +274,9 @@ public class PlayerMove : MonoBehaviour
         if (isDodging) EndDodge();
     }
 
-    // 공중 아래공격
+    #endregion
+
+    #region  착지 공격
     [Header("Air Down Attack")]
     [SerializeField] float airDownPrepareDuration = 0.15f;
     [SerializeField] float airDownFallSpeed = 20f;
@@ -376,8 +351,13 @@ public class PlayerMove : MonoBehaviour
         isAirDownPrepare = false;
         player.isInvincible = false;
     }
+    #endregion
 
-    // ---- 중력 / 착지 ----
+    #region 중력
+    float baseGrav = 9.81f;
+    public float apexGrav = 0.1f;
+    public float apexThreshold = 0.7f;
+    public float fallGravityMultiplier = 2.0f; // 2~3 정도
     void HandleGravity()
     {
         if (isDodging)
@@ -398,16 +378,7 @@ public class PlayerMove : MonoBehaviour
             rb.gravityScale = baseGrav;
         }
     }
-
-
-
-    // ---- 죽음 모션 ----
-    public void HandleDieMotion()
-    {
-        anim.SetTrigger("Die");
-        rb.linearVelocity = Vector2.zero;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-    }
+    #endregion
 
     void HandleGroundCheck()
     {
@@ -483,6 +454,15 @@ public class PlayerMove : MonoBehaviour
 
         return dist; // -1이면 바닥 없음
     }
+
+    #region 벽타기
+    public bool isWallGrabbing = false;
+    public bool isWallSliding  = false;
+    public LayerMask wallMask;
+    [SerializeField] float wallCheckDistance = 0.5f;
+    [SerializeField] float wallSlideSpeed = 2f;
+    [SerializeField] float wallJumpForceX = 10f;
+    [SerializeField] float wallJumpForceY = 15f;
      void HandleWallCheck()
         {
             if (isGrounded || isDodging)
@@ -525,7 +505,7 @@ public class PlayerMove : MonoBehaviour
                 originGravityScale = rb.gravityScale;
                 rb.gravityScale = 0f;
             }
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             currentJumpCount = maxJumpCount;
         }
         else if (isWallSliding)
@@ -534,7 +514,7 @@ public class PlayerMove : MonoBehaviour
             {
                 rb.gravityScale = originGravityScale;
             }
-            rb.velocity = new Vector2(0f, Mathf.Max(rb.velocity.y, -wallSlideSpeed));
+            rb.linearVelocity = new Vector2(0f, Mathf.Max(rb.linearVelocity.y, -wallSlideSpeed));
             currentJumpCount = maxJumpCount;
         }
         else
@@ -544,5 +524,14 @@ public class PlayerMove : MonoBehaviour
                 rb.gravityScale = baseGrav;
             }
         }
+    }
+    #endregion
+
+    // ---- 죽음 모션 ----
+    public void HandleDieMotion()
+    {
+        anim.SetTrigger("Die");
+        rb.linearVelocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Kinematic;
     }
 }

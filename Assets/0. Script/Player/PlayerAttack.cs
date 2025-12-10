@@ -127,25 +127,15 @@ public class PlayerAttack : MonoBehaviour
     //Animator에 각 Trigger Parameter 추가하기(오타주의)
     public void StartAttack(AttackType type)
     {
-        switch (type)
+        animator.SetTrigger("Attack");
+        animator.SetInteger("AttackType", (int)type);
+
+
+        if (type == AttackType.Down)
         {
-            case AttackType.Normal: // 1
-                animator.SetTrigger("Attack_Normal");
-                break;
-            case AttackType.Up: // 2
-                animator.SetTrigger("Attack_Up");
-                break;
-            case AttackType.Down: // 3
-                animator.SetTrigger("Attack_Down");
-                playerMove.StartAirDownAttack();
-                break;
-            case AttackType.Special: // 4
-                animator.SetTrigger("Attack_Special");
-                break;
-            case AttackType.Jump: // 5
-                animator.SetTrigger("Attack_Jump");
-                break;
+            playerMove.StartAirDownAttack();
         }
+
         isAttacking = true;
     }
 
