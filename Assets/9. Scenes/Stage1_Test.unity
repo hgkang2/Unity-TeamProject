@@ -6447,9 +6447,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 661590221}
-  - component: {fileID: 661590224}
-  - component: {fileID: 661590225}
-  - component: {fileID: 661590226}
   - component: {fileID: 661590223}
   - component: {fileID: 661590222}
   m_Layer: 5
@@ -6533,65 +6530,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 661590220}
   m_CullTransparentMesh: 1
---- !u!114 &661590224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 661590220}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f60bb1c7bbb0af47b77e8c321cf4169, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tooltipUI: {fileID: 774004214}
-  SM: {fileID: 756024847}
-  haveSoulSlotPrefab: {fileID: 8865729324723260921, guid: a53f0905c7d400a40b67d77d59289404, type: 3}
-  emptySlot:
-  - {fileID: 1666091990}
-  - {fileID: 653289799}
-  - {fileID: 1725759802}
-  - {fileID: 1222438322}
-  - {fileID: 341266202}
-  - {fileID: 1743053102}
-  - {fileID: 1715016394}
-  - {fileID: 917327686}
-  - {fileID: 1591059131}
-  - {fileID: 71345025}
-  - {fileID: 2070052420}
-  - {fileID: 1060945517}
-  - {fileID: 457398039}
-  - {fileID: 1839358082}
-  - {fileID: 1395844358}
-  - {fileID: 898771236}
-  - {fileID: 679206287}
---- !u!114 &661590225
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 661590220}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8c299bffacccdd4097e5609190409b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buildOnAwake: 1
-  subscribeOnEnable: 1
---- !u!114 &661590226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 661590220}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8090dbbb5c47434498802ee9843bbd7a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &663342285
 GameObject:
   m_ObjectHideFlags: 0
@@ -8106,7 +8044,7 @@ GameObject:
   - component: {fileID: 774004212}
   - component: {fileID: 774004211}
   m_Layer: 5
-  m_Name: SoulPanel
+  m_Name: SoulTooltip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8130,7 +8068,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.66, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.000030517578, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &774004211
@@ -11219,8 +11157,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 774004210}
   - {fileID: 1680680743}
+  - {fileID: 774004210}
   m_Father: {fileID: 571381779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -17917,10 +17855,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1680680743}
+  - component: {fileID: 1680680747}
+  - component: {fileID: 1680680746}
   - component: {fileID: 1680680745}
   - component: {fileID: 1680680744}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: HaveSoulPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17988,6 +17928,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1680680742}
   m_CullTransparentMesh: 1
+--- !u!114 &1680680746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1680680742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8c299bffacccdd4097e5609190409b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildOnAwake: 1
+  subscribeOnEnable: 1
+--- !u!114 &1680680747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1680680742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f60bb1c7bbb0af47b77e8c321cf4169, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soulTooltipUI: {fileID: 0}
+  SM: {fileID: 756024847}
+  haveSoulSlotPrefab: {fileID: 8865729324723260921, guid: a53f0905c7d400a40b67d77d59289404, type: 3}
+  emptySlot:
+  - {fileID: 1666091990}
+  - {fileID: 653289799}
+  - {fileID: 1725759802}
+  - {fileID: 1222438322}
+  - {fileID: 341266202}
+  - {fileID: 1743053102}
+  - {fileID: 1715016394}
+  - {fileID: 917327686}
+  - {fileID: 1591059131}
+  - {fileID: 71345025}
+  - {fileID: 2070052420}
+  - {fileID: 1060945517}
+  - {fileID: 457398039}
+  - {fileID: 1839358082}
+  - {fileID: 1395844358}
+  - {fileID: 898771236}
+  - {fileID: 679206287}
+  soulLevel: {fileID: 1421453958}
+  soulExp: {fileID: 1438898814}
+  soulEffects: []
 --- !u!1 &1684263368
 GameObject:
   m_ObjectHideFlags: 0

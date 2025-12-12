@@ -1,16 +1,20 @@
 using UnityEngine;
 using System.Collections.Generic;
 using RuntimeInspectorNamespace;
+using TMPro;
 
 public class HaveSoulsPanel : MonoBehaviour
 {
-    [SerializeField] HaveSoulTooltipUI tooltipUI;
+    [SerializeField] HaveSoulTooltipUI soulTooltipUI;
     [SerializeField] SoulManager SM;
     [SerializeField] HaveSoulSlot haveSoulSlotPrefab;
     List<IInteractiveView<SoulData>> uiSlots = new List<IInteractiveView<SoulData>>();
     [SerializeField] List<Transform> emptySlot = new List<Transform>();
-
     SoulPanelEventAggregator forwarder;
+
+    [SerializeField] TMP_Text soulLevel;
+    [SerializeField] TMP_Text soulExp;
+    [SerializeField] List<TMP_Text> soulEffects;
     
     
     void Awake()
@@ -74,12 +78,12 @@ public class HaveSoulsPanel : MonoBehaviour
 
     void ShowTooltipUI(SoulData data)
     {
-        tooltipUI.Show(data);
+        soulTooltipUI.Show(data);
     }
 
     void HideTooltipUI()
     {
-        tooltipUI.Hide();
+        soulTooltipUI.Hide();
     }
 }
 
