@@ -100,7 +100,7 @@ public class LevelUpPanel : UIKeyboardHandler
         {
             soulPanels[i].transform.localPosition = Vector3.zero;
             soulPanels[i].gameObject.SetActive(true);
-            soulPanels[i].InvisibleContent();
+            soulPanels[i].ShowBack();
 
             CanvasGroup cg = soulPanels[i].GetComponent<CanvasGroup>();
             RectTransform rect = soulPanels[i].GetComponent<RectTransform>();
@@ -179,7 +179,7 @@ public class LevelUpPanel : UIKeyboardHandler
             int index = i;
             cardSeq.AppendCallback(() =>
             {
-                soulPanels[index].visibleContent();
+                soulPanels[index].ShowFront();
                 rect.localRotation = Quaternion.Euler(0f, -90f, 0f);
             });
 

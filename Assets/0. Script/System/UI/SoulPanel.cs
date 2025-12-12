@@ -14,7 +14,8 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public Ease hoverEase = Ease.OutQuad;
     public Ease backEase = Ease.InQuad;
 
-    [SerializeField] CanvasGroup contentGroup;
+    [SerializeField] CanvasGroup front;
+    [SerializeField] CanvasGroup back;
     [SerializeField] Image soulImage;
     [SerializeField] TMP_Text soulName;
     [SerializeField] TMP_Text soulEffect;
@@ -65,13 +66,15 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         OriginPanelScale();
     }
 
-    public void visibleContent()
+    public void ShowFront()
     {
-        contentGroup.alpha = 1f;
+        front.alpha = 1f;
+        back.alpha = 0f;
     }
-    public void InvisibleContent()
+    public void ShowBack()
     {
-        contentGroup.alpha = 0f;
+        front.alpha = 0f;
+        back.alpha = 1f;
     }
 
     public void ExpandPanelScale()
