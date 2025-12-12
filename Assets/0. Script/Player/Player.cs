@@ -330,10 +330,6 @@ public class Player : MonoBehaviour, IDamageable
         ApplyKnockback(10f, attackerWorldPosition);
         StartHitStun(0.15f);
         StartInvincibleForDuration();
-
-
-        // --- 비주얼 피드백 ---
-        spriteFlash.PlayHitFlash();
     }
 
     void HandleDie()

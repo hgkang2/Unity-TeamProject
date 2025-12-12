@@ -5,10 +5,6 @@ public class SpriteFlash : MonoBehaviour
 {
     [SerializeField] SpriteRenderer[] renderers;
 
-    [Header("Hit Flash")]
-    [SerializeField] Color hitColor = Color.white;
-    [SerializeField] float hitFlashDuration = 0.05f;
-
     [Header("Invincible Blink")]
     [SerializeField] Color blinkColor = Color.white;
     [SerializeField] float blinkInterval = 0.1f;
@@ -28,23 +24,6 @@ public class SpriteFlash : MonoBehaviour
         {
             originalColors[i] = renderers[i].color;
         }
-    }
-
-    // ----------------------------
-    // 피격 순간 한번 번쩍
-    // ----------------------------
-    public void PlayHitFlash()
-    {
-        StartCoroutine(HitFlashRoutine());
-    }
-
-    IEnumerator HitFlashRoutine()
-    {
-        // 히트 색으로 변경
-        SetAllColors(hitColor);
-        yield return new WaitForSeconds(hitFlashDuration);
-        // 원래 색으로 되돌리기
-        RestoreOriginalColors();
     }
 
     // ----------------------------
