@@ -36,15 +36,22 @@ public class HaveSoulSlot : MonoBehaviour, IInteractiveView<SoulData>
         Clear();
     }
 
-    public void Bind(SoulData data)
+    public void Bind(SoulData newData)
     {
-        soulIcon.gameObject.SetActive(true);
+        if (newData == null)
+        {
+            Clear();
+            return;
+        }
+
+        data = newData;
+
         soulIcon.sprite = data.soulIcon;
     }
 
     public void Clear()
     {
+        data = null;
         soulIcon.sprite = null;
-        soulIcon.gameObject.SetActive(false);
     }
 }

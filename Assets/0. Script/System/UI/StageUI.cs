@@ -20,7 +20,7 @@ public class StageUI : MonoBehaviour
     [SerializeField] LevelUpPanel levelUpPanel;
 
     //보유 영성 ui
-    [SerializeField] HaveSoulsPanel haveSoulsPanel;
+    [SerializeField] GameObject haveSoulsUI;
 
     void Awake()
     {
@@ -32,7 +32,7 @@ public class StageUI : MonoBehaviour
         escpanel.gameObject.SetActive(true);
         settingPanel.gameObject.SetActive(true);
         levelUpPanel.gameObject.SetActive(true);
-        haveSoulsPanel.gameObject.SetActive(true);
+        haveSoulsUI.gameObject.SetActive(true);
         
 
         characterName.text = SelectedCharacter.CurCharacter.ToString();
@@ -44,7 +44,7 @@ public class StageUI : MonoBehaviour
         escpanel.gameObject.SetActive(false);
         settingPanel.gameObject.SetActive(false);
         levelUpPanel.gameObject.SetActive(false);
-        haveSoulsPanel.gameObject.SetActive(false);
+        haveSoulsUI.gameObject.SetActive(false);
     }
     void OnDestroy()
     {
@@ -55,35 +55,35 @@ public class StageUI : MonoBehaviour
 
     void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.Z))
-        // {
-        //     haveSoulsPanel.gameObject.SetActive(true);
-        // }
-        // if (Input.GetKeyUp(KeyCode.Z))
-        // {
-        //     haveSoulsPanel.gameObject.SetActive(false);
-        // }
-        // if (Input.GetKeyDown(KeyCode.Escape))
-        // {
-        //     //우선 설정창 켜져있으면 닫기
-        //     if (settingPanel.activeSelf)
-        //     {
-        //         HideSettingPanel();
-        //         return;
-        //     }
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            haveSoulsUI.gameObject.SetActive(true);
+        }
+        if (Input.GetKeyUp(KeyCode.Z))
+        {
+            haveSoulsUI.gameObject.SetActive(false);
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //우선 설정창 켜져있으면 닫기
+            if (settingPanel.activeSelf)
+            {
+                HideSettingPanel();
+                return;
+            }
 
-        //     //아니면 일시정지 / 풀기
-        //     if (!PauseManager.IsPaused)
-        //     {
-        //         ShowEscPanel();
-        //         PauseManager.Pause();
-        //     }
-        //     else
-        //     {
-        //         HideEscPanel();
-        //         PauseManager.Resume();
-        //     }
-        // }
+            //아니면 일시정지 / 풀기
+            if (!TimeManager.IsPaused)
+            {
+                ShowEscPanel();
+                TimeManager.Pause();
+            }
+            else
+            {
+                HideEscPanel();
+                TimeManager.Resume();
+            }
+        }
     }
 
     public void ShowEscPanel()

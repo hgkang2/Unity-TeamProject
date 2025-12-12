@@ -14,7 +14,7 @@ public abstract class UIPointerHandler<T> : UIPointerHandler,
     public Func<RectTransform> GetRect;
 
     // 필요하면 PointerEventData도 같이 넘길 수 있게 확장
-    public event Action<T, RectTransform> PointerEntered;
+    public event Action<T, RectTransform, PointerEventData> PointerEntered;
     public event Action PointerExited;
 
     void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
@@ -28,7 +28,7 @@ public abstract class UIPointerHandler<T> : UIPointerHandler,
         RectTransform rect = GetRect();
         if (rect == null) return;
 
-        PointerEntered?.Invoke(data, rect);
+        PointerEntered?.Invoke(data, rect, eventData);
     }
 
     void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
