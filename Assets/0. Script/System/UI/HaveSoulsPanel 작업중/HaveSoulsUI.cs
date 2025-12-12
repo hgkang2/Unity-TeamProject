@@ -1,13 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.EventSystems;
 
-public class HaveSoulsPanel : MonoBehaviour
+public class HaveSoulsUI : MonoBehaviour
 {
     [SerializeField] HaveSoulTooltipUI tooltipUI;
     [SerializeField] SoulManager SM;
-    [SerializeField] HaveSoulUI prefabHaveSoulUI;
+    [SerializeField] HaveSoulSlot haveSoulSlotPrefab;
     List<HaveSoulUI> soulUIs = new List<HaveSoulUI>();
     
     void Awake()
@@ -31,6 +29,7 @@ public class HaveSoulsPanel : MonoBehaviour
             soulUIs.Add(haveSoulUI);
         }
     }
+    
     void OnDisable()
     {
         foreach (HaveSoulUI haveSoulUI in soulUIs)
@@ -60,6 +59,7 @@ public class HaveSoulsPanel : MonoBehaviour
         tooltipUI.gameObject.SetActive(true);
         tooltipUI.Set(inst.data);
     }
+
     void HideTooltipUI()
     {
         tooltipUI.gameObject.SetActive(false);
