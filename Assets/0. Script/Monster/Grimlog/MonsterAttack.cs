@@ -23,7 +23,7 @@ public class MonsterAttack : MonoBehaviour
 
     private void HandleHit(IDamageable target)
     {
-        float damage = monster.monsterData.Skill_Damage;
+        float damage = monster.monsterStats.skillDamage;
 
         Debug.Log("[MonsterAttack] HandleHit ȣ��, ������:" + damage);
         target.TakeDamage(damage, transform.position);

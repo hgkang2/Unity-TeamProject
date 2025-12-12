@@ -14,8 +14,6 @@ public class FelmosBullet : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         cd = GetComponent<Collider2D>();
-
-        //player = FindObjectOfType<Player>();
     }
 
     public void Initialize(Vector2 direction, float dmg)

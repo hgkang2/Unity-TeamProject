@@ -19,7 +19,7 @@ public class MonsterDetecter : MonoBehaviour
     {
         if (monsterBase == null) return;
 
-        float aggroRange = monsterBase.monsterData.AggroRange;
+        float aggroRange = monsterBase.monsterStats.aggroRange;
         LayerMask playermask = monsterBase.PlayerLayermask;
 
         Collider2D detectCollider = Physics2D.OverlapCircle(transform.position, aggroRange, playermask);
@@ -45,14 +45,5 @@ public class MonsterDetecter : MonoBehaviour
     protected virtual Vector2 GetTargetPosition(Vector2 playerWorldPos)
     {
         return new Vector2(playerWorldPos.x, transform.position.y);
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        if (monsterBase == null) monsterBase = GetComponent<MonsterBase>();
-        if (monsterBase == null) return;
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, monsterBase.monsterData.AggroRange);
     }
 }

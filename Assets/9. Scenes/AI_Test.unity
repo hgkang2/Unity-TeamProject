@@ -844,6 +844,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93041d8cba40f4d43b753720d74b3aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &902023747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902023738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d9484a983aa9de4490ff92cd430d8c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MinHeight: 3
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+--- !u!114 &902023755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902023738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aad46a3c468123444b6343a3dec7ef77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 399982679}
+  MinDistance: 4
+  prePause: 1
+  retreatDuration: 0.5
+  postPause: 2
+  retreatSpeed: 5
 --- !u!1 &1879690441 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8776228013463675604, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
@@ -941,6 +975,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4810138954635433111, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
+      propertyPath: monsterStats
+      value: 
+      objectReference: {fileID: 11400000, guid: 2cf5b4ec706892c41a0efd98c183f2b5, type: 2}
+    - target: {fileID: 4810138954635433111, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: PlayerPosition
       value: 
       objectReference: {fileID: 399982679}
@@ -950,7 +988,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8776228013463675604, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -973,6 +1011,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 399982679}
     - target: {fileID: 1004645095914255813, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
+      propertyPath: keepDistance
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1004645095914255813, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
+      propertyPath: monsterStats
+      value: 
+      objectReference: {fileID: 11400000, guid: f6cec5c9b8739f0459ac4c39125d6be9, type: 2}
+    - target: {fileID: 1004645095914255813, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
+      propertyPath: heightLimiter
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1004645095914255813, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: PlayerPosition
       value: 
       objectReference: {fileID: 399982679}
@@ -982,7 +1032,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7213174648725036300, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1035,6 +1085,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 902023746}
+    - targetCorrespondingSourceObject: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 902023747}
+    - targetCorrespondingSourceObject: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 902023755}
   m_SourcePrefab: {fileID: 100100000, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
