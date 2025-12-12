@@ -25,7 +25,9 @@ public class HaveSoulsPanel : MonoBehaviour
 
         forwarder.MouseEntered += HandleMouseEnter;
         forwarder.MouseExited += HandleMouseExit;
+        forwarder.RightClicked += HandleMouseClick;
 
+        Debug.Log("OnENable");
         // 슬롯 생성 및 바인딩
         for(int i=0; i<SM.CurSouls.Count; i++)
         {
@@ -53,14 +55,21 @@ public class HaveSoulsPanel : MonoBehaviour
         HideTooltipUI();
     }
 
+    //bool isClicked;
     void HandleMouseEnter(SlotEventArgs<SoulData> e)
     {
-        ShowTooltipUI( e.Data);
+        ShowTooltipUI(e.Data);
     }
 
     void HandleMouseExit(SlotEventArgs<SoulData> e)
     {
         HideTooltipUI();
+    }
+
+    void HandleMouseClick(SlotEventArgs<SoulData> e)
+    {
+        //클릭했을 때 고정되는 등 효ㅘ
+        //HideTooltipUI();
     }
 
     void ShowTooltipUI(SoulData data)
