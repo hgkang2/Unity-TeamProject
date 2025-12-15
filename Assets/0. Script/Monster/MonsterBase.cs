@@ -8,8 +8,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     HP hp;
     public float Damage { get { return monsterStats.skillDamage; } }
 
-    [Header("Stats")]
+    [Header("Refs")]
     public MonsterStats monsterStats;
+    public DetectorTest detector;
+    public MonsterGroundMovement mover;
 
     public MonsterStateType currentState = MonsterStateType.Idle;
 
@@ -26,9 +28,8 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public bool isAttackReady = true;
 
     protected float StateTimer;
-    public float DistanceToPlayer; 
+    public int patrolDirX = 1;
 
-    public Transform PlayerPosition; 
     public Rigidbody2D rb;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
@@ -36,8 +37,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public Collider2D MonsterHitBox;
     public GameObject SkillCol;
-
-    public Vector2 direction;
 
     public Vector2 lastHitFrom;
 
@@ -48,6 +47,8 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         animator = GetComponentInChildren<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         MonsterHitBox = GetComponent<Collider2D>();
+        detector = GetComponent<DetectorTest>();
+        mover = GetComponent<MonsterGroundMovement>();
 
         isUsingSkill = false;
         isDead = false;
@@ -65,14 +66,14 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         if(TimeManager.IsPaused) return;
         if(isDead) return;
 
+        detector?.Detector(this);
+
         if (Input.GetKeyDown(KeyCode.F1))
         {
             TakeDamage(10f);
         }
 
         MonsterFSM();
-
-        MonsterMovement();
     }
 
     public virtual void MonsterFSM()
@@ -99,14 +100,16 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void Idle()
     {
-        if(StateTimer >= monsterStats.idleTime)
+        mover.StopX();
+
+        if (StateTimer >= monsterStats.idleTime)
         {
             animator.SetTrigger("Patrol");
             ChangeState(MonsterStateType.Patrol);
             return;
         }
 
-        if (DistanceToPlayer <= monsterStats.aggroRange)
+        if (detector.distance <= monsterStats.aggroRange)
         {
             animator.SetTrigger("Alert");
             ChangeState(MonsterStateType.Aggro);
@@ -115,6 +118,8 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void Patrol()
     {
+        mover.MoveX(patrolDirX, monsterStats.patrolSpeed);
+
         if (StateTimer >= monsterStats.patrolTime)
         {
             animator.SetTrigger("Idle");
@@ -122,7 +127,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             return;
         }
 
-        if(DistanceToPlayer <= monsterStats.aggroRange)
+        if(detector.distance <= monsterStats.aggroRange)
         {
             animator.SetTrigger("Alert");
             ChangeState(MonsterStateType.Aggro);
@@ -133,20 +138,28 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         if (isUsingSkill) return;
 
-        if (DistanceToPlayer >= monsterStats.aggroRange * 1.2f)
+        float stopDeadZone = 0.1f;
+
+        if (detector != null && Mathf.Abs(detector.dx) <= stopDeadZone)
+            mover.StopX();
+        else
+            mover.MoveX(detector != null ? detector.moveDirx : patrolDirX, monsterStats.aggroSpeed);
+
+        if (detector.distance >= monsterStats.aggroRange * 1.2f)
         { 
             animator.SetTrigger("Idle"); 
-            ChangeState(MonsterStateType.Idle); 
+            ChangeState(MonsterStateType.Idle);
+            return;
         }
 
-        if (DistanceToPlayer <= monsterStats.skillActiveRange && DistanceToPlayer >= monsterStats.attackRange && isSkillReady && !isUsingSkill)
+        if (detector.distance <= monsterStats.skillActiveRange && detector.distance >= monsterStats.attackRange && isSkillReady && !isUsingSkill)
         {
             animator.SetTrigger("ReadySkill");
             isUsingSkill = true;
             isSkillReady = false;
         }
 
-        if (DistanceToPlayer <= monsterStats.attackRange && isAttackReady && !isAttack)
+        if (detector.distance <= monsterStats.attackRange && isAttackReady && !isAttack)
         {
             animator.SetTrigger("Attack");
             isAttack = true;
@@ -156,9 +169,11 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void TakeDamageState()
     {
+        mover.StopX();
+
         if (StateTimer >= monsterStats.hitStunTime)
         {
-            if (DistanceToPlayer <= monsterStats.aggroRange)
+            if (detector.distance <= monsterStats.aggroRange)
             {
                 animator.SetTrigger("Aggro");
                 ChangeState(MonsterStateType.Aggro);
@@ -168,33 +183,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
                 animator.SetTrigger("Idle");
                 ChangeState(MonsterStateType.Idle);
             }
-        }
-    }
-
-    public virtual void MonsterMovement()
-    {
-        if (currentState == MonsterStateType.Take_Damage ||
-        currentState == MonsterStateType.Dead)
-        {
-            rb.linearVelocity = new Vector2(0, -9.81f);
-            return;
-        }
-
-        if(currentState == MonsterStateType.Idle)
-        {
-            rb.linearVelocity = Vector2.zero;
-        }
-
-        if (currentState == MonsterStateType.Patrol)
-        {
-            rb.linearVelocity = new Vector2(direction.x * monsterStats.patrolSpeed, rb.linearVelocity.y);
-            return;
-        }
-
-        if(currentState == MonsterStateType.Aggro && !isUsingSkill)
-        {
-            rb.linearVelocity = new Vector2(direction.x * monsterStats.aggroSpeed, rb.linearVelocity.y);
-            return;
         }
     }
 
@@ -244,6 +232,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     {
         if (isDead) return;
 
+        mover.StopX();
         isDead = true;
 
         ChangeState(MonsterStateType.Dead);
@@ -258,18 +247,6 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         FindFirstObjectByType<Player>().Exp.AddExp(monsterStats.exp);
 
         GameObject.Destroy(this.gameObject, 3f);
-    }
-
-    void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            Player player = collision.gameObject.GetComponent<Player>();
-            if(player != null)
-            {
-                player.TakeDamage(monsterStats.colideDamage, DamageType.Normal);
-            }
-        }
     }
 
     private void OnDrawGizmos()

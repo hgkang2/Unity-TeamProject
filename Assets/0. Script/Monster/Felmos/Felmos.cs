@@ -30,21 +30,11 @@ public class Felmos : MonsterBase
 
         PlayerPos = GameObject.Find("Player").transform;
         keepDistance.SetTarget(GameObject.Find("Player").transform);
-        direction.x = 1;
     }
 
     public override void Update()
     {
         base.Update();
-
-        if (direction.x > 0)
-        {
-            spriteRenderer.flipX = false;
-        }
-        else if (direction.x < 0)
-        {
-            spriteRenderer.flipX = true;
-        }
     }
 
     public override void Patrol()
@@ -61,33 +51,33 @@ public class Felmos : MonsterBase
             ChangeState(MonsterStateType.Idle);
         }
 
-        if(DistanceToPlayer <= monsterStats.aggroRange)
-        {
-            animator.SetTrigger("Alert");
-            ChangeState(MonsterStateType.Aggro);
-        }
+        //if(DistanceToPlayer <= monsterStats.aggroRange)
+        //{
+        //    animator.SetTrigger("Alert");
+        //    ChangeState(MonsterStateType.Aggro);
+        //}
     }
 
     public override void Aggro()
     {
         if (isUsingSkill || retreating) return;
 
-        rb.linearVelocity = direction * monsterStats.aggroSpeed;
+        //rb.linearVelocity = direction * monsterStats.aggroSpeed;
 
-        keepDistance?.TryRetreat();
+        //keepDistance?.TryRetreat();
 
-        if (DistanceToPlayer >= monsterStats.aggroRange * 1.2f)
-        {
-            animator.SetTrigger("Idle");
-            ChangeState(MonsterStateType.Idle);
-        }
+        //if (DistanceToPlayer >= monsterStats.aggroRange * 1.2f)
+        //{
+        //    animator.SetTrigger("Idle");
+        //    ChangeState(MonsterStateType.Idle);
+        //}
 
-        if (DistanceToPlayer <= monsterStats.skillActiveRange && isSkillReady && !isUsingSkill)
-        {
-            animator.SetTrigger("ReadySkill");
-            isUsingSkill = true;
-            isSkillReady = false;
-        }
+        //if (DistanceToPlayer <= monsterStats.skillActiveRange && isSkillReady && !isUsingSkill)
+        //{
+        //    animator.SetTrigger("ReadySkill");
+        //    isUsingSkill = true;
+        //    isSkillReady = false;
+        //}
     }
 
     public override void UseSkill()
@@ -118,10 +108,5 @@ public class Felmos : MonsterBase
         yield return new WaitForSeconds(monsterStats.skillCoolTime);
 
         isSkillReady = true;
-    }
-
-    public override void MonsterMovement()
-    {
-        // 이 몹은 Patrol/Aggro에서 직접 rb.linearVelocity 관리하니까 여기서는 아무것도 안 함
     }
 }
