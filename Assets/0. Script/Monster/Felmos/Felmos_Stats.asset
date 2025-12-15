@@ -19,6 +19,9 @@ MonoBehaviour:
   patrolSpeed: 5
   aggroRange: 12
   aggroSpeed: 7
+  attackRange: 0
+  attackDamage: 0
+  attackRate: 0
   skillDamage: 100
   colideDamage: 0
   skillDelay: 1

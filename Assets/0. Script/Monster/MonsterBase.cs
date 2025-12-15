@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum MonsterStateType { Idle, Patrol, Aggro, Take_Damage, Dead }
@@ -5,7 +6,6 @@ public enum MonsterStateType { Idle, Patrol, Aggro, Take_Damage, Dead }
 public abstract class MonsterBase : MonoBehaviour, IDamageable
 {
     HP hp;
-
     public float Damage { get { return monsterStats.skillDamage; } }
 
     [Header("Stats")]
@@ -17,8 +17,13 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     bool isDead;
 
+    [Header("Skill Info")]
     public bool isUsingSkill = false;
     public bool isSkillReady = true;
+
+    [Header("Attack Info")]
+    public bool isAttack = false;
+    public bool isAttackReady = true;
 
     protected float StateTimer;
     public float DistanceToPlayer; 
@@ -28,6 +33,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public SpriteRenderer spriteRenderer;
     public Animator animator;
     public GameObject Alert;
+
     public Collider2D MonsterHitBox;
     public GameObject SkillCol;
 
@@ -133,11 +139,18 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             ChangeState(MonsterStateType.Idle); 
         }
 
-        if (DistanceToPlayer <= monsterStats.skillActiveRange && isSkillReady && !isUsingSkill)
+        if (DistanceToPlayer <= monsterStats.skillActiveRange && DistanceToPlayer >= monsterStats.attackRange && isSkillReady && !isUsingSkill)
         {
             animator.SetTrigger("ReadySkill");
             isUsingSkill = true;
             isSkillReady = false;
+        }
+
+        if (DistanceToPlayer <= monsterStats.attackRange && isAttackReady && !isAttack)
+        {
+            animator.SetTrigger("Attack");
+            isAttack = true;
+            isAttackReady = false;
         }
     }
 
@@ -185,10 +198,12 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         }
     }
 
+    public virtual void Attack() { }
+    public virtual void OnAttackUpdate() { }
+    public virtual void OnAttackExit() { }
+
     public virtual void UseSkill() { }
-
     public virtual void OnSkillUpdate() { }
-
     public virtual void OnSkillExit() { }
 
     public void TakeDamage(float amount)
@@ -255,5 +270,17 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
                 player.TakeDamage(monsterStats.colideDamage, DamageType.Normal);
             }
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, monsterStats.aggroRange);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, monsterStats.skillActiveRange);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, monsterStats.attackRange);
     }
 }

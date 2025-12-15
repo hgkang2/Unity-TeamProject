@@ -5,11 +5,16 @@ using DG.Tweening;
 public class Grimlog : MonsterBase
 {   
     Vector3 originScale;
+
+    [SerializeField]
+    KeepDistance keepDistance;
+
     public override void Awake()
     {
         base.Awake();
         direction.x = 1;
         originScale = transform.localScale;
+        keepDistance.SetTarget(GameObject.Find("Player").transform);
     }
 
     public override void Update()
@@ -24,6 +29,31 @@ public class Grimlog : MonsterBase
         {
             transform.localScale = originScale;
         }
+    }
+
+    public override void Attack()
+    {
+        SkillCol.SetActive(true);
+    }
+
+    public override void OnAttackExit()
+    {
+        SkillCol.SetActive(false);
+        StartCoroutine(AttackCooldown());
+    }
+
+    IEnumerator AttackCooldown()
+    {
+        isAttack = false;
+        keepDistance.TryRetreat();
+
+        //yield return new WaitForSeconds(2f);
+        animator.SetTrigger("Aggro");
+
+        yield return new WaitForSeconds(monsterStats.attackRate);
+
+        isAttackReady = true;
+        keepDistance.StopRetreat();
     }
 
     public override void UseSkill()

@@ -16,6 +16,11 @@ public class MonsterStats : ScriptableObject
     public float aggroRange;
     public float aggroSpeed;
 
+    [Header("Attack")]
+    public float attackRange;
+    public float attackDamage;
+    public float attackRate;
+
     [Header("Damage")]
     public float skillDamage;
     public float colideDamage;

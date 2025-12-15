@@ -895,6 +895,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07362723bfed4ff4babb78cf92df6580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1879690459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879690441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aad46a3c468123444b6343a3dec7ef77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 399982679}
+  MinDistance: 4
+  prePause: 1
+  retreatDuration: 4
+  postPause: 2
+  retreatSpeed: 3
 --- !u!1 &2008190504
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,6 +993,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4810138954635433111, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
+      propertyPath: keepDistance
+      value: 
+      objectReference: {fileID: 1879690459}
+    - target: {fileID: 4810138954635433111, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: monsterStats
       value: 
       objectReference: {fileID: 11400000, guid: 2cf5b4ec706892c41a0efd98c183f2b5, type: 2}
@@ -988,7 +1010,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8776228013463675604, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -997,6 +1019,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8776228013463675604, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1879690450}
+    - targetCorrespondingSourceObject: {fileID: 8776228013463675604, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1879690459}
   m_SourcePrefab: {fileID: 100100000, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
 --- !u!1001 &8588210317409235971
 PrefabInstance:
@@ -1032,7 +1057,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7213174648725036300, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: m_LocalPosition.x
