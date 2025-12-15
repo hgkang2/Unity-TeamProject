@@ -13,7 +13,7 @@ public class Exp : MonoBehaviour
     public int CurLevel => curlevel;
     public int CurExp => curExp;
 
-    public int CurrentLevelMaxExp
+    public int MaxExp
     {
         get
         {
@@ -26,8 +26,6 @@ public class Exp : MonoBehaviour
     public event Action<int> LevelChanged;
     public event Action<int, int> ExpChanged; // (curExp, maxExp)
 
-    // 영성 시스템에서 사용
-    public event Action LevelUpped;
 
     void Awake()
     {
@@ -51,14 +49,14 @@ public class Exp : MonoBehaviour
         curExp += amount;
 
         // 연속 레벨업 처리
-        while (curExp >= CurrentLevelMaxExp)
+        while (curExp >= MaxExp)
         {
-            curExp -= CurrentLevelMaxExp;
+            curExp -= MaxExp;
             LevelUp();
         }
 
         // UI 반영
-        ExpChanged?.Invoke(curExp, CurrentLevelMaxExp);
+        ExpChanged?.Invoke(curExp, MaxExp);
     }
 
     public void LevelUp(int value = 1){
@@ -67,11 +65,11 @@ public class Exp : MonoBehaviour
         if(curlevel > levelMaxExpTable.Length){
             curlevel = levelMaxExpTable.Length;
         }
-        LevelUpped?.Invoke();
         LevelChanged?.Invoke(curlevel);
     }
 
-    // 세이브 전용
+
+    #region Save&Load
     public ExpData SaveExp()
     {
         return new ExpData
@@ -81,16 +79,12 @@ public class Exp : MonoBehaviour
         };
     }
 
-    // 로드 전용
     public void LoadExp(ExpData data)
     {
         this.curlevel = data.level;
         this.curExp = data.curExp;
-
-        // UI 즉시 갱신
-        LevelChanged?.Invoke(curlevel);
-        ExpChanged?.Invoke(curExp, CurrentLevelMaxExp);
     }
+    #endregion
 }
 
 [Serializable]

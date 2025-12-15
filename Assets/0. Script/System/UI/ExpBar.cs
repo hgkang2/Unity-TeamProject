@@ -42,7 +42,7 @@ public class ExpBar : MonoBehaviour
         targetExp.LevelChanged += HandleLevelChanged;
 
         // 초기값 반영
-        HandleExpChanged(targetExp.CurExp, targetExp.CurrentLevelMaxExp);
+        HandleExpChanged(targetExp.CurExp, targetExp.MaxExp);
     }
 
     public void Clear()

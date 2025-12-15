@@ -32,7 +32,15 @@ public class HaveSoulTooltipUI : MonoBehaviour
     {
         soulImage.sprite = data.soulSprite;
         soulName.text = data.displayName;
-        soulEffect.text = data.soulEffectText;
+        int value = data.GetValue();
+        if(value != -1 && value != 0)
+        {
+            soulEffect.text = $"{data.soulEffectText}{data.GetValue()}{data.soulEffectText2}";
+        }
+        else
+        {
+            soulEffect.text = $"{data.soulEffectText}";
+        }
         soulDescript.text = data.soulDescript;
     }
 }

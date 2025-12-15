@@ -13,13 +13,14 @@ public class SoulData : ScriptableObject
     [Label("영성 이름")]
     public string displayName;
     [Label("영성 효과")]
-    public string soulEffectText = "Atk +10%";
+    public string soulEffectText = "Atk +";
+    public string soulEffectText2 = "%";
     [Label("영성 설명")]
     public string soulDescript;
-    
+
     [Label("영성 효과")]
-    public SoulEffect[] effects;
-    
+    public SoulEffect effect;
+
     [Label("캐릭터 제한")]
     public CharacterId soulCharacterType;
 
@@ -80,5 +81,22 @@ public class SoulData : ScriptableObject
         }
 
         return true;
+    }
+    public int GetValue()
+    {
+        switch (effect.type)
+        {
+            case SoulEffectType.StatFlat:
+                return effect.flatValue;
+            case SoulEffectType.StatPercent:
+                return effect.percentValue;
+            case SoulEffectType.IncreaseJumpNum:
+                return 1;
+            case SoulEffectType.LearnSkill:
+                return 0;
+            case SoulEffectType.HealHP:
+                return -1;
+        }
+        return -1;
     }
 }

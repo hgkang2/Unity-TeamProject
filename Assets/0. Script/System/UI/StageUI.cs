@@ -25,7 +25,7 @@ public class StageUI : MonoBehaviour
     void Awake()
     {
         //이벤트 구독
-        exp.LevelUpped += HandleLevelUp;
+        exp.LevelChanged += HandleLevelUp;
         levelUpPanel.SelectSoulCompleted += HideLevelupPanel;
 
         //기본적으로 모든 ui 한번 열었다 닫기(초기화용)
@@ -48,7 +48,7 @@ public class StageUI : MonoBehaviour
     }
     void OnDestroy()
     {
-        exp.LevelUpped -= HandleLevelUp;
+        exp.LevelChanged -= HandleLevelUp;
         levelUpPanel.SelectSoulCompleted -= HideLevelupPanel;
     }
 
@@ -113,7 +113,7 @@ public class StageUI : MonoBehaviour
     }
 
     
-    void HandleLevelUp()
+    void HandleLevelUp(int newCurLevel)
     {
         ShowLevelupPanel();
     }

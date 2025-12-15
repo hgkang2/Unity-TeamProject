@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 6797658465126727401}
   - component: {fileID: 7436586581079057000}
   - component: {fileID: 8508408560950462055}
-  - component: {fileID: 3246203202638581411}
   - component: {fileID: 6733278554063955151}
+  - component: {fileID: 3246203202638581411}
   - component: {fileID: 115294010333658088}
   - component: {fileID: 3732372594089069875}
   - component: {fileID: 7239913965431233772}
@@ -172,25 +172,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   renderers: []
-  hitColor: {r: 1, g: 1, b: 1, a: 1}
-  hitFlashDuration: 0.05
   blinkColor: {r: 1, g: 1, b: 1, a: 1}
   blinkInterval: 0.1
---- !u!114 &3246203202638581411
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 21353070434239750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1975b857ce72bd142a191f6ba33d2625, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelMaxExpTable: 0a000000140000001e00000028000000320000003c00000046000000500000005a00000064000000
-  curlevel: 1
-  curExp: 0
 --- !u!114 &6733278554063955151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,6 +190,21 @@ MonoBehaviour:
   armor: 0
   initializeOnAwake: 1
   curHP: 0
+--- !u!114 &3246203202638581411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21353070434239750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1975b857ce72bd142a191f6ba33d2625, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelMaxExpTable: 0a000000140000001e00000028000000320000003c00000046000000500000005a00000064000000
+  curlevel: 1
+  curExp: 0
 --- !u!114 &115294010333658088
 MonoBehaviour:
   m_ObjectHideFlags: 0

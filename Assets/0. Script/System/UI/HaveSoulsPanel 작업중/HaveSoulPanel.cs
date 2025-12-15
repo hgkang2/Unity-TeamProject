@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using RuntimeInspectorNamespace;
 using TMPro;
+using UnityEngine.UIElements;
 
 public class HaveSoulsPanel : MonoBehaviour
 {
@@ -15,24 +16,33 @@ public class HaveSoulsPanel : MonoBehaviour
     [SerializeField] TMP_Text soulLevel;
     [SerializeField] TMP_Text soulExp;
     [SerializeField] List<TMP_Text> soulEffects;
+
+    [SerializeField] Exp exp;
     
     
     void Awake()
     {
         forwarder = GetComponent<SoulPanelEventAggregator>();
-        HideTooltipUI();
+        exp = FindFirstObjectByType<Exp>();
     }
 
     void OnEnable()
     {
         HideTooltipUI();
 
-        forwarder.MouseEntered += HandleMouseEnter;
-        forwarder.MouseExited += HandleMouseExit;
-        forwarder.RightClicked += HandleMouseClick;
+        UpdateExp(exp.CurExp, exp.MaxExp);
+        UpdateLevel(exp.CurLevel);
+        UpdateSoulEffects(SoulManager.Instance.CurSouls);
 
-        Debug.Log("OnENable");
-        // 슬롯 생성 및 바인딩
+        // 게임 데이터 구독
+        exp.ExpChanged += UpdateExp;
+        exp.LevelChanged += UpdateLevel;
+        SoulManager.Instance.soulGot += UpdateSoulEffects;
+
+        // UI 마우스 이벤트 구독
+        forwarder.MouseEntered += HandleMouseEnter;
+
+        // 미니아이콘 슬롯 생성 및 바인딩
         for(int i=0; i<SM.CurSouls.Count; i++)
         {
             HaveSoulSlot haveSoulUI = Instantiate(haveSoulSlotPrefab, transform);
@@ -50,22 +60,50 @@ public class HaveSoulsPanel : MonoBehaviour
     void OnDisable()
     {
         forwarder.MouseEntered -= HandleMouseEnter;
-        forwarder.MouseExited -= HandleMouseExit;
-
         foreach (var slot in uiSlots)
             Destroy(slot.GO);
 
         uiSlots.Clear();
         HideTooltipUI();
     }
+    void UpdateExp(int newCurExp, int newMaxExp)
+    {
+        soulExp.SetText($"{newCurExp} / {newMaxExp}");
+    }
 
-    //bool isClicked;
+    void UpdateLevel(int newCurLevel)
+    {
+        soulLevel.SetText($"LV. {newCurLevel}");
+    }
+
+    [SerializeField] TMP_Text statText;
+    [SerializeField] TMP_Text effectText;
+    void UpdateSoulEffects(List<SoulInstance> curSouls)
+    {
+        statText.SetText("");
+        effectText.SetText("");
+        foreach(SoulInstance soul in curSouls)
+        {
+            SoulEffectType type = soul.data.effect.type;
+            if(type == SoulEffectType.StatFlat || type == SoulEffectType.StatPercent)
+            {
+                statText.text += $"{soul.GetEffectText()}\n";
+            }
+            else
+            {
+                effectText.text += $"{soul.GetEffectText()}\n";
+            }
+        }
+    }
+
+
     void HandleMouseEnter(SlotEventArgs<SoulData> e)
     {
         ShowTooltipUI(e.Data);
     }
 
-    void HandleMouseExit(SlotEventArgs<SoulData> e)
+    // 슬롯이 아닌 슬롯 패널(MouseEventSupporter) 밖으로 나가야 선택 취소되고 뒷면 보여짐
+    public void SlotMouseExit()
     {
         HideTooltipUI();
     }

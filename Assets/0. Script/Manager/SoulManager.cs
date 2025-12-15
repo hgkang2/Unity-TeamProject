@@ -14,6 +14,8 @@ public class SoulManager : MonoBehaviour
     List<SoulInstance> curSouls = new List<SoulInstance>();
     public List<SoulInstance> CurSouls => curSouls;
 
+    public event Action<List<SoulInstance>> soulGot;
+
     public static SoulManager Instance {get; private set;}
     void Awake()
     {   // Resources/SoulDatas 폴더
@@ -46,7 +48,7 @@ public class SoulManager : MonoBehaviour
                 inst.stack++;
 
                 // 이번에 추가된 스택 1개분만 효과 적용
-                ApplySoulDataEffectsOnce(data.effects);
+                ApplySoulDataEffectsOnce(data.effect);
             }
             // 더 이상 쌓을 수 없으면 무시
             return;
@@ -57,23 +59,18 @@ public class SoulManager : MonoBehaviour
         curSouls.Add(newInst);
 
         // 새로 얻은 1개분 효과 적용
-        ApplySoulDataEffectsOnce(data.effects);
+        ApplySoulDataEffectsOnce(data.effect);
     }
 
     /// SoulData 안에 있는 모든 SoulEffect를 한 번씩 실행
     /// (실제 로직은 SoulEffect 쪽에 있음)
-    public void ApplySoulDataEffectsOnce(SoulEffect[] effects)
+    public void ApplySoulDataEffectsOnce(SoulEffect effect)
     {
-        if (effects == null || effects.Length == 0) return;
-
-        for (int i = 0; i < effects.Length; i++)
-        {
-            SoulEffect effect = effects[i];
-            if (effect != null)
-            {
-                effect.ApplyOnce(player);
-            }
-        }
+        if (effect == null) return;
+        effect.ApplyOnce(player);
+        
+        // 등록 완료 되면 UI등에 알리기
+        soulGot(curSouls);
     }
 
     #region 영성 뽑기

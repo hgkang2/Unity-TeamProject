@@ -16,14 +16,16 @@ MonoBehaviour:
   soulSprite: {fileID: 9101181491800818358, guid: c662293f0b8cd094bbb331264825b823, type: 3}
   soulIcon: {fileID: 5700019135636183792, guid: c69e021deaa5e0e429d31d195899e3fd, type: 3}
   displayName: "\uB2E8\uB828"
-  soulEffectText: Max HP +20
+  soulEffectText: Max HP +
+  soulEffectText2: 
   soulDescript: "\uB354\uC6B1 \uB2E8\uB828\uD558\uC5EC \uCD5C\uB300 \uCCB4\uB825\uC774
     \uC99D\uAC00\uD569\uB2C8\uB2E4."
-  effects:
-  - type: 0
+  effect:
+    type: 0
     targetStat: 1
     flatValue: 20
     percentValue: 0
+    bonusValue: 0
     skillToLearn: 0
     soulEtcEffect: 0
     healAmount: 0
