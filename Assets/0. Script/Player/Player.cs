@@ -30,7 +30,7 @@ public class Player : MonoBehaviour, IDamageable
             if (HP.IsDead) return false;
             if (isStunned) return false;
             if (isDodging) return false;
-            if (isKnockback) return false; // 필요 시 별도 구분
+            if (isKnockback) return false;
             return true;
         }
     }
