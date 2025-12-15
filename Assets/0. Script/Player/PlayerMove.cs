@@ -14,8 +14,12 @@ public class PlayerMove : MonoBehaviour
     // ---- 입력 / 상태 ----
     public Vector2 inputVec;
     public bool isGrounded = false;
-    public bool jumpRequested = false;
     public bool isRightFacing = true;
+
+    [SerializeField] float coyoteTime = 0.12f;
+    [SerializeField] float jumpBufferTime = 0.12f;
+    float lastGroundedTime = -999f;
+    float lastJumpPressedTime = -999f;
 
 
     // 공중 제어 보간 속도
@@ -132,10 +136,8 @@ public class PlayerMove : MonoBehaviour
     }
     void OnJumpPressed()
     {
-        if (!player.isDodging && (isGrounded || currentJumpCount > 0))
-        {
-            jumpRequested = true;
-        }
+        if (player.isDodging) return;
+        lastJumpPressedTime = Time.time;
     }
     #region 이동
     void HandleMove()
@@ -174,27 +176,43 @@ public class PlayerMove : MonoBehaviour
     int currentJumpCount;
     void HandleJump()
     {
+        // 1) 점프 선입력 버퍼 안에 있는지 확인
+        bool hasBufferedJump = (Time.time - lastJumpPressedTime) <= jumpBufferTime;
+        if (!hasBufferedJump)
+        {
+            return;
+        }
 
-        if (!jumpRequested) return;
-        jumpRequested = false;
+        // 2) 코요테 타임 안이면 "지상 점프 가능"으로 본다
+        bool withinCoyote = (Time.time - lastGroundedTime) <= coyoteTime;
+        bool canUseGroundJump = isGrounded || withinCoyote;
 
+        // 3) 그게 아니면 공중 점프(이단 점프)만 검사
+        bool canUseDoubleJump = !canUseGroundJump && currentJumpCount > 0;
+
+        if (!canUseGroundJump && !canUseDoubleJump) return;
+
+        // 여기까지 왔으면 버퍼를 소비(한 번만 쓰고 버림)
+        lastJumpPressedTime = -999f;
+
+        // 4) 벽 점프 우선
         if (isWallGrabbing || isWallSliding)
         {
             HandleWallJump();
             return;
         }
 
-        bool canJump = isGrounded || currentJumpCount > 0;
-        if (!canJump) return;
         anim.ResetTrigger("Land");
 
-        if (isGrounded)
+        if (canUseGroundJump)
         {
+            // 지상(코요테 포함)에서 점프하면 남은 점프 횟수 세팅
             currentJumpCount = maxJumpCount - 1;
             anim.SetTrigger("Jump");
         }
         else
         {
+            // 공중 점프 소모
             currentJumpCount--;
         }
 
@@ -202,6 +220,7 @@ public class PlayerMove : MonoBehaviour
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
     }
+
 
     void HandleWallJump()
     {
@@ -312,6 +331,12 @@ public class PlayerMove : MonoBehaviour
 
         bool wasGrounded = isGrounded;
         bool groundedNow = hitSomething;
+
+        if (groundedNow)
+        {
+            lastGroundedTime = Time.time;
+        }
+
         isGrounded = groundedNow;
 
         bool landedThisFrame = !wasGrounded && groundedNow && rb.linearVelocityY < -0.01;

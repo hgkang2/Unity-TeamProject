@@ -64,6 +64,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         if(TimeManager.IsPaused) return;
     }
+
     #region 넉백
     public bool isKnockback;
     public void ApplyKnockback(float force, Vector2? attackerPos = null)
@@ -71,7 +72,6 @@ public class Player : MonoBehaviour, IDamageable
         playerMove.ApplyKnockbackImpulse(force, attackerPos);
         anim.SetTrigger("Hit");
     }
-
     #endregion
 
     #region 회피
@@ -314,7 +314,6 @@ public class Player : MonoBehaviour, IDamageable
         hp.Heal(amount);
     }
 
-    // IDamageable 기본 버전 (공격자 위치 모를 때)
     public void TakeDamage(float amount, Vector2? attackerWorldPosition = null)
     {
         // --- 방어 조건 ---
