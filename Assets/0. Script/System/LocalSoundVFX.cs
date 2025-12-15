@@ -13,7 +13,7 @@ public class LocalSoundVFX : MonoBehaviour
 
         [Tooltip("이 키에서 무작위로 재생될 클립들")]
         public List<AudioClip> clips = new();
-        
+
         [Range(0f, 1f)]
         public float volume = 1f;
 
@@ -39,6 +39,17 @@ public class LocalSoundVFX : MonoBehaviour
         source.rolloffMode = AudioRolloffMode.Linear;
         source.minDistance = 1f;
         source.maxDistance = 20f;
+    }
+
+    void OnEnable()
+    {
+        SoundManager.Instance.OnVolumeChanged += HandleVolumeChanged;
+    }
+
+    void OnDisable()
+    {
+        SoundManager.Instance.OnVolumeChanged -= HandleVolumeChanged;
+        StopAllLoops();
     }
 
     // 단발음 재생
@@ -84,6 +95,32 @@ public class LocalSoundVFX : MonoBehaviour
             loopSrc.Stop();
             Destroy(loopSrc);
             loopSources.Remove(key);
+        }
+    }
+
+    void StopAllLoops()
+    {
+        foreach (KeyValuePair<string, AudioSource> pair in loopSources)
+        {
+            StopLoop(pair.Key);
+        }
+        loopSources.Clear();
+    }
+
+    void HandleVolumeChanged()
+    {
+        float global = GetGlobalSfxVolume();
+
+        foreach (KeyValuePair<string, AudioSource> pair in loopSources)
+        {
+            string key = pair.Key;
+            AudioSource loopSrc = pair.Value;
+
+            SoundEntry entry = FindEntry(key);
+            if (entry != null && loopSrc != null)
+            {
+                loopSrc.volume = entry.volume * global;
+            }
         }
     }
 

@@ -125,6 +125,7 @@ public class StartPanel : UIKeyboardHandler
         startPanelCanvasGroup.alpha = 1f;
         startPanelCanvasGroup.interactable = true;
         startPanelCanvasGroup.blocksRaycasts = true;
+
     }
 
 

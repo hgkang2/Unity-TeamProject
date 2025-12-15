@@ -17,6 +17,19 @@ public class SoundManager : MonoBehaviour
     Dictionary<string, AudioClip> bgmLibrary = new();
     Dictionary<string, AudioClip> uiLibrary = new();
 
+    public event System.Action OnVolumeChanged;
+
+
+    [System.Serializable]
+    public class NamedClip
+    {
+        public string key;
+        public AudioClip clip;
+    }
+
+    [SerializeField] List<NamedClip> bgmClips = new();
+    [SerializeField] List<NamedClip> uiClips = new();
+
     void Awake()
     {
         if (Instance != null)
@@ -26,6 +39,18 @@ public class SoundManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        foreach (NamedClip pair in bgmClips)
+        {
+            if (pair.clip != null && !bgmLibrary.ContainsKey(pair.key))
+                bgmLibrary.Add(pair.key, pair.clip);
+        }
+
+        foreach (NamedClip pair in uiClips)
+        {
+            if (pair.clip != null && !uiLibrary.ContainsKey(pair.key))
+                uiLibrary.Add(pair.key, pair.clip);
+        }
     }
 
 
@@ -54,11 +79,16 @@ public class SoundManager : MonoBehaviour
     {
         masterVolume = Mathf.Clamp01(volume);
         UpdateVolumes();
+        OnVolumeChanged?.Invoke();
     }
 
     void UpdateVolumes()
     {
         bgmSource.volume = masterVolume * bgmVolume;
         // SFX는 각 LocalSoundVFX가 개별적으로 적용
+    }
+    public float GetGlobalSfxVolume()
+    {
+        return masterVolume * sfxVolume;
     }
 }
