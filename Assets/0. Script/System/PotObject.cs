@@ -20,7 +20,7 @@ public class PotObject : MonoBehaviour, IDamageable
         }
         hp.OnDied += OnDie;
     }
-    void IDamageable.TakeDamage(float amount, Vector2? attackerWorldPosition)
+    void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
         hp.TakeDamage(amount);
     }

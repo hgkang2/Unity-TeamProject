@@ -26,6 +26,6 @@ public class MonsterAttack : MonoBehaviour
         float damage = monster.monsterStats.skillDamage;
 
         Debug.Log("[MonsterAttack] HandleHit ȣ��, ������:" + damage);
-        target.TakeDamage(damage, transform.position);
+        target.TakeDamage(damage, DamageType.Normal, transform.position);
     }
 }

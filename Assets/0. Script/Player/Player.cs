@@ -314,7 +314,7 @@ public class Player : MonoBehaviour, IDamageable
         hp.Heal(amount);
     }
 
-    public void TakeDamage(float amount, Vector2? attackerWorldPosition = null)
+    public void TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition = null)
     {
         // --- 방어 조건 ---
         if (isInvincible) return;  // 경직 무적
@@ -326,9 +326,18 @@ public class Player : MonoBehaviour, IDamageable
         if(hp.IsDead) return;
 
         // --- 리액션 처리 ---
-        ApplyKnockback(10f, attackerWorldPosition);
-        StartHitStun(0.15f);
-        StartInvincibleForDuration();
+        switch (type)
+        {
+            case DamageType.Normal:
+                ApplyKnockback(10f, attackerWorldPosition);
+                goto case DamageType.Area;
+            case DamageType.Area:
+                StartHitStun(0.15f);
+                StartInvincibleForDuration();
+                break;
+        }
+
+
     }
 
     void HandleDie()

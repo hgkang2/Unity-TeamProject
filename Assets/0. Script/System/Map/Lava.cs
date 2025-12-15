@@ -13,7 +13,7 @@ public class Lava : MonoBehaviour
     {
         IDamageable target = other.GetComponent<IDamageable>();
         if (target == null) return;
-        target.TakeDamage(damage);
+        target.TakeDamage(damage, DamageType.Area);
     }
     void OnTriggerStay2D(Collider2D other)
     {
@@ -25,7 +25,7 @@ public class Lava : MonoBehaviour
         if (timer >= tick)
         {
             timer = 0f;
-            target.TakeDamage(damage);
+            target.TakeDamage(damage, DamageType.Area);
         }
     }
     void OnTriggerExit2D(Collider2D other) {

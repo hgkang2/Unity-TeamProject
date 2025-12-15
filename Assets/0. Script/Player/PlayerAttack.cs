@@ -56,7 +56,7 @@ public class PlayerAttack : MonoBehaviour
 
     void HandleHit(IDamageable target)
     {
-        target.TakeDamage(stats.curDamage, transform.position);
+        target.TakeDamage(stats.curDamage, DamageType.Normal, transform.position);
 
         // 적 타격 시 Hit Stop
         switch (currentType)

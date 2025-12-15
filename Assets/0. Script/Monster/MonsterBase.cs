@@ -202,7 +202,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         OnHit(transform.position - Vector3.right);
     }
 
-    void IDamageable.TakeDamage(float amount, Vector2? attackerWorldPosition)
+    void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
         if (hp == null) return;
 
@@ -252,7 +252,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
             Player player = collision.gameObject.GetComponent<Player>();
             if(player != null)
             {
-                player.TakeDamage(monsterStats.colideDamage);
+                player.TakeDamage(monsterStats.colideDamage, DamageType.Normal);
             }
         }
     }

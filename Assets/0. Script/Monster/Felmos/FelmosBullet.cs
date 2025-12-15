@@ -32,7 +32,7 @@ public class FelmosBullet : MonoBehaviour
         {
             var player = collision.gameObject.GetComponent<Player>();
 
-            player.TakeDamage(damage);
+            player.TakeDamage(damage, DamageType.Normal);
         }
 
         if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground"))

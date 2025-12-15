@@ -53,7 +53,7 @@ public class UIDeveloperTool : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            player.TakeDamage(takeDamageSlider.value);
+            player.TakeDamage(takeDamageSlider.value, DamageType.Normal);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {

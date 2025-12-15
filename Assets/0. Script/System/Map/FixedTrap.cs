@@ -8,6 +8,6 @@ public class FixedTrap : MonoBehaviour
     {
         IDamageable target = other.gameObject.GetComponent<IDamageable>();
         if (target == null) return;
-        target.TakeDamage(damage);
+        target.TakeDamage(damage, DamageType.Normal);
     }
 }

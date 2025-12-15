@@ -19,7 +19,7 @@ public class BreakableWall : MonoBehaviour, IDamageable
         if(wallHP <= 0) Destroy(gameObject);
     }
 
-        void IDamageable.TakeDamage(float amount, Vector2? attackerWorldPosition)
+        void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
         TakeDamage(amount);
     }
