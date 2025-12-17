@@ -18,6 +18,7 @@ public class LoadDataUI : UIKeyboardHandler
 
     public void ToStageScene()
     {
-        SceneLoader.LoadScene("Stage1_Test");
+        SoundManager.Instance.StopBGM();
+        SceneLoader.NoLoadingScene("CharacterChoice");
     }
 }

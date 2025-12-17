@@ -4,19 +4,19 @@ using UnityEngine;
 public class SoundManager : MonoBehaviour
 {
     // 런타임 이전에 강제 생성
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void AutoCreate()
-    {
-        if (Instance != null) return;
-        SoundManager existing = Object.FindAnyObjectByType<SoundManager>();
-        if (existing != null)
-        {
-            Instance = existing;
-            return;
-        }
-        GameObject go = new GameObject("[SoundManager]");
-        go.AddComponent<SoundManager>();
-    }
+    // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    // static void AutoCreate()
+    // {
+    //     if (Instance != null) return;
+    //     SoundManager existing = Object.FindAnyObjectByType<SoundManager>();
+    //     if (existing != null)
+    //     {
+    //         Instance = existing;
+    //         return;
+    //     }
+    //     GameObject go = new GameObject("[SoundManager]");
+    //     go.AddComponent<SoundManager>();
+    // }
 
     public static SoundManager Instance { get; private set; }
 

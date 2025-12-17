@@ -82,7 +82,7 @@ public class StartPanel : UIKeyboardHandler
     {
         openingSequence = DOTween.Sequence();
 
-        openingSequence.AppendInterval(0.5f);
+        openingSequence.AppendInterval(2f);
         
         // 1) Opening fade-out
         openingSequence.Append(

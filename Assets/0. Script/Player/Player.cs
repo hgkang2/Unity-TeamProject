@@ -351,6 +351,7 @@ public class Player : MonoBehaviour, IDamageable
     public void OnEndDieAnimation()
     {
         SceneLoader.LoadScene("Start");
+        playerSprite.enabled = false;
     }
 
     public void UsePlayerSprite()

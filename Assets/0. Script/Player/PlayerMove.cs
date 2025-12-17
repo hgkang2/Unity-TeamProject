@@ -230,6 +230,8 @@ public class PlayerMove : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
+        anim.SetTrigger("Jump");
+        anim.SetBool("IsJumping", true);
     }
 
 
