@@ -32,13 +32,17 @@ public class HaveSoulsPanel : MonoBehaviour
 
         UpdateExp(exp.CurExp, exp.MaxExp);
         UpdateLevel(exp.CurLevel);
-        UpdateSoulEffects(SoulManager.Instance.CurSouls);
+
+        if (SoulManager.Instance != null)
+        {
+            UpdateSoulEffects(SoulManager.Instance.CurSouls);
+            SoulManager.Instance.soulGot += UpdateSoulEffects;
+        }
 
         // 게임 데이터 구독
         exp.ExpChanged += UpdateExp;
         exp.LevelChanged += UpdateLevel;
-        SoulManager.Instance.soulGot += UpdateSoulEffects;
-
+        
         // UI 마우스 이벤트 구독
         forwarder.MouseEntered += HandleMouseEnter;
 
@@ -59,6 +63,10 @@ public class HaveSoulsPanel : MonoBehaviour
 
     void OnDisable()
     {
+        if (SoulManager.Instance != null)
+        {
+            SoulManager.Instance.soulGot -= UpdateSoulEffects;
+        }
         forwarder.MouseEntered -= HandleMouseEnter;
         foreach (var slot in uiSlots)
             Destroy(slot.GO);
@@ -80,6 +88,7 @@ public class HaveSoulsPanel : MonoBehaviour
     [SerializeField] TMP_Text effectText;
     void UpdateSoulEffects(List<SoulInstance> curSouls)
     {
+        if(curSouls == null || curSouls.Count == 0) return;
         statText.SetText("");
         effectText.SetText("");
         foreach(SoulInstance soul in curSouls)

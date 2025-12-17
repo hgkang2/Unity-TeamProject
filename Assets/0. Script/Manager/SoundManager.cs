@@ -3,6 +3,21 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
+    // 런타임 이전에 강제 생성
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void AutoCreate()
+    {
+        if (Instance != null) return;
+        SoundManager existing = Object.FindAnyObjectByType<SoundManager>();
+        if (existing != null)
+        {
+            Instance = existing;
+            return;
+        }
+        GameObject go = new GameObject("[SoundManager]");
+        go.AddComponent<SoundManager>();
+    }
+
     public static SoundManager Instance { get; private set; }
 
     [Header("Global Sources")]
@@ -53,7 +68,18 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    // SoundManager에 등록된 클립을 사용
+    public void PlayBGM(string key, bool loop = true)
+    {
+        if (!bgmLibrary.TryGetValue(key, out AudioClip clip) || clip == null)
+        {
+            Debug.LogWarning($"[SoundManager] BGM key not found: {key}");
+            return;
+        }
+        PlayBGM(clip, loop);
+    }
 
+    // 개별 클립 사용
     public void PlayBGM(AudioClip clip, bool loop = true)
     {
         if (clip == null) return;
@@ -73,6 +99,16 @@ public class SoundManager : MonoBehaviour
     {
         if (clip == null) return;
         uiSource.PlayOneShot(clip, masterVolume);
+    }
+
+    public void PlayUI(string key, bool loop = true)
+    {
+        if (!uiLibrary.TryGetValue(key, out AudioClip clip) || clip == null)
+        {
+            Debug.LogWarning($"[SoundManager] UI key not found: {key}");
+            return;
+        }
+        PlayUI(clip);
     }
 
     public void SetMasterVolume(float volume)
