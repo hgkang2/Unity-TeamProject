@@ -13,7 +13,7 @@ public class StartPanel : UIKeyboardHandler
     
     CanvasGroup startPanelCanvasGroup;
 
-    DG.Tweening.Sequence openingSequence;                           // 페이드용 시퀀스 저장
+    DG.Tweening.Sequence openingSequence;
 
     bool isOpeningPhase = true;
     Button[] menuButtons;
@@ -125,6 +125,8 @@ public class StartPanel : UIKeyboardHandler
         startPanelCanvasGroup.alpha = 1f;
         startPanelCanvasGroup.interactable = true;
         startPanelCanvasGroup.blocksRaycasts = true;
+
+        SoundManager.Instance.PlayBGM("MainTheme");
     }
 
 

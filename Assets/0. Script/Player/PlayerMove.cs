@@ -15,6 +15,17 @@ public class PlayerMove : MonoBehaviour
     public Vector2 inputVec;
     public bool isGrounded = false;
     public bool isRightFacing = true;
+    public bool IsWalking
+    {
+        get
+        {
+            if (!isGrounded) return false;
+            if (Mathf.Abs(rb.linearVelocity.x) < 0.1f) return false;
+            if (!player.CanControl) return false;
+            if (isWallGrabbing || isWallSliding) return false;
+            return true;
+        }
+    }
 
     [SerializeField] float coyoteTime = 0.12f;
     [SerializeField] float jumpBufferTime = 0.12f;
@@ -476,6 +487,8 @@ public class PlayerMove : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
     }
+
+    
 
 
 }
