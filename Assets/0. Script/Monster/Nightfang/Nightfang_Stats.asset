@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b367afe3982f8e4a8fe5b10a8131b7c, type: 3}
-  m_Name: Grimlog_Stats
+  m_Name: Nightfang_Stats
   m_EditorClassIdentifier: 
   exp: 5
   idleTime: 1

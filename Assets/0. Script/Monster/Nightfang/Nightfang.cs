@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 
-public class Grimlog : MonsterBase
+public class Nightfang : MonsterBase
 {
     int facingX;
     Vector3 originScale;

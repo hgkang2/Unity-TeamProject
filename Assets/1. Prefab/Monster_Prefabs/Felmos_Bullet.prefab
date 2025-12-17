@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5779308799368191835}
   - component: {fileID: 1178460524154883582}
   m_Layer: 0
-  m_Name: FelmosBullet
+  m_Name: Felmos_Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -832,19 +832,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
   m_PrefabInstance: {fileID: 8588210317409235971}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &902023746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 902023738}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93041d8cba40f4d43b753720d74b3aad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  monsterBase: {fileID: 0}
 --- !u!114 &902023747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -879,6 +866,28 @@ MonoBehaviour:
   retreatDuration: 0.5
   postPause: 2
   retreatSpeed: 5
+--- !u!114 &902023763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902023738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e305bba956210547815f4260cd2a23a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  aggroRange: 0
+  player: {fileID: 0}
+  distance: 0
+  dirToPlayer: {x: 0, y: 0}
+  moveDirx: 0
+  dx: 0
+  deadZoneX: 0.1
 --- !u!1 &2008190504
 GameObject:
   m_ObjectHideFlags: 0
@@ -920,7 +929,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 537382995791829701, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: m_Name
-      value: Grimlog
+      value: Nightfang
       objectReference: {fileID: 0}
     - target: {fileID: 4880289530479134016, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1005,7 +1014,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7213174648725036300, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1057,13 +1066,13 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 902023746}
-    - targetCorrespondingSourceObject: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 902023747}
     - targetCorrespondingSourceObject: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 902023755}
+    - targetCorrespondingSourceObject: {fileID: 6606948017098971087, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 902023763}
   m_SourcePrefab: {fileID: 100100000, guid: 8e4c30c5b9b7cf64cb13659b31c5402d, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

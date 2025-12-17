@@ -8,7 +8,7 @@ public class MonsterAttack : MonoBehaviour
 
     private void Awake()
     {   
-        monster = GetComponent<Grimlog>();
+        monster = GetComponent<Nightfang>();
     }
 
     private void OnEnable()
