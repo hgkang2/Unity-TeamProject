@@ -70,7 +70,7 @@ public class SoulManager : MonoBehaviour
         effect.ApplyOnce(player);
         
         // 등록 완료 되면 UI등에 알리기
-        soulGot(curSouls);
+        soulGot?.Invoke(curSouls);
     }
 
     #region 영성 뽑기
