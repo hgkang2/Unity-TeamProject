@@ -225,9 +225,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         ChangeState(MonsterStateType.Take_Damage);
         spriteRenderer.color = Color.red;
 
-        if (isAttack || isUsingSkill) return;
-
-        animator.SetTrigger("Hit");
+        if (!isAttack || !isUsingSkill)
+        {
+            animator.SetTrigger("Hit");
+        }
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
 

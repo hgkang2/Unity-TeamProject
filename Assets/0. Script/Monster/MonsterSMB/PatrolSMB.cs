@@ -4,6 +4,6 @@ public class PatrolSMB : MonsterStateSMB
 {
     public override void OnEnter()
     {
-        monsterBase.patrolDirX *= -1;
+        //monsterBase.patrolDirX *= -1;
     }
 }

@@ -7,8 +7,6 @@ public class HitSMB : MonsterStateSMB
         monsterBase.MonsterHitBox.enabled = false;
         monsterBase.isUsingSkill = false;
         monsterBase.spriteRenderer.color = Color.red;
-
-        monsterBase.StopAllCoroutines();
     }
 
     public override void OnExit()
