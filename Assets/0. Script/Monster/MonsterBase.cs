@@ -10,7 +10,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     [Header("Refs")]
     public MonsterStats monsterStats;
-    public DetectorTest detector;
+    public MonsterDetector detector;
     public MonsterGroundMovement mover;
 
     public MonsterStateType currentState = MonsterStateType.Idle;
@@ -47,7 +47,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
         animator = GetComponentInChildren<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         MonsterHitBox = GetComponent<Collider2D>();
-        detector = GetComponent<DetectorTest>();
+        detector = GetComponent<MonsterDetector>();
         mover = GetComponent<MonsterGroundMovement>();
 
         isUsingSkill = false;
@@ -79,6 +79,8 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public virtual void MonsterFSM()
     {
         StateTimer += Time.deltaTime;
+
+        Debug.Log(currentState);
 
         switch (currentState)
         {
@@ -136,7 +138,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
     public virtual void Aggro()
     {
-        if (isUsingSkill) return;
+        if (isUsingSkill || !isAttackReady) return;
 
         float stopDeadZone = 0.1f;
 

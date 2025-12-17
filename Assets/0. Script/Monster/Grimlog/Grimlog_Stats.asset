@@ -21,11 +21,11 @@ MonoBehaviour:
   aggroSpeed: 7
   attackRange: 3
   attackDamage: 50
-  attackRate: 5
+  attackRate: 1
   skillDamage: 100
   colideDamage: 50
   skillDelay: 1
   skillActiveRange: 8
-  skillCoolTime: 10
+  skillCoolTime: 6
   hitStunTime: 1
   knockbackPower: 5

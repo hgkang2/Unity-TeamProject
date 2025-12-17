@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class DetectorTest : MonoBehaviour
+public class MonsterDetector : MonoBehaviour
 {
     public LayerMask playerMask;
     public float aggroRange = 0f;

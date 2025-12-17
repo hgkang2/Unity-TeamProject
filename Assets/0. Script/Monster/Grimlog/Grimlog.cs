@@ -7,15 +7,11 @@ public class Grimlog : MonsterBase
     int facingX;
     Vector3 originScale;
 
-    [SerializeField]
-    //KeepDistance keepDistance;
-
     public override void Awake()
     {
         base.Awake();
         originScale = transform.localScale;
         facingX = 1;
-        //keepDistance.SetTarget(GameObject.Find("Player").transform);
     }
 
     public override void Update()
@@ -28,6 +24,8 @@ public class Grimlog : MonsterBase
         }
         else if (currentState == MonsterStateType.Aggro && detector != null)
         {
+            if (isAttack || isUsingSkill) return;
+
             float deadZone = 0.05f;
 
             if (Mathf.Abs(detector.dx) > deadZone)
@@ -45,6 +43,8 @@ public class Grimlog : MonsterBase
     public override void Attack()
     {
         SkillCol.SetActive(true);
+        Vector2 dashDir = Vector2.right * facingX;
+        rb.AddForce(2f * dashDir, ForceMode2D.Impulse);
     }
 
     public override void OnAttackExit()
@@ -55,16 +55,14 @@ public class Grimlog : MonsterBase
 
     IEnumerator AttackCooldown()
     {
-        isAttack = false;
-        //keepDistance.TryRetreat();
-
-        //yield return new WaitForSeconds(2f);
-        animator.SetTrigger("Aggro");
+        mover.StopX();
 
         yield return new WaitForSeconds(monsterStats.attackRate);
 
+        animator.SetTrigger("Aggro");
+        mover.MoveX(detector != null ? detector.moveDirx : patrolDirX, monsterStats.aggroSpeed);
+        isAttack = false;
         isAttackReady = true;
-        //keepDistance.StopRetreat();
     }
 
     public override void UseSkill()
