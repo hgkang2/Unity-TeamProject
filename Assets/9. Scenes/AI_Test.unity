@@ -839,7 +839,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 902023738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d9484a983aa9de4490ff92cd430d8c9, type: 3}
   m_Name: 
@@ -855,7 +855,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 902023738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aad46a3c468123444b6343a3dec7ef77, type: 3}
   m_Name: 
@@ -930,6 +930,10 @@ PrefabInstance:
     - target: {fileID: 537382995791829701, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: m_Name
       value: Nightfang
+      objectReference: {fileID: 0}
+    - target: {fileID: 537382995791829701, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4880289530479134016, guid: de8ce238c11e6ac4d86a6bc85f3125e3, type: 3}
       propertyPath: m_LocalPosition.x
