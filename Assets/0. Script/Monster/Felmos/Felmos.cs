@@ -25,11 +25,11 @@ public class Felmos : MonsterBase
     {
         base.Awake();
 
-        if (heightLimiter = null) heightLimiter = GetComponent<GroundHeightLimiter>();
-        if (keepDistance = null) keepDistance = GetComponent<KeepDistance>();
+        //if (heightLimiter = null) heightLimiter = GetComponent<GroundHeightLimiter>();
+        //if (keepDistance = null) keepDistance = GetComponent<KeepDistance>();
 
-        PlayerPos = GameObject.Find("Player").transform;
-        keepDistance.SetTarget(GameObject.Find("Player").transform);
+        //PlayerPos = GameObject.Find("Player").transform;
+        //keepDistance.SetTarget(GameObject.Find("Player").transform);
     }
 
     public override void Update()
@@ -62,7 +62,7 @@ public class Felmos : MonsterBase
     {
         if (isUsingSkill || retreating) return;
 
-        //rb.linearVelocity = direction * monsterStats.aggroSpeed;
+        rb.linearVelocity = detector.dirToPlayer * monsterStats.aggroSpeed;
 
         //keepDistance?.TryRetreat();
 

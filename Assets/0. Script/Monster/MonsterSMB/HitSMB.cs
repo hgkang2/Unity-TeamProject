@@ -4,11 +4,11 @@ public class HitSMB : MonsterStateSMB
 {
     public override void OnEnter()
     {
-        monsterBase.StopAllCoroutines();
         monsterBase.MonsterHitBox.enabled = false;
         monsterBase.isUsingSkill = false;
         monsterBase.spriteRenderer.color = Color.red;
-        //monsterBase.rb.linearVelocity = Vector2.zero;
+
+        monsterBase.StopAllCoroutines();
     }
 
     public override void OnExit()

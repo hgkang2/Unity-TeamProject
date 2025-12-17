@@ -175,6 +175,7 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
 
         if (StateTimer >= monsterStats.hitStunTime)
         {
+            spriteRenderer.color = Color.white;
             if (detector.distance <= monsterStats.aggroRange)
             {
                 animator.SetTrigger("Aggro");
@@ -222,6 +223,10 @@ public abstract class MonsterBase : MonoBehaviour, IDamageable
     public virtual void OnHit(Vector2 attackerWorldPosition)
     {
         ChangeState(MonsterStateType.Take_Damage);
+        spriteRenderer.color = Color.red;
+
+        if (isAttack || isUsingSkill) return;
+
         animator.SetTrigger("Hit");
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
