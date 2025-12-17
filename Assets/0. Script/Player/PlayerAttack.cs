@@ -54,9 +54,30 @@ public class PlayerAttack : MonoBehaviour
         InputManager.Instance.SpecialAttackPressed -= HandleSpecialAttackPressed;
     }
 
-    void HandleHit(IDamageable target)
+    void HandleHit(Collider2D other)
     {
-        target.TakeDamage(stats.curDamage, DamageType.Normal, transform.position);
+        Vector2 hitPoint = other.ClosestPoint(transform.position);
+        Vector2 normal = (other.transform.position - transform.position).normalized;
+
+        HitContext ctx = new HitContext
+        {
+            point = hitPoint,
+            normal = normal,
+            attackerWorldPos = transform.position,
+            instigator = gameObject,
+            amount = stats.curDamage,
+            type = DamageType.Normal
+        };
+
+        if (other.TryGetComponent<IHitReceiver>(out var hit))
+        {
+            hit.OnHit(ctx);
+        }
+
+        if (other.TryGetComponent<IDamageable>(out var dmg))
+        {
+            dmg.TakeDamage(ctx.amount, ctx.type, ctx.attackerWorldPos);
+        }
 
         // 적 타격 시 Hit Stop
         switch (currentType)
