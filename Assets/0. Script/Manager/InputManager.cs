@@ -149,7 +149,7 @@ public class InputManager : MonoBehaviour
     void OnLeftClick(InputAction.CallbackContext ctx)
     {
         vfxManager.MouseClickVFX();
-        SoundManager.Instance.PlayUI("Click");
+        //SoundManager.Instance.PlayUI("Click");
     }
     #endregion
 

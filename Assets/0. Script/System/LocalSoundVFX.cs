@@ -43,12 +43,12 @@ public class LocalSoundVFX : MonoBehaviour
 
     void OnEnable()
     {
-        SoundManager.Instance.OnVolumeChanged += HandleVolumeChanged;
+        if(SoundManager.Instance) SoundManager.Instance.OnVolumeChanged += HandleVolumeChanged;
     }
 
     void OnDisable()
     {
-        SoundManager.Instance.OnVolumeChanged -= HandleVolumeChanged;
+        if(SoundManager.Instance) SoundManager.Instance.OnVolumeChanged -= HandleVolumeChanged;
         StopAllLoops();
     }
 

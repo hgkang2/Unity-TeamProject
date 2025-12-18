@@ -27,7 +27,7 @@ public class UIDeveloperTool : MonoBehaviour
         getExpValueText.text = ((int)(getExpSlider.value)).ToString();
     }
 
-        //Change TimeScale
+    //Change TimeScale
     [SerializeField] Slider getTimeScaleSlider;
     [SerializeField] TMP_Text getTimeScaleText;
     public void ChangeTimeScaleValueText()
@@ -46,18 +46,30 @@ public class UIDeveloperTool : MonoBehaviour
     }
     void Update()
     {
-        
+
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            player.Heal(HealSlider.value);
+            if (HealSlider.isActiveAndEnabled)
+                player.Heal(HealSlider.value);
+            else
+                player.Heal(10);
+
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            player.TakeDamage(takeDamageSlider.value, DamageType.Normal);
+            if (takeDamageSlider.isActiveAndEnabled)
+                player.TakeDamage(takeDamageSlider.value, DamageType.Normal);
+            else
+                player.TakeDamage(takeDamageSlider.value, DamageType.Normal);
+
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            player.Exp.AddExp((int)getExpSlider.value);
+            if (getExpSlider.isActiveAndEnabled)
+                player.Exp.AddExp((int)getExpSlider.value);
+            else
+                player.Exp.AddExp(10);
+
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {

@@ -231,7 +231,6 @@ public class PlayerMove : MonoBehaviour
         rb.AddForce(Vector2.up * stats.curJumpForce, ForceMode2D.Impulse);
         isGrounded = false;
         anim.SetTrigger("Jump");
-        anim.SetBool("IsJumping", true);
     }
 
 
@@ -469,7 +468,7 @@ public class PlayerMove : MonoBehaviour
             {
                 rb.gravityScale = originGravityScale;
             }
-            rb.linearVelocity = new Vector2(0f, Mathf.Max(rb.linearVelocity.y, -wallSlideSpeed));
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -wallSlideSpeed));
             currentJumpCount = maxJumpCount;
         }
         else
