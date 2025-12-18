@@ -93,6 +93,7 @@ public class Player : MonoBehaviour, IDamageable
 
         // 상태 관리
         isDodging = true;
+        BeginInvincible();
 
         // 애니메이션, 이펙트 관리
         anim.SetTrigger("Dodge");
@@ -126,9 +127,9 @@ public class Player : MonoBehaviour, IDamageable
     void EndDodge()
     {
         isDodging = false;
+        EndInvincible();
         anim.SetTrigger("OnDodgeEnd");
         dodgeEffectSprite.SetActive(false);
-        playerMove.EndDodge();
     }
     #endregion
 
@@ -142,7 +143,7 @@ public class Player : MonoBehaviour, IDamageable
     public void ExecuteAirDownAttack()
     {
         // 착지공격동안 무적
-        isInvincible = true;
+        BeginInvincible();
 
         // 이거 보고 PlayerMove가 알아서 무빙 처리
         isAirDownAttack = true;
@@ -179,8 +180,8 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] float cameraShakeDuration;
     void EndAirDownAttack()
     {
-        isInvincible = false;
         isAirDownAttack = false;
+        EndInvincible();
         anim.ResetTrigger("Land");
         CameraManager.Instance.Shake(cameraShakeAmplitude, cameraShakeFrequency, cameraShakeDuration);
     }
@@ -317,8 +318,7 @@ public class Player : MonoBehaviour, IDamageable
     public void TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition = null)
     {
         // --- 방어 조건 ---
-        if (isInvincible) return;  // 경직 무적
-        if (isDodging) return;     // 회피 무적
+        if (isInvincible) return;  // 무적
         if (HP.IsDead) return;     // 사망 시 무시
 
         // --- 데미지 반영 ---

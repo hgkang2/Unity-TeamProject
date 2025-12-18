@@ -17,6 +17,13 @@ public class CharacterChoiceUI : MonoBehaviour
         }
         HideSelectPanel();
     }
+    void OnDestroy()
+    {
+        for (int i = 0; i < characterChoicePanels.Length; i++)
+        {
+            characterChoicePanels[i].Clicked -= ShowSelectPanel;
+        }
+    }
 
     public void ShowSelectPanel(int characterId)
     {

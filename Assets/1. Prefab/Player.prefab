@@ -86,9 +86,9 @@ MonoBehaviour:
   airDownPrepareDuration: 0.15
   isAirDownAttack: 0
   isAirDownPrepare: 0
-  cameraShakeAmplitude: 0
-  cameraShakeFrequency: 0
-  cameraShakeDuration: 0
+  cameraShakeAmplitude: 1
+  cameraShakeFrequency: 1
+  cameraShakeDuration: 0.5
   hitStunDuration: 0.15
   hitInvincibleDuration: 0.5
   isInvincible: 0
@@ -133,12 +133,10 @@ MonoBehaviour:
   groundRayLength: 0.2
   groundRayOffsetX: 0.25
   maxJumpCount: 1
-  airDownFallSpeed: 40
-  airDownGravityScale: 5
-  apexGrav: 0.1
-  apexThreshold: 0.7
-  fallGravityMultiplier: 3
-  minGroundDistanceForAirAttack: 0.3
+  apexGrav: 6
+  apexThreshold: 0.6
+  fallGravityMultiplier: 2.5
+  airDownGravityScale: 100
   isWallGrabbing: 0
   isWallSliding: 0
   wallMask:
@@ -148,6 +146,7 @@ MonoBehaviour:
   wallSlideSpeed: 2
   wallJumpForceX: 10
   wallJumpForceY: 15
+  minGroundDistanceForAirAttack: 0.3
 --- !u!114 &7436586581079057000
 MonoBehaviour:
   m_ObjectHideFlags: 0
