@@ -14,9 +14,7 @@ public class PlayerMove : MonoBehaviour
     public Vector2 inputVec;
     public bool isGrounded = false;
     public bool isRightFacing = true;
-
     GravityMode gravityMode = GravityMode.Normal;
-
     public bool IsWalking
     {
         get
@@ -36,32 +34,6 @@ public class PlayerMove : MonoBehaviour
 
     [SerializeField] float airControlLerp = 8f;
 
-    // ---- Ground Check ----
-    public LayerMask groundMask;
-    public float groundRayLength = 0.2f;
-    public float groundRayOffsetX = 0.25f;
-
-    // ---- Jump ----
-    public int maxJumpCount = 2;
-    int currentJumpCount;
-
-    // ---- Gravity ----
-    float baseGrav = 9.81f;
-    public float apexGrav = 0.15f;
-    public float apexThreshold = 0.6f;
-    public float fallGravityMultiplier = 2.5f;
-
-    // ---- Air Down ----
-    [SerializeField] float airDownGravityScale = 5f;
-
-    // ---- Wall ----
-    public bool isWallGrabbing = false;
-    public bool isWallSliding = false;
-    public LayerMask wallMask;
-    [SerializeField] float wallCheckDistance = 0.5f;
-    [SerializeField] float wallSlideSpeed = 2f;
-    [SerializeField] float wallJumpForceX = 10f;
-    [SerializeField] float wallJumpForceY = 15f;
 
     void Awake()
     {
@@ -115,18 +87,18 @@ public class PlayerMove : MonoBehaviour
         HandleGroundCheck();
         GetGroundDistance();
 
-        // 2) 점프(임펄스/속도 변경이 발생할 수 있음)
+        // 2) 점프
         bool canNormalControl = !player.isDodging && player.CanControl && !player.isAirDownAttack && !isWallGrabbing && !isWallSliding;
         if (canNormalControl)
         {
             HandleJump();
         }
 
-        // 3) 중력 모드 결정(상태 기반) + 적용(1회)
+        // 3) 중력 적용
         UpdateGravityMode();
         ApplyGravity();
 
-        // 4) 이동/특수행동 모두 “속도 의도”를 한 곳에서 계산 후, 적용 1회
+        // 4) 좌우 이동 적용(필요시 상하이동 제한)
         ApplyVelocity();
     }
 
@@ -166,41 +138,39 @@ public class PlayerMove : MonoBehaviour
         float newX = rb.linearVelocity.x;
         float newY = rb.linearVelocity.y;
 
-        // 1) 벽 잡기
+        // 벽 잡기
         if (isWallGrabbing)
         {
             newX = 0f;
             newY = 0f;
             currentJumpCount = maxJumpCount;
         }
-        // 2) 벽 슬라이드
+        // 벽 슬라이드
         else if (isWallSliding)
         {
             newX = 0f;
             currentJumpCount = maxJumpCount;
+            if (!wasWallSliding) newY = 0f; // 슬라이드 시작시에 1회 초기화
         }
-        // 3) 회피
+        // 회피
         else if (player.isDodging)
         {
             float dir = isRightFacing ? 1f : -1f;
             newX = dir * stats.curMoveSpeed * 2f;
             newY = 0f;
         }
-        // 4) 내려찍기
+        // 내려찍기
         else if (player.isAirDownAttack)
         {
             newX = 0f;
-            if (player.isAirDownPrepare)
-            {
-                newY = 0f;
-            }
+            if (player.isAirDownPrepare) newY = 0f;
         }
-        // 5) 지상 공격 고정
+        // 지상 공격 중 이동불가
         else if (playerAttack.isAttacking && isGrounded)
         {
             newX = 0f;
         }
-        // 6) 일반 이동
+        // 일반 이동
         else
         {
             float targetX = inputVec.x * stats.curMoveSpeed;
@@ -216,6 +186,9 @@ public class PlayerMove : MonoBehaviour
     #endregion
 
     #region Jump/WallJump
+    public int maxJumpCount = 2;
+    int currentJumpCount;
+
     void HandleJump()
     {
         bool hasBufferedJump = (Time.time - lastJumpPressedTime) <= jumpBufferTime;
@@ -271,16 +244,16 @@ public class PlayerMove : MonoBehaviour
     #endregion
 
     #region Gravity
+    float baseGrav = 9.81f;
+    public float apexGravityMultiplier = 0.66f; // 점프 정점 중력 계수
+    public float apexThreshold = 0.6f; // 점프 정점 구간
+    public float fallGravityMultiplier = 2.5f; // 공중에서 떨어질때 가속 계수
+    public float wallSlideGravityMultiplier = 0.25f;
+    [SerializeField] float airDownGravityScale = 50f; // 내려찍기 중력
     void UpdateGravityMode()
     {
         // --- 우선순위 규칙 ---
-        if (isWallGrabbing)
-        {
-            gravityMode = GravityMode.Zero;
-            return;
-        }
-
-        if (player.isDodging)
+        if (isWallGrabbing || player.isDodging || player.isAirDownPrepare)
         {
             gravityMode = GravityMode.Zero;
             return;
@@ -288,10 +261,15 @@ public class PlayerMove : MonoBehaviour
 
         if (player.isAirDownAttack)
         {
-            gravityMode = player.isAirDownPrepare ? GravityMode.Zero : GravityMode.AirDown;
+            gravityMode = GravityMode.AirDown;
             return;
         }
 
+        if (isWallSliding)
+        {
+            gravityMode = GravityMode.WallSlide;
+            return;
+        }
 
         // ---일반 규칙---
 
@@ -331,7 +309,7 @@ public class PlayerMove : MonoBehaviour
                 break;
 
             case GravityMode.Apex:
-                newGrav = apexGrav;
+                newGrav = baseGrav * apexGravityMultiplier;
                 break;
 
             case GravityMode.Falling:
@@ -342,7 +320,10 @@ public class PlayerMove : MonoBehaviour
                 newGrav = airDownGravityScale;
                 break;
 
-            case GravityMode.Normal:
+            case GravityMode.WallSlide:
+                newGrav = baseGrav * wallSlideGravityMultiplier;
+                break;
+                
             default:
                 newGrav = baseGrav;
                 break;
@@ -352,7 +333,10 @@ public class PlayerMove : MonoBehaviour
     }
     #endregion
 
-    #region Ground/Wall Check
+    #region Ground Check
+    public LayerMask groundMask;
+    public float groundRayLength = 0.2f;
+    public float groundRayOffsetX = 0.25f;
     void HandleGroundCheck()
     {
         Bounds b = col.bounds;
@@ -425,7 +409,17 @@ public class PlayerMove : MonoBehaviour
 
         return dist;
     }
+    #endregion
 
+    #region  Wall Check
+    public bool isWallGrabbing = false;
+    public bool isWallSliding = false;
+    public LayerMask wallMask;
+    [SerializeField] float wallCheckDistance = 0.5f;
+    [SerializeField] float wallSlideSpeed = 2f;
+    [SerializeField] float wallJumpForceX = 10f;
+    [SerializeField] float wallJumpForceY = 15f;
+    bool wasWallSliding;
     void HandleWallCheck()
     {
         if (isGrounded || !player.CanControl)
@@ -434,6 +428,8 @@ public class PlayerMove : MonoBehaviour
             isWallSliding = false;
             return;
         }
+
+        wasWallSliding = isWallSliding;
 
         Bounds b = col.bounds;
         Vector2 rayOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, b.center.y);
