@@ -7,6 +7,7 @@ public class PlayerAttack : MonoBehaviour
     PlayerMove playerMove;
     PlayerStats stats;
     Animator animator;
+    HitVfx hitVfx;
 
     //Player 아래에 각 공격 범위 별로 히트박스 만들기 후 
     //4개다 Player-PlayerAttack 인스펙터에 끝어다 넣기(Player 하위에 만들어논거 참고)
@@ -27,6 +28,7 @@ public class PlayerAttack : MonoBehaviour
         stats = GetComponent<PlayerStats>();
         animator = GetComponent<Animator>();
         player = GetComponent<Player>();
+        hitVfx = GetComponent<HitVfx>();
     }
     void Start()
     {
@@ -72,6 +74,7 @@ public class PlayerAttack : MonoBehaviour
         if (other.TryGetComponent<IHitReceiver>(out var hit))
         {
             hit.OnHit(ctx);
+            hitVfx.Play(ctx);
         }
 
         if (other.TryGetComponent<IDamageable>(out var dmg))
