@@ -344,13 +344,14 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         StopX();
         isAttack = false;
+        LockX(true);
         spriteRenderer.color = Color.white;
 
         yield return new WaitForSeconds(attackRate);
         
         animator?.SetTrigger("Aggro");
         ChangeState(State.Aggro);
-
+        LockX(false);
         isAttackReady = true;
     }
 
@@ -375,12 +376,14 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         StopX();
         isUsingSkill = false;
+        LockX(true);
         spriteRenderer.color = Color.white;
 
         yield return new WaitForSeconds(skillDelay);
 
         animator?.SetTrigger("Aggro");
         ChangeState(State.Aggro);
+        LockX(false);
 
         StartCoroutine(SkillCooldownRoutine());
     }
@@ -433,6 +436,15 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (state != State.Patrol && state != State.Aggro) return;
 
         rb.linearVelocity = new Vector2(dirX * speed, rb.linearVelocity.y);
+    }
+
+    void LockX(bool locked)
+    {
+        if (!rb) return;
+
+        rb.constraints = locked
+            ? RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation
+            : RigidbodyConstraints2D.FreezeRotation;
     }
 
     void OnDrawGizmosSelected()

@@ -308,7 +308,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: attackRate
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: skillDelay
