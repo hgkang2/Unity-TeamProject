@@ -1,17 +1,19 @@
 using UnityEngine;
 
-public class HitSMB : MonsterStateSMB
+public class HitSMB : StateMachineBehaviour
 {
-    public override void OnEnter()
+    NightfangStandalone nightfang;
+
+    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        monsterBase.MonsterHitBox.enabled = false;
-        monsterBase.isUsingSkill = false;
-        monsterBase.spriteRenderer.color = Color.red;
+        if (nightfang == null)
+            nightfang = animator.GetComponentInParent<NightfangStandalone>();
+
     }
 
-    public override void OnExit()
+    public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        monsterBase.MonsterHitBox.enabled = true;
-        monsterBase.spriteRenderer.color = Color.white;
+        if (nightfang == null) return; // 안전장치
+
     }
 }

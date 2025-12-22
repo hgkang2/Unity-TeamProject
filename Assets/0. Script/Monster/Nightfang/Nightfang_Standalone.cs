@@ -1,8 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
-public class NightfangStandalone : MonoBehaviour
+public class NightfangStandalone : MonoBehaviour, IDamageable
 {
+    HP hp;
+
     public enum State { Idle, Patrol, Aggro, Attack, Skill, TakeDamage, Dead }
 
     [Header("Debug Step Test (단계별로 켜기)")]
@@ -17,10 +19,12 @@ public class NightfangStandalone : MonoBehaviour
     [SerializeField] SpriteRenderer spriteRenderer;
 
     [Header("Optional")]
-    [SerializeField] GameObject skillCol;   // 공격 히트박스(있으면 켜고/끄기)
-    [SerializeField] Transform player;      // 비우면 자동 탐색
+    [SerializeField] GameObject skillHitBoxObj;   // 공격 히트박스(있으면 켜고/끄기)
+    [SerializeField] GameObject attackHitboxObj;
 
     [Header("Detect")]
+    [SerializeField] Transform player;      // 비우면 자동 탐색
+    public string playerTag = "Player";
     public LayerMask playerMask;
     public float deadZoneX = 0.1f;
 
@@ -33,6 +37,8 @@ public class NightfangStandalone : MonoBehaviour
     public float aggroRange = 6.0f;
     public float aggroSpeed = 3.5f;
 
+    public float maxHeightDiffForAttack = 0.8f;
+
     public float attackRange = 1.2f;
     public float attackRate = 1.0f;     // 공격 쿨타임
 
@@ -40,6 +46,14 @@ public class NightfangStandalone : MonoBehaviour
     public float skillDelay = 0.2f;     // 스킬 후 딜레이(복귀 전)
     public float skillCoolTime = 2.0f;  // 스킬 쿨타임
     public float readySkillWindup = 0.25f;
+
+    public float nextAttackDelay = 1f;
+
+    public float hitStunTime = 0.25f;
+
+    [Header("Damage")]
+    public float attackDamage = 10f;
+    public float skillDamage = 25f;
 
     [Header("Runtime")]
     public State state = State.Idle;
@@ -65,6 +79,8 @@ public class NightfangStandalone : MonoBehaviour
 
     Coroutine runningRoutine;
 
+    Vector2 lastHitFrom;
+
     void Reset()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -77,21 +93,34 @@ public class NightfangStandalone : MonoBehaviour
         if (!rb) rb = GetComponent<Rigidbody2D>();
         if (!spriteRenderer) spriteRenderer = GetComponent<SpriteRenderer>();
         if (!animator) animator = GetComponentInChildren<Animator>();
+        if (!hp) hp = GetComponent<HP>();
+
+        isDead = false;
+
+        hp.OnDied += OnDied;
 
         originScale = transform.localScale;
         facingX = 1;
         patrolDirX = 1;
 
-        if (skillCol) skillCol.SetActive(false);
+        if (skillHitBoxObj) skillHitBoxObj.SetActive(false);
+        if (attackHitboxObj) attackHitboxObj.SetActive(false);
 
         ChangeState(State.Idle);
 
-        Debug.Log($"Animator obj = {animator.gameObject.name}");
-        Debug.Log($"Controller = {animator.runtimeAnimatorController?.name}");
+        //Debug.Log($"Animator obj = {animator.gameObject.name}");
+        //Debug.Log($"Controller = {animator.runtimeAnimatorController?.name}");
+    }
+
+    public void OnDestroy()
+    {
+        hp.OnDied -= OnDied;
     }
 
     void Update()
     {
+        Debug.Log(state);
+
         if (isDead) return;
 
         // 0) 플레이어 찾기 (MonsterDetector가 하던 FindFirstObjectByType<Player> 대체) :contentReference[oaicite:13]{index=13}
@@ -115,6 +144,7 @@ public class NightfangStandalone : MonoBehaviour
 
         // (테스트 편의) 강제 상태 전환 키
         // F2: Idle, F3: Patrol, F4: Aggro
+        if (Input.GetKeyDown(KeyCode.F1)) TakeDamage(20f);
         if (Input.GetKeyDown(KeyCode.F2)) ChangeState(State.Idle);
         if (Input.GetKeyDown(KeyCode.F3)) ChangeState(State.Patrol);
         if (Input.GetKeyDown(KeyCode.F4)) ChangeState(State.Aggro);
@@ -150,16 +180,18 @@ public class NightfangStandalone : MonoBehaviour
 
             // Attack/Skill은 “애니메이션 이벤트”로 AttackStart/AttackEnd 같은 걸 붙여도 되고,
             // 여기서는 코루틴으로 단순화했음.
-            case State.Attack:
-            case State.Skill:
-            case State.TakeDamage:
-            case State.Dead:
+            case State.Attack: break;
+            case State.Skill: break;
+            case State.TakeDamage : TickTakeDamage();
                 break;
+            case State.Dead: break;
         }
     }
 
     void TickIdle()
     {
+        if (isAttack || isUsingSkill) return;
+
         StopX();
 
         // 1단계 테스트: Idle만 유지
@@ -174,27 +206,34 @@ public class NightfangStandalone : MonoBehaviour
 
         if (enablePatrol && stateTimer >= idleTime)
         {
-            animator?.SetTrigger("Patrol");
+            //animator?.SetTrigger("Patrol");
+            patrolDirX *= -1;
+            ApplyFlip();
             ChangeState(State.Patrol);
         }
     }
 
     void TickPatrol()
     {
-        MoveX(patrolDirX, patrolSpeed);
-        facingX = patrolDirX;
+        if (isAttack || isUsingSkill) return;
 
         if (enableAggro && distance <= aggroRange)
         {
+            StopX();
             TriggerAlertThenAggro();
             return;
         }
 
         if (stateTimer >= patrolTime)
         {
-            animator?.SetTrigger("Idle");
+            StopX();
+            //animator?.SetTrigger("Idle");
+
             ChangeState(State.Idle);
         }
+
+        MoveX(patrolDirX, patrolSpeed);
+        facingX = patrolDirX;
     }
 
     void TriggerAlertThenAggro()
@@ -216,11 +255,19 @@ public class NightfangStandalone : MonoBehaviour
 
     void TickAggro()
     {
+        if (isUsingSkill || isAttack) return;
+
         if (animator && animator.GetCurrentAnimatorStateInfo(0).IsName("Alert"))
         {
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            StopX();
             return;
         }
+
+        float dy = player
+        ? Mathf.Abs(player.position.y - transform.position.y)
+        : float.PositiveInfinity;
+
+        bool heightOk = dy <= maxHeightDiffForAttack;
 
         // Aggro에서 facing 결정(예전 Nightfang 로직) :contentReference[oaicite:14]{index=14}
         if (!isAttack && !isUsingSkill)
@@ -231,8 +278,16 @@ public class NightfangStandalone : MonoBehaviour
 
         // 이동(예전 MonsterBase.Aggro 추격/정지) :contentReference[oaicite:15]{index=15}
         float stopDeadZone = 0.1f;
-        if (Mathf.Abs(dx) <= stopDeadZone) StopX();
-        else MoveX(moveDirX, aggroSpeed);
+        if (Mathf.Abs(dx) <= stopDeadZone)
+        {
+            StopX();
+            animator?.SetTrigger("Idle");
+        }
+        else
+        {
+            MoveX(moveDirX, aggroSpeed);
+            animator?.SetTrigger("Aggro");
+        }
 
         // 어그로 해제
         if (distance >= aggroRange * 1.2f)
@@ -243,12 +298,13 @@ public class NightfangStandalone : MonoBehaviour
         }
 
         // 스킬 조건(중거리)
-        if (enableSkill &&
+        if (enableSkill && heightOk &&
             distance <= skillActiveRange &&
             distance >= attackRange &&
             isSkillReady && !isUsingSkill)
         {
             animator?.SetTrigger("ReadySkill");
+            Debug.Log("Skill");
             isUsingSkill = true;
             isSkillReady = false;
 
@@ -257,11 +313,12 @@ public class NightfangStandalone : MonoBehaviour
         }
 
         // 공격 조건(근거리)
-        if (enableAttack &&
+        if (enableAttack && heightOk &&
             distance <= attackRange &&
             isAttackReady && !isAttack)
         {
             animator?.SetTrigger("Attack");
+            Debug.Log("Attack");
             isAttack = true;
             isAttackReady = false;
 
@@ -279,25 +336,24 @@ public class NightfangStandalone : MonoBehaviour
     IEnumerator AttackRoutine()
     {
         ChangeState(State.Attack);
+        spriteRenderer.color = Color.blue;
 
         // Attack() 핵심: 히트박스 on + 약한 대쉬 :contentReference[oaicite:16]{index=16}
-        if (skillCol) skillCol.SetActive(true);
+        if (attackHitboxObj) attackHitboxObj.SetActive(true);
         rb.AddForce(2f * Vector2.right * facingX, ForceMode2D.Impulse);
 
         // “공격 판정 시간” (애니메이션 길이에 맞춰 조절)
         yield return new WaitForSeconds(0.15f);
 
         // OnAttackExit() 핵심: 히트박스 off + 쿨다운 :contentReference[oaicite:17]{index=17}
-        if (skillCol) skillCol.SetActive(false);
+        if (attackHitboxObj) attackHitboxObj.SetActive(false);
         StopX();
 
         yield return new WaitForSeconds(attackRate);
+        spriteRenderer.color = Color.white;
 
         isAttack = false;
         isAttackReady = true;
-
-        animator?.SetTrigger("Aggro");
-        ChangeState(State.Aggro);
     }
 
     public void StartSkill()
@@ -308,7 +364,10 @@ public class NightfangStandalone : MonoBehaviour
 
     IEnumerator SkillRoutine()
     {
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        spriteRenderer.color = Color.red;
+        if (skillHitBoxObj) skillHitBoxObj.SetActive(true);
+        StopX();
+
         yield return new WaitForSeconds(readySkillWindup);
 
         ChangeState(State.Skill);
@@ -319,11 +378,16 @@ public class NightfangStandalone : MonoBehaviour
         // OnSkillExit() 핵심: 딜레이 후 Aggro 복귀 + 쿨타임 :contentReference[oaicite:19]{index=19}
         yield return new WaitForSeconds(skillDelay);
 
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        spriteRenderer.color = Color.white;
+
+        if (skillHitBoxObj) skillHitBoxObj.SetActive(false);
+        StopX();
+
         isUsingSkill = false;
 
-        animator?.SetTrigger("Aggro");
-        ChangeState(State.Aggro);
+        animator.ResetTrigger("StandBy");
+        animator.SetTrigger("StandBy");
+
         StartCoroutine(SkillCooldownRoutine());
     }
 
@@ -333,13 +397,22 @@ public class NightfangStandalone : MonoBehaviour
         isSkillReady = true;
     }
 
-    void ChangeState(State next)
+    public void ChangeState(State next)
     {
         if (isDead && next != State.Dead) return;
 
-        Debug.Log($"STATE: {state} -> {next}");
-        state = next;
         stateTimer = 0f;
+        //Debug.Log($"STATE: {state} -> {next}");
+        state = next;
+
+        if (animator)
+        {
+            animator.ResetTrigger("Idle");
+            animator.ResetTrigger("Patrol");
+
+            if (state == State.Idle) animator.SetTrigger("Idle");
+            else if (state == State.Patrol) animator.SetTrigger("Patrol");
+        }
     }
 
     void ApplyFlip()
@@ -360,7 +433,11 @@ public class NightfangStandalone : MonoBehaviour
 
     void MoveX(int dirX, float speed)
     {
-        if (!rb || isUsingSkill || isAttack) return;
+        if (!rb) return;
+
+        // 이동이 허용되는 상태만 이동
+        if (state != State.Patrol && state != State.Aggro) return;
+
         rb.linearVelocity = new Vector2(dirX * speed, rb.linearVelocity.y);
     }
 
@@ -374,5 +451,86 @@ public class NightfangStandalone : MonoBehaviour
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, skillActiveRange);
+    }
+
+    void TickTakeDamage()
+    {
+        // 피격 중엔 무조건 멈춤 (추격/이동 로직 차단)
+        StopX();
+
+        if (stateTimer >= hitStunTime)
+        {
+            spriteRenderer.color = Color.white;
+
+            // 복귀는 상황에 따라
+            if (enableAggro && distance <= aggroRange)
+            {
+                animator?.SetTrigger("Aggro");
+                ChangeState(State.Aggro);
+            }
+            else
+            {
+                animator?.SetTrigger("Idle");
+                ChangeState(State.Idle);
+            }
+        }
+    }
+
+    public void TakeDamage(float amount)
+    {
+        if (hp == null) return;
+
+        hp.TakeDamage(amount);
+
+        if (isDead) return;
+
+        OnHit(transform.position - Vector3.right);
+    }
+
+    void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
+    {
+        if (hp == null) return;
+
+        hp.TakeDamage(amount);
+
+        if (isDead) return;
+
+        lastHitFrom = (Vector2)attackerWorldPosition;
+        OnHit((Vector2)attackerWorldPosition);
+    }
+
+    public virtual void OnHit(Vector2 attackerWorldPosition)
+    {
+        if (isAttack || isUsingSkill) return;
+
+        StopX();
+        ChangeState(State.TakeDamage);
+        spriteRenderer.color = Color.red;
+
+        animator?.SetTrigger("Hit");
+
+        Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
+        rb.linearVelocity = new Vector2(dir.x * 40f, dir.y * 40f);
+    }
+
+    public virtual void OnDied()
+    {
+        if (isDead) return;
+
+        StopX();
+        isDead = true;
+
+        ChangeState(State.Dead);
+
+        animator?.SetTrigger("Dead");
+
+        StopAllCoroutines();
+        isUsingSkill = false;
+
+        GetComponent<Collider2D>().enabled = false;
+
+        //FindFirstObjectByType<Player>().Exp.AddExp(10);
+
+        GameObject.Destroy(this.gameObject, 3f);
     }
 }
