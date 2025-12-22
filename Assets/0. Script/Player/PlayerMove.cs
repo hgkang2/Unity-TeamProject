@@ -436,6 +436,15 @@ public class PlayerMove : MonoBehaviour
         Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
 
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, wallCheckDistance, wallMask);
+
+        Color color = hit.collider != null ? Color.red : Color.green;
+        Debug.DrawLine(
+            rayOrigin,
+            rayOrigin + rayDirection * wallCheckDistance,
+            color
+        );
+
+
         bool isTouchingWall = (hit.collider != null);
 
         bool inputTowardWall =

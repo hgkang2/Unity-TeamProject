@@ -69,6 +69,7 @@ public class Player : MonoBehaviour, IDamageable
     public bool isKnockback;
     public void ApplyKnockback(float force, Vector2? attackerPos = null)
     {
+        playerAttack.EndAttack();
         playerMove.ApplyKnockbackImpulse(force, attackerPos);
         anim.SetTrigger("Hit");
     }
