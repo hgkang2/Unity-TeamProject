@@ -51,9 +51,9 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     public float hitStunTime = 0.25f;
 
-    [Header("Damage")]
-    public float attackDamage = 10f;
-    public float skillDamage = 25f;
+    //[Header("Damage")]
+    //public float attackDamage = 10f;
+    //public float skillDamage = 25f;
 
     [Header("Runtime")]
     public State state = State.Idle;
@@ -343,11 +343,14 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         yield return new WaitForSeconds(0.5f);
 
         StopX();
-
-        yield return new WaitForSeconds(attackRate);
+        isAttack = false;
         spriteRenderer.color = Color.white;
 
-        isAttack = false;
+        yield return new WaitForSeconds(attackRate);
+        
+        animator?.SetTrigger("Aggro");
+        ChangeState(State.Aggro);
+
         isAttackReady = true;
     }
 
@@ -362,22 +365,22 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         ChangeState(State.Skill);
 
         spriteRenderer.color = Color.red;
-        if (skillHitBoxObj) skillHitBoxObj.SetActive(true);
         StopX();
 
         yield return new WaitForSeconds(readySkillWindup);
 
         rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
 
-        yield return new WaitForSeconds(skillDelay);
+        yield return new WaitForSeconds(0.5f);
 
         StopX();
+        isUsingSkill = false;
         spriteRenderer.color = Color.white;
 
-        isUsingSkill = false;
+        yield return new WaitForSeconds(skillDelay);
 
-        animator.ResetTrigger("StandBy");
-        animator.SetTrigger("StandBy");
+        animator?.SetTrigger("Aggro");
+        ChangeState(State.Aggro);
 
         StartCoroutine(SkillCooldownRoutine());
     }
@@ -501,7 +504,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         animator?.SetTrigger("Hit");
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
-        rb.linearVelocity = new Vector2(dir.x * 40f, dir.y * 40f);
+        rb.linearVelocity = new Vector2(dir.x * 10f, rb.linearVelocity.y);
     }
 
     public virtual void OnDied()
@@ -519,6 +522,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         isUsingSkill = false;
 
         GetComponent<Collider2D>().enabled = false;
+        rb.linearVelocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Kinematic;
 
         FindFirstObjectByType<Player>().Exp.AddExp(10);
 
