@@ -1,14 +1,20 @@
 using UnityEngine;
 
-public class AttackSMB : MonsterStateSMB
+public class AttackSMB : StateMachineBehaviour
 {
-    public override void OnEnter()
+    NightfangStandalone nightfang;
+
+    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        monsterBase.Attack();
+        if (nightfang == null)
+            nightfang = animator.GetComponentInParent<NightfangStandalone>();
+
+        nightfang.attackHitboxObj.SetActive(true);
     }
 
-    public override void OnExit()
+    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        monsterBase.OnAttackExit();
+        if (nightfang == null) return;
+        nightfang.attackHitboxObj.SetActive(false);
     }
 }

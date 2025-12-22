@@ -19,8 +19,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] SpriteRenderer spriteRenderer;
 
     [Header("Optional")]
-    [SerializeField] GameObject skillHitBoxObj;   // 공격 히트박스(있으면 켜고/끄기)
-    [SerializeField] GameObject attackHitboxObj;
+    [SerializeField] public GameObject skillHitBoxObj;   // 공격 히트박스(있으면 켜고/끄기)
+    [SerializeField] public GameObject attackHitboxObj;
 
     [Header("Detect")]
     [SerializeField] Transform player;      // 비우면 자동 탐색
@@ -338,15 +338,10 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         ChangeState(State.Attack);
         spriteRenderer.color = Color.blue;
 
-        // Attack() 핵심: 히트박스 on + 약한 대쉬 :contentReference[oaicite:16]{index=16}
-        if (attackHitboxObj) attackHitboxObj.SetActive(true);
         rb.AddForce(2f * Vector2.right * facingX, ForceMode2D.Impulse);
 
-        // “공격 판정 시간” (애니메이션 길이에 맞춰 조절)
-        yield return new WaitForSeconds(0.15f);
+        yield return new WaitForSeconds(0.5f);
 
-        // OnAttackExit() 핵심: 히트박스 off + 쿨다운 :contentReference[oaicite:17]{index=17}
-        if (attackHitboxObj) attackHitboxObj.SetActive(false);
         StopX();
 
         yield return new WaitForSeconds(attackRate);
@@ -364,24 +359,20 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     IEnumerator SkillRoutine()
     {
+        ChangeState(State.Skill);
+
         spriteRenderer.color = Color.red;
         if (skillHitBoxObj) skillHitBoxObj.SetActive(true);
         StopX();
 
         yield return new WaitForSeconds(readySkillWindup);
 
-        ChangeState(State.Skill);
-
-        // UseSkill() 핵심: 강한 대쉬 :contentReference[oaicite:18]{index=18}
         rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
 
-        // OnSkillExit() 핵심: 딜레이 후 Aggro 복귀 + 쿨타임 :contentReference[oaicite:19]{index=19}
         yield return new WaitForSeconds(skillDelay);
 
-        spriteRenderer.color = Color.white;
-
-        if (skillHitBoxObj) skillHitBoxObj.SetActive(false);
         StopX();
+        spriteRenderer.color = Color.white;
 
         isUsingSkill = false;
 
@@ -529,7 +520,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         GetComponent<Collider2D>().enabled = false;
 
-        //FindFirstObjectByType<Player>().Exp.AddExp(10);
+        FindFirstObjectByType<Player>().Exp.AddExp(10);
 
         GameObject.Destroy(this.gameObject, 3f);
     }

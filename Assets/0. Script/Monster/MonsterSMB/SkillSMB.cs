@@ -1,16 +1,20 @@
 using UnityEngine;
 
-public class SkillSMB : MonsterStateSMB
+public class SkillSMB : StateMachineBehaviour
 {
-    public override void OnEnter()
+    NightfangStandalone nightfang;
+
+    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        monsterBase.SkillCol.SetActive(true);
-        monsterBase.UseSkill();
+        if (nightfang == null)
+            nightfang = animator.GetComponentInParent<NightfangStandalone>();
+
+        nightfang.skillHitBoxObj.SetActive(true);
     }
 
-    public override void OnExit()
+    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        monsterBase.SkillCol.SetActive(false);
-        monsterBase.OnSkillExit();
+        if (nightfang == null) return;
+        nightfang.skillHitBoxObj.SetActive(false);
     }
 }
