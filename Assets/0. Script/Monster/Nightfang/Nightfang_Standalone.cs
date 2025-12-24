@@ -131,17 +131,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (isDead) return;
 
-        // 0) �÷��̾� ã�� (MonsterDetector�� �ϴ� FindFirstObjectByType<Player> ��ü) :contentReference[oaicite:13]{index=13}
-        if (!player)
-        {
-            //var p = FindFirstObjectByType<Player>();
-            //if (p) player = p.transform;
-            var go = GameObject.FindGameObjectWithTag("Player");
-            if (go) player = go.transform;
-        }
-
         // 1) Ž�� ������Ʈ
-        UpdateDetect();
+        PlayerDetect();
 
         // 2) ���� �ӽ�
         stateTimer += Time.deltaTime;
@@ -156,10 +147,26 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (Input.GetKeyDown(KeyCode.F4)) ChangeState(State.Aggro);
     }
 
-    void UpdateDetect()
+    void PlayerDetect()
     {
         if (!player)
         {
+            Collider2D hit = Physics2D.OverlapCircle(transform.position, aggroRange, playerMask);
+
+            if(hit)
+                player = hit.transform;
+            else
+            {
+                distance = float.PositiveInfinity;
+                dx = 0f;
+                return;
+            }
+            
+        }
+
+        if(!player.gameObject.activeInHierarchy)
+        {
+            player = null;
             distance = float.PositiveInfinity;
             dx = 0f;
             return;
@@ -255,9 +262,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void TickAggro()
     {
-        if (state != State.Aggro) return;
-        if (isAttack || isUsingSkill) return;
-
         float dy = player
         ? Mathf.Abs(player.position.y - transform.position.y)
         : float.PositiveInfinity;
@@ -333,12 +337,12 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         StopX();
         
         isAttack = false;
-        LockX(true);
+        //LockX(true);
 
         yield return new WaitForSeconds(attackRate);
         ChangeState(State.Aggro);
 
-        LockX(false);
+        //LockX(false);
         isAttackReady = true;
     }
 
@@ -363,13 +367,13 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         StopX();
         isUsingSkill = false;
-        LockX(true);
+        //LockX(true);
         spriteRenderer.color = Color.white;
 
         yield return new WaitForSeconds(skillDelay);
 
         ChangeState(State.Aggro);
-        LockX(false);
+        //LockX(false);
 
         StartCoroutine(SkillCooldownRoutine());
     }
@@ -437,28 +441,24 @@ void PlayStateAnim(State s)
 
     void StopX()
     {
-        if (!rb) return;
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
 
     void MoveX(int dirX, float speed)
     {
-        if (!rb) return;
-
-        // �̵��� ���Ǵ� ���¸� �̵�
         if (state != State.Patrol && state != State.Aggro) return;
 
         rb.linearVelocity = new Vector2(dirX * speed, rb.linearVelocity.y);
     }
 
-    void LockX(bool locked)
-    {
-        if (!rb) return;
+    // void LockX(bool locked)
+    // {
+    //     if (!rb) return;
 
-        rb.constraints = locked
-            ? RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation
-            : RigidbodyConstraints2D.FreezeRotation;
-    }
+    //     rb.constraints = locked
+    //         ? RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation
+    //         : RigidbodyConstraints2D.FreezeRotation;
+    // }
 
     void OnDrawGizmosSelected()
     {
@@ -475,25 +475,15 @@ void PlayStateAnim(State s)
     void TickTakeDamage()
     {
         if(!isAttackReady || isUsingSkill) return;
-        StopX();
 
         if (stateTimer >= hitStunTime)
         {
-            if (enableAggro && distance <= aggroRange)
-            {
-                ChangeState(State.Aggro);
-            }
-            else
-            {
-                ChangeState(State.Idle);
-            }
+            ChangeState(State.Idle);
         }
     }
 
     public void TakeDamage(float amount)
     {
-        if (hp == null) return;
-
         hp.TakeDamage(amount);
 
         if (isDead) return;
@@ -503,8 +493,6 @@ void PlayStateAnim(State s)
 
     void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
-        if (hp == null) return;
-
         hp.TakeDamage(amount);
 
         if (isDead) return;
@@ -515,14 +503,12 @@ void PlayStateAnim(State s)
 
     public virtual void OnHit(Vector2 attackerWorldPosition)
     {
-        if (isAttack || isUsingSkill) return;
-
         StopX();
         ChangeState(State.TakeDamage);
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
         dir = new Vector2(dir.x, 0).normalized;
-        rb.AddForce(dir * 20f, ForceMode2D.Impulse);
+        rb.AddForce(dir * 5f, ForceMode2D.Impulse);
     }
 
     public virtual void OnDied()
