@@ -12,7 +12,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     const string TR_PATROL = "Patrol";
     const string TR_AGGRO  = "Aggro";
     const string TR_ATTACK = "Attack";
-    const string TR_SKILL  = "Skill";
+    const string TR_SKILL  = "ReadySkill";
     const string TR_HIT    = "Hit";
     const string TR_DEAD   = "Dead";
 
@@ -368,6 +368,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(skillDelay);
 
+        ChangeState(State.Aggro);
         LockX(false);
 
         StartCoroutine(SkillCooldownRoutine());
@@ -473,7 +474,7 @@ void PlayStateAnim(State s)
 
     void TickTakeDamage()
     {
-        if(!isAttackReady) return;
+        if(!isAttackReady || isUsingSkill) return;
         StopX();
 
         if (stateTimer >= hitStunTime)
@@ -520,7 +521,8 @@ void PlayStateAnim(State s)
         ChangeState(State.TakeDamage);
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
-        rb.linearVelocity = new Vector2(dir.x * 10f, rb.linearVelocity.y);
+        dir = new Vector2(dir.x, 0).normalized;
+        rb.AddForce(dir * 20f, ForceMode2D.Impulse);
     }
 
     public virtual void OnDied()
