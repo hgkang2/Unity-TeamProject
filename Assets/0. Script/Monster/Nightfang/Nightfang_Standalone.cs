@@ -131,17 +131,14 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (isDead) return;
 
-        // 1) Ž�� ������Ʈ
         PlayerDetect();
 
-        // 2) ���� �ӽ�
         stateTimer += Time.deltaTime;
         RunFSM();
 
-        // 3) �ø��� ������ �ٶ󺸴� ���⡱ �������� ����
         ApplyFlip();
 
-        if (Input.GetKeyDown(KeyCode.F1)) TakeDamage(1.0f);
+        if (Input.GetKeyDown(KeyCode.F1)) TakeDamage(10f);
         if (Input.GetKeyDown(KeyCode.F2)) ChangeState(State.Idle);
         if (Input.GetKeyDown(KeyCode.F3)) ChangeState(State.Patrol);
         if (Input.GetKeyDown(KeyCode.F4)) ChangeState(State.Aggro);
@@ -206,6 +203,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (isAttack || isUsingSkill) return;
 
         StopX();
+        animator.SetTrigger("Idle");
 
         // 1�ܰ� �׽�Ʈ: Idle�� ����
         if (!enablePatrol && !enableAggro) return;
@@ -221,13 +219,15 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         {
             patrolDirX *= -1;
             ApplyFlip();
-            ChangeState(State.Patrol);
+            ChangeState(State.Patrol);   
         }
     }
 
     void TickPatrol()
     {
         if (isAttack || isUsingSkill) return;
+
+        animator?.SetTrigger("Patrol");
 
         if (enableAggro && distance <= aggroRange)
         {
@@ -239,7 +239,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (stateTimer >= patrolTime)
         {
             StopX();
-
+            animator?.SetTrigger("Idle");
             ChangeState(State.Idle);
         }
 
@@ -258,10 +258,13 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         ChangeState(State.Aggro);
+        animator?.SetTrigger("Aggro");
     }
 
     void TickAggro()
     {
+        //if(isAttack) return;
+
         float dy = player
         ? Mathf.Abs(player.position.y - transform.position.y)
         : float.PositiveInfinity;
@@ -278,16 +281,19 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (Mathf.Abs(dx) <= stopDeadZone)
         {
             StopX();
+            //animator?.SetTrigger("Idle");
         }
         else
         {
             MoveX(moveDirX, aggroSpeed);
+            //animator?.SetTrigger("Aggro");
         }
 
         // ��׷� ����
         if (distance >= aggroRange * 1.2f)
         {
             ChangeState(State.Idle);
+            animator?.SetTrigger("Idle");
             return;
         }
 
@@ -296,7 +302,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             distance >= attackRange &&
             isSkillReady && !isUsingSkill)
         {
-            // animator?.SetTrigger("ReadySkill");
+            animator?.SetTrigger("ReadySkill");
             isUsingSkill = true;
             isSkillReady = false;
 
@@ -309,9 +315,10 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             distance <= attackRange &&
             isAttackReady && !isAttack)
         {
+            animator?.SetTrigger("ReadySkill");
             isAttack = true;
             isAttackReady = false;
-
+            
             StartAttack(); 
             return;
         }
@@ -323,29 +330,33 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         runningRoutine = StartCoroutine(AttackRoutine());
     }
 
+    [SerializeField] float attackDuration = 1f;
     IEnumerator AttackRoutine()
     {
         ChangeState(State.Attack);
         StopX();
+        
 
         yield return new WaitForSeconds(attackDelay);
 
+        animator?.SetTrigger("Attack");
         rb.AddForce(5f * Vector2.right * facingX, ForceMode2D.Impulse);
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(attackDuration);
 
         StopX();
-        
-        isAttack = false;
-        //LockX(true);
+
+        animator?.SetTrigger("Idle");
 
         yield return new WaitForSeconds(attackRate);
-        ChangeState(State.Aggro);
-
-        //LockX(false);
+        
+        ChangeState(State.Idle);
+        animator?.SetTrigger("Idle");
+        isAttack = false;
         isAttackReady = true;
     }
 
+    #region Skill
     public void StartSkill()
     {
         if (runningRoutine != null) StopCoroutine(runningRoutine);
@@ -361,6 +372,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(readySkillWindup);
 
+        animator.SetTrigger("Skill");
+
         rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
 
         yield return new WaitForSeconds(0.5f);
@@ -372,7 +385,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(skillDelay);
 
-        ChangeState(State.Aggro);
+        ChangeState(State.Idle);
         //LockX(false);
 
         StartCoroutine(SkillCooldownRoutine());
@@ -383,40 +396,41 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         yield return new WaitForSeconds(skillCoolTime);
         isSkillReady = true;
     }
+    #endregion
 
-    void ResetAllStateTriggers()
-    {
-        if (!animator) return;
-        animator.ResetTrigger(TR_IDLE);
-        animator.ResetTrigger(TR_PATROL);
-        animator.ResetTrigger(TR_AGGRO);
-        animator.ResetTrigger(TR_ATTACK);
-        animator.ResetTrigger(TR_SKILL);
-        animator.ResetTrigger(TR_HIT);
-        animator.ResetTrigger(TR_DEAD);
-    }
+    // void ResetAllStateTriggers()
+    // {
+    //     if (!animator) return;
+    //     animator.ResetTrigger(TR_IDLE);
+    //     animator.ResetTrigger(TR_PATROL);
+    //     animator.ResetTrigger(TR_AGGRO);
+    //     animator.ResetTrigger(TR_ATTACK);
+    //     animator.ResetTrigger(TR_SKILL);
+    //     animator.ResetTrigger(TR_HIT);
+    //     animator.ResetTrigger(TR_DEAD);
+    // }
 
-void PlayStateAnim(State s)
-{
-    if (!animator) return;
+// void PlayStateAnim(State s)
+// {
+//     if (!animator) return;
 
-    // 같은 상태로 반복 호출 방지
-    // var cur = animator.GetCurrentAnimatorStateInfo(0);
-    // if (cur.IsName(s.ToString())) return;
+//     // 같은 상태로 반복 호출 방지
+//     // var cur = animator.GetCurrentAnimatorStateInfo(0);
+//     // if (cur.IsName(s.ToString())) return;
 
-    ResetAllStateTriggers();
+//     ResetAllStateTriggers();
 
-    switch (s)
-    {
-        case State.Idle:      animator.SetTrigger(TR_IDLE); break;
-        case State.Patrol:    animator.SetTrigger(TR_PATROL); break;
-        case State.Aggro:     animator.SetTrigger(TR_AGGRO); break;
-        case State.Attack:    animator.SetTrigger(TR_ATTACK); break;
-        case State.Skill:     animator.SetTrigger(TR_SKILL); break;
-        case State.TakeDamage:animator.SetTrigger(TR_HIT); break;
-        case State.Dead:      animator.SetTrigger(TR_DEAD); break;
-    }
-}
+//     switch (s)
+//     {
+//         case State.Idle:      animator.SetTrigger(TR_IDLE); break;
+//         case State.Patrol:    animator.SetTrigger(TR_PATROL); break;
+//         case State.Aggro:     animator.SetTrigger(TR_AGGRO); break;
+//         case State.Attack:    animator.SetTrigger(TR_ATTACK); break;
+//         case State.Skill:     animator.SetTrigger(TR_SKILL); break;
+//         case State.TakeDamage:animator.SetTrigger(TR_HIT); break;
+//         case State.Dead:      animator.SetTrigger(TR_DEAD); break;
+//     }
+// }
 
     public void ChangeState(State next)
     {
@@ -426,7 +440,7 @@ void PlayStateAnim(State s)
         //Debug.Log($"STATE: {state} -> {next}");
         state = next;
 
-        PlayStateAnim(state);
+        //PlayStateAnim(state);
     }
 
     void ApplyFlip()
@@ -446,8 +460,6 @@ void PlayStateAnim(State s)
 
     void MoveX(int dirX, float speed)
     {
-        if (state != State.Patrol && state != State.Aggro) return;
-
         rb.linearVelocity = new Vector2(dirX * speed, rb.linearVelocity.y);
     }
 
@@ -479,6 +491,7 @@ void PlayStateAnim(State s)
         if (stateTimer >= hitStunTime)
         {
             ChangeState(State.Idle);
+            animator.SetTrigger("Idle");
         }
     }
 
@@ -501,14 +514,19 @@ void PlayStateAnim(State s)
         OnHit((Vector2)attackerWorldPosition);
     }
 
+    [SerializeField]float knockBackXForce = 5f;
+    [SerializeField]float knockBackYForce = 1f;
+
     public virtual void OnHit(Vector2 attackerWorldPosition)
     {
-        StopX();
+        //StopX();
         ChangeState(State.TakeDamage);
+        animator.SetTrigger("Hit");
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
-        dir = new Vector2(dir.x, 0).normalized;
-        rb.AddForce(dir * 5f, ForceMode2D.Impulse);
+        dir = new Vector2(dir.x * knockBackXForce, knockBackYForce);
+        //rb.AddForce(dir, ForceMode2D.Impulse);
+        rb.linearVelocity = dir;
     }
 
     public virtual void OnDied()
@@ -519,6 +537,7 @@ void PlayStateAnim(State s)
         isDead = true;
 
         ChangeState(State.Dead);
+        animator.SetTrigger("Dead");
 
         StopAllCoroutines();
         isUsingSkill = false;

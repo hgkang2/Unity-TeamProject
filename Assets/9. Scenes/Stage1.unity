@@ -328,7 +328,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: attackDelay
-      value: 0.25
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: enableAggro
@@ -336,15 +336,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: enableSkill
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: hitStunTime
-      value: 0.2
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: enableAttack
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: enablePatrol
@@ -353,6 +353,14 @@ PrefabInstance:
     - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: skillCoolTime
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
+      propertyPath: knockBackYForce
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3389612499101591149, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
+      propertyPath: playerMask.m_Bits
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 5285283011277283470, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: m_IsTrigger
@@ -365,6 +373,10 @@ PrefabInstance:
     - target: {fileID: 5285283011277283470, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: m_IncludeLayers.m_Bits
       value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 7364252208457456261, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
+      propertyPath: maxHP
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7867814683284999657, guid: ccf0fb412c6917244a57bba1101ada65, type: 3}
       propertyPath: m_Name
@@ -15037,7 +15049,7 @@ CompositeCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: ee524a1c422b3c3419e2b15d2f9f6104, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
