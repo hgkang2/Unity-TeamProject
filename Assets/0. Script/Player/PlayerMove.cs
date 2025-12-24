@@ -102,7 +102,10 @@ public class PlayerMove : MonoBehaviour
 
         // 4) 좌우 이동 적용(필요시 상하이동 제한)
         ApplyVelocity();
+
+        mygravity = rb.gravityScale;
     }
+    public float mygravity;
 
     void LateUpdate()
     {
@@ -159,7 +162,11 @@ public class PlayerMove : MonoBehaviour
         {
             float dir = isRightFacing ? 1f : -1f;
             newX = dir * stats.curMoveSpeed * 2f;
-            newY = 0f;
+            if (player.Dodgeflag)
+            {
+                player.Dodgeflag = false;
+                newY = 0f;
+            }
         }
         // 내려찍기
         else if (player.isAirDownAttack)
@@ -256,8 +263,13 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] float airDownGravityScale = 50f; // 내려찍기 중력
     void UpdateGravityMode()
     {
+        if (player.isDodging)
+        {
+            gravityMode = GravityMode.Normal;
+            return;
+        }
         // --- 우선순위 규칙 ---
-        if (isWallGrabbing || player.isDodging || player.isAirDownPrepare)
+        if (isWallGrabbing || player.isAirDownPrepare)
         {
             gravityMode = GravityMode.Zero;
             return;

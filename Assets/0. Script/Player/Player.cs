@@ -78,6 +78,7 @@ public class Player : MonoBehaviour, IDamageable
     #region 회피
     [SerializeField] GameObject dodgeEffectSprite;
     public bool isDodging = false;
+    public bool Dodgeflag = false;
     public float dodgeDuration = 1f;
     public float dodgeCooldown = 2f;
     float nextDodgeAvailableTime = 0f;
@@ -94,6 +95,7 @@ public class Player : MonoBehaviour, IDamageable
 
         // 상태 관리
         isDodging = true;
+        Dodgeflag = true; // 중력 0으로 1회 초기화(PlayerMove.ApplyVelocity())
         BeginInvincible();
 
         // 애니메이션, 이펙트 관리
