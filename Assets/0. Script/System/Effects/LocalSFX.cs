@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
-public class LocalSoundVFX : MonoBehaviour
+public class LocalSFX : MonoBehaviour
 {
     [Serializable]
     public class SoundEntry

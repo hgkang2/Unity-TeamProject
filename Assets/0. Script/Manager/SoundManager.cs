@@ -98,7 +98,7 @@ public class SoundManager : MonoBehaviour
     public void PlayUI(AudioClip clip)
     {
         if (clip == null) return;
-        uiSource.PlayOneShot(clip, masterVolume);
+        uiSource.PlayOneShot(clip, masterVolume * sfxVolume);
     }
 
     public void PlayUI(string key, bool loop = true)

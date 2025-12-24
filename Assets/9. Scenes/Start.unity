@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 553879}
   - component: {fileID: 553878}
   - component: {fileID: 553880}
+  - component: {fileID: 553881}
   - component: {fileID: 553877}
   m_Layer: 5
   m_Name: "\uB3C4\uAC10"
@@ -255,6 +256,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activate: 0
   myIndex: 0
+--- !u!114 &553881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 553875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97df1bce6fdf176459ff16611579aec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverKey: Button_Hover
+  clickKey: Button_Click
+  enableHover: 0
+  enableClick: 0
 --- !u!1 &18211901
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,6 +284,7 @@ GameObject:
   - component: {fileID: 18211905}
   - component: {fileID: 18211904}
   - component: {fileID: 18211906}
+  - component: {fileID: 18211907}
   - component: {fileID: 18211903}
   m_Layer: 5
   m_Name: "\uC124\uC815"
@@ -391,6 +409,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activate: 1
   myIndex: 0
+--- !u!114 &18211907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18211901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97df1bce6fdf176459ff16611579aec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverKey: Button_Hover
+  clickKey: Button_Click
+  enableHover: 1
+  enableClick: 1
 --- !u!1 &111838931
 GameObject:
   m_ObjectHideFlags: 0
@@ -1594,6 +1628,7 @@ GameObject:
   - component: {fileID: 586276264}
   - component: {fileID: 586276263}
   - component: {fileID: 586276265}
+  - component: {fileID: 586276266}
   - component: {fileID: 586276262}
   m_Layer: 5
   m_Name: "\uC885\uB8CC"
@@ -1730,6 +1765,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activate: 1
   myIndex: 0
+--- !u!114 &586276266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586276260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97df1bce6fdf176459ff16611579aec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverKey: Button_Hover
+  clickKey: Button_Click
+  enableHover: 1
+  enableClick: 1
 --- !u!1 &587683565
 GameObject:
   m_ObjectHideFlags: 0
@@ -1742,6 +1793,7 @@ GameObject:
   - component: {fileID: 587683569}
   - component: {fileID: 587683568}
   - component: {fileID: 587683570}
+  - component: {fileID: 587683571}
   - component: {fileID: 587683567}
   m_Layer: 5
   m_Name: "\uB7AD\uD0B9"
@@ -1866,6 +1918,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activate: 0
   myIndex: 0
+--- !u!114 &587683571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 587683565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97df1bce6fdf176459ff16611579aec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverKey: Button_Hover
+  clickKey: Button_Click
+  enableHover: 0
+  enableClick: 0
 --- !u!1 &692491318
 GameObject:
   m_ObjectHideFlags: 0
@@ -2150,8 +2218,10 @@ GameObject:
   - component: {fileID: 1012239467}
   - component: {fileID: 1012239466}
   - component: {fileID: 1012239469}
+  - component: {fileID: 1012239471}
   - component: {fileID: 1012239465}
   - component: {fileID: 1012239468}
+  - component: {fileID: 1012239470}
   m_Layer: 5
   m_Name: "\uC2A4\uD1A0\uB9AC \uBAA8\uB4DC"
   m_TagString: Untagged
@@ -2301,6 +2371,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activate: 1
   myIndex: 0
+--- !u!114 &1012239470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012239463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!114 &1012239471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012239463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97df1bce6fdf176459ff16611579aec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverKey: Button_Hover
+  clickKey: Button_Click
+  enableHover: 1
+  enableClick: 1
 --- !u!1 &1048412575
 GameObject:
   m_ObjectHideFlags: 0
@@ -2552,8 +2667,10 @@ MonoBehaviour:
   - key: MainTheme
     clip: {fileID: 8300000, guid: 737a046f83762aa46b2005111b77ca43, type: 3}
   uiClips:
-  - key: Click
-    clip: {fileID: 8300000, guid: 7f2f0e3dbd9bf8c48bc03c2dd4281dfa, type: 3}
+  - key: Button_Hover
+    clip: {fileID: 8300000, guid: fbd5c8b3874f08549880e309eb74313c, type: 3}
+  - key: Button_Click
+    clip: {fileID: 8300000, guid: 72d4b45cda2ab7241a875f30b4e6f531, type: 3}
 --- !u!4 &1095817084
 Transform:
   m_ObjectHideFlags: 0
@@ -4021,6 +4138,7 @@ GameObject:
   - component: {fileID: 2108356908}
   - component: {fileID: 2108356907}
   - component: {fileID: 2108356909}
+  - component: {fileID: 2108356910}
   - component: {fileID: 2108356906}
   m_Layer: 5
   m_Name: "\uCC4C\uB9B0\uC9C0 \uBAA8\uB4DC"
@@ -4145,6 +4263,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activate: 0
   myIndex: 0
+--- !u!114 &2108356910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108356904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97df1bce6fdf176459ff16611579aec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverKey: Button_Hover
+  clickKey: Button_Click
+  enableHover: 0
+  enableClick: 0
 --- !u!114 &448603254653212429
 MonoBehaviour:
   m_ObjectHideFlags: 0

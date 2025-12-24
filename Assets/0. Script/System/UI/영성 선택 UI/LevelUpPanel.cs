@@ -45,7 +45,7 @@ public class LevelUpPanel : UIKeyboardHandler
         {
             soulPanels[i].transform.position = soulPanels_OriginPos[i];
         }
-        rerollButton.gameObject.SetActive(false);
+        
         DrawSoul();
         StartAnim();
     }
@@ -84,6 +84,10 @@ public class LevelUpPanel : UIKeyboardHandler
 
     void StartAnim()
     {
+        // 전체 연출 설정 초기화
+
+        // 연출 중 입력 차단
+        DisableInput();
 
         // 부채꼴 각도 세팅
         float startAngle = -angleRange * 0.5f;
@@ -98,19 +102,20 @@ public class LevelUpPanel : UIKeyboardHandler
         // 연출 시작
         for (int i = 0; i < panelNum; i++)
         {
-            soulPanels[i].transform.localPosition = Vector3.zero;
-            soulPanels[i].gameObject.SetActive(true);
-            soulPanels[i].ShowBack();
+            // 패널별 연출 설정 초기화 
 
-            CanvasGroup cg = soulPanels[i].GetComponent<CanvasGroup>();
-            RectTransform rect = soulPanels[i].GetComponent<RectTransform>();
+            SoulPanel panel = soulPanels[i];
+            panel.gameObject.SetActive(true);
 
-            // --- 초기 상태: 한 점에 겹쳐 있음 + 완전 투명 ---
+            panel.ShowBack();
+
+            RectTransform rect = panel.GetComponent<RectTransform>();
+            CanvasGroup cg = panel.GetComponent<CanvasGroup>();
+
+            // 0단계 : 한 점에 겹쳐 시작, 완전 투명
+            rect.anchoredPosition = Vector2.zero;
             cg.alpha = 0f;
-            DisableInput();
-
-            rect.anchoredPosition = Vector3.zero;          // 전부 같은 위치
-
+            cg.blocksRaycasts = true;
 
             Sequence cardSeq = DOTween.Sequence();
 
@@ -187,14 +192,15 @@ public class LevelUpPanel : UIKeyboardHandler
                 rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
 
-            ).OnComplete(() =>
-                {
-                    rerollButton.gameObject.SetActive(true);
-                    EnableInput();
-                });
+            );
 
             seq.Join(cardSeq);
         }
+
+        seq.OnComplete(() =>
+        {
+            EnableInput();
+        });
     }
     #endregion
 
@@ -362,13 +368,13 @@ public class LevelUpPanel : UIKeyboardHandler
     void EnableInput()
     {
         SubscribeChildEvent();
-        rerollButton.GetComponent<Button>().enabled = true;
+        rerollButton.gameObject.SetActive(true);
         canInput = true;
     }
     void DisableInput()
     {
         UnSubscribeChildEvent();
-        rerollButton.GetComponent<Button>().enabled = false;
+        rerollButton.gameObject.SetActive(false);
         canInput = false;
     }
     
