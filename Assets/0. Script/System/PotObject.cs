@@ -5,6 +5,10 @@ using UnityEngine;
 public class PotObject : MonoBehaviour, IDamageable
 {
     HP hp ;
+    Animator anim;
+    Collider2D col;
+    LocalSFX sfx;
+
     public List<GameObject> itemPrefabs;
     public float dropForce = 5f;
 
@@ -12,14 +16,13 @@ public class PotObject : MonoBehaviour, IDamageable
 
     void Awake()
     {
-         hp = GetComponent<HP>();
-         if (hp == null)
-        {
-            enabled = false;
-            return;
-        }
-        hp.OnDied += OnDie;
+        hp = GetComponent<HP>();
+        hp.OnDied += Die;
+        anim = GetComponent<Animator>();
+        col = GetComponent<Collider2D>();
+        sfx = GetComponent<LocalSFX>();        
     }
+
     void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
         hp.TakeDamage(amount);
@@ -28,11 +31,20 @@ public class PotObject : MonoBehaviour, IDamageable
 
     //부숴졌을 때(hp가 0이 되었을때) 구슬 랜덤으로 뱉기
 
-    void OnDie()
+    void Die()
     {
         if(isBroken) return;
         isBroken = true;
+
+
         DropItems();
+        col.enabled = false;
+        anim.SetTrigger("OnDestroy");
+        sfx.Play("OnDestroy");
+    }
+    // Animation Clip 마지막 프레임에서 호출
+    public void Destroy()
+    {
         Destroy(gameObject);
     }
 
