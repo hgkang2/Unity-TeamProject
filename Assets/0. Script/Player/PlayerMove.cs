@@ -9,6 +9,7 @@ public class PlayerMove : MonoBehaviour
     Collider2D col;
     Animator anim;
     SpriteRenderer spr;
+    LocalSFX sfx;
 
     // ---- 입력 / 상태 ----
     public Vector2 inputVec;
@@ -44,6 +45,7 @@ public class PlayerMove : MonoBehaviour
         anim = GetComponent<Animator>();
         spr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        sfx = GetComponent<LocalSFX>();
 
         baseGrav = rb.gravityScale;
         currentJumpCount = maxJumpCount;
@@ -224,6 +226,7 @@ public class PlayerMove : MonoBehaviour
 
         isGrounded = false;
         anim.SetTrigger("Jump");
+        sfx.Play("JumpVoice");
     }
 
     void HandleWallJump()
@@ -238,6 +241,7 @@ public class PlayerMove : MonoBehaviour
 
         Vector2 wallJumpVec = new Vector2(wallJumpForceX * jumpDir, wallJumpForceY);
         rb.AddForce(wallJumpVec, ForceMode2D.Impulse);
+        sfx.Play("JumpVoice");
 
         currentJumpCount--;
     }
@@ -372,6 +376,8 @@ public class PlayerMove : MonoBehaviour
             {
                 anim.ResetTrigger("Land");
             }
+
+            sfx.Play("Land");
         }
 
 #if UNITY_EDITOR

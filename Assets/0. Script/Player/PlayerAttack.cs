@@ -1,4 +1,5 @@
 using System.Globalization;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
@@ -8,6 +9,8 @@ public class PlayerAttack : MonoBehaviour
     PlayerStats stats;
     Animator animator;
     HitVfx hitVfx;
+    LocalSFX sfx;
+    string sfxKey;
 
     //Player 아래에 각 공격 범위 별로 히트박스 만들기 후 
     //4개다 Player-PlayerAttack 인스펙터에 끝어다 넣기(Player 하위에 만들어논거 참고)
@@ -29,6 +32,7 @@ public class PlayerAttack : MonoBehaviour
         animator = GetComponent<Animator>();
         player = GetComponent<Player>();
         hitVfx = GetComponent<HitVfx>();
+        sfx = GetComponent<LocalSFX>();
     }
     void Start()
     {
@@ -121,21 +125,26 @@ public class PlayerAttack : MonoBehaviour
         if (inputDir.y > 0.5f)
         {
             type = AttackType.Up;
+            sfxKey = "AttackVoice";
         }
         // 아래 방향키 + 공중일경우만
         else if (inputDir.y < -0.5f && !playerMove.isGrounded)
         {
             type = AttackType.Down;
+            sfxKey = "SkillAttackVoice";
         }
         // 점프 버튼 + 공중일경우만
         else if (InputManager.Instance.IsJumpHeld && !playerMove.isGrounded)
         {
             type = AttackType.Jump;
+            sfxKey = "AttackVoice";
         }
         else
         {
             type = AttackType.Normal;
+            sfxKey = "AttackVoice";
         }
+        
 
         StartAttack(type);
     }
@@ -155,6 +164,8 @@ public class PlayerAttack : MonoBehaviour
 
         animator.SetTrigger("Attack");
         animator.SetInteger("AttackType", (int)type);
+
+        sfx.Play(sfxKey);
 
         isAttacking = true;
     }
@@ -220,4 +231,5 @@ public class PlayerAttack : MonoBehaviour
         if (jumpHitbox != null) jumpHitbox.col.enabled = false;
         //if (specialHitbox != null) specialHitbox.enabled = false;
     }
+
 }

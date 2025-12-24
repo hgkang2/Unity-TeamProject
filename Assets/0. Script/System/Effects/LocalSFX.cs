@@ -17,16 +17,13 @@ public class LocalSFX : MonoBehaviour
         [Range(0f, 1f)]
         public float volume = 1f;
 
-        [Header("걸음 같은 지속적 소리 여부")]
-        public bool loopable = false;
-
-        [Header("랜덤 피치 (예: 0.95 ~ 1.05)")]
-        public float pitchMin = 1f;
-        public float pitchMax = 1f;
     }
 
     [Header("사운드 목록")]
     public List<SoundEntry> sounds = new();
+
+    public float pitchMin = 0.95f;
+    public float pitchMax = 1.05f;
 
     AudioSource source;
     readonly Dictionary<string, AudioSource> loopSources = new();
@@ -62,7 +59,7 @@ public class LocalSFX : MonoBehaviour
         if (clip == null) return;
 
         float volume = entry.volume * GetGlobalSfxVolume();
-        source.pitch = UnityEngine.Random.Range(entry.pitchMin, entry.pitchMax);
+        source.pitch = UnityEngine.Random.Range(pitchMin, pitchMax);
         source.PlayOneShot(clip, volume);
     }
 
@@ -70,7 +67,7 @@ public class LocalSFX : MonoBehaviour
     public void PlayLoop(string key)
     {
         SoundEntry entry = FindEntry(key);
-        if (entry == null || !entry.loopable || entry.clips.Count == 0) return;
+        if (entry == null || entry.clips.Count == 0) return;
         if (loopSources.ContainsKey(key)) return; // 이미 재생 중이면 무시
 
         AudioClip clip = GetRandomClip(entry);
@@ -82,7 +79,7 @@ public class LocalSFX : MonoBehaviour
         loopSrc.playOnAwake = false;
         loopSrc.spatialBlend = 1f;
         loopSrc.volume = entry.volume * GetGlobalSfxVolume();
-        loopSrc.pitch = UnityEngine.Random.Range(entry.pitchMin, entry.pitchMax);
+        loopSrc.pitch = UnityEngine.Random.Range(pitchMin, pitchMax);
         loopSrc.Play();
 
         loopSources[key] = loopSrc;
