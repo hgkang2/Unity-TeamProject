@@ -49,16 +49,13 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     public float maxHeightDiffForAttack = 0.8f;
 
     public float attackRange = 1.2f;
-    public float attackDelay = 1f;
-    public float attackRate = 1.0f;     // ���� ��Ÿ��
+    public float readyAttackWindup = 1f;
+    public float attackCoolTime = 1.0f;
 
     public float skillActiveRange = 3.5f;
-    public float skillDelay = 0.2f;     // ��ų �� ������(���� ��)
-    public float skillCoolTime = 2.0f;  // ��ų ��Ÿ��
+    public float skillCoolTime = 0.2f;     //
+    public float skillDuration;
     public float readySkillWindup = 0.25f;
-
-    public float nextAttackDelay = 1f;
-
     public float hitStunTime = 0.25f;
 
 
@@ -84,6 +81,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     int patrolDirX = 1;
     bool isDead;
+    public bool isHit;
 
     Coroutine runningRoutine;
 
@@ -115,9 +113,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (attackHitboxObj) attackHitboxObj.SetActive(false);
 
         ChangeState(State.Idle);
-
-        //Debug.Log($"Animator obj = {animator.gameObject.name}");
-        //Debug.Log($"Controller = {animator.runtimeAnimatorController?.name}");
     }
 
     public void OnDestroy()
@@ -127,8 +122,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void Update()
     {
-        Debug.Log(state);
-
         if (isDead) return;
 
         PlayerDetect();
@@ -139,9 +132,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         ApplyFlip();
 
         if (Input.GetKeyDown(KeyCode.F1)) TakeDamage(10f);
-        if (Input.GetKeyDown(KeyCode.F2)) ChangeState(State.Idle);
-        if (Input.GetKeyDown(KeyCode.F3)) ChangeState(State.Patrol);
-        if (Input.GetKeyDown(KeyCode.F4)) ChangeState(State.Aggro);
     }
 
     void PlayerDetect()
@@ -187,9 +177,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             case State.Idle: TickIdle(); break;
             case State.Patrol: TickPatrol(); break;
             case State.Aggro: TickAggro(); break;
-
-            // Attack/Skill�� ���ִϸ��̼� �̺�Ʈ���� AttackStart/AttackEnd ���� �� �ٿ��� �ǰ�,
-            // ���⼭�� �ڷ�ƾ���� �ܼ�ȭ����.
             case State.Attack: break;
             case State.Skill: break;
             case State.TakeDamage : TickTakeDamage();
@@ -200,65 +187,48 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void TickIdle()
     {
-        if (isAttack || isUsingSkill) return;
-
         StopX();
-        animator.SetTrigger("Idle");
+        //animator.SetTrigger("Idle");
 
-        // 1�ܰ� �׽�Ʈ: Idle�� ����
         if (!enablePatrol && !enableAggro) return;
 
-        // ��׷� �켱(���ϸ� �ݴ��)
-        if (enableAggro && distance <= aggroRange)
+        if (enableAggro && isAttackReady &&distance <= aggroRange && !isHit)
         {
-            TriggerAlertThenAggro();
+            ChangeState(State.Aggro);
+            animator?.SetTrigger("Aggro");
             return;
         }
 
-        if (enablePatrol && stateTimer >= idleTime)
+        if (enablePatrol && stateTimer >= idleTime && !isHit)
         {
             patrolDirX *= -1;
             ApplyFlip();
-            ChangeState(State.Patrol);   
+            ChangeState(State.Patrol);
+            animator?.SetTrigger("Patrol");
         }
     }
 
     void TickPatrol()
     {
-        if (isAttack || isUsingSkill) return;
-
-        animator?.SetTrigger("Patrol");
+        // if (isAttack || isUsingSkill) return;
 
         if (enableAggro && distance <= aggroRange)
         {
             StopX();
-            TriggerAlertThenAggro();
+            ChangeState(State.Aggro);
+            animator?.SetTrigger("Aggro");
             return;
         }
 
         if (stateTimer >= patrolTime)
         {
             StopX();
-            animator?.SetTrigger("Idle");
             ChangeState(State.Idle);
+            animator?.SetTrigger("Idle");
         }
 
         MoveX(patrolDirX, patrolSpeed);
         facingX = patrolDirX;
-    }
-
-    void TriggerAlertThenAggro()
-    {
-        if (player)
-        {
-            int dir = (player.position.x - transform.position.x) >= 0f ? 1 : -1;
-            facingX = dir;
-            ApplyFlip();
-        }
-
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-        ChangeState(State.Aggro);
-        animator?.SetTrigger("Aggro");
     }
 
     void TickAggro()
@@ -281,15 +251,12 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (Mathf.Abs(dx) <= stopDeadZone)
         {
             StopX();
-            //animator?.SetTrigger("Idle");
         }
         else
         {
             MoveX(moveDirX, aggroSpeed);
-            //animator?.SetTrigger("Aggro");
         }
 
-        // ��׷� ����
         if (distance >= aggroRange * 1.2f)
         {
             ChangeState(State.Idle);
@@ -300,25 +267,17 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (enableSkill && heightOk &&
             distance <= skillActiveRange &&
             distance >= attackRange &&
-            isSkillReady && !isUsingSkill)
+            isSkillReady && !isUsingSkill && !isHit)
         {
-            animator?.SetTrigger("ReadySkill");
-            isUsingSkill = true;
-            isSkillReady = false;
-
-            StartSkill(); // �ڷ�ƾ ��� ����
+            StartSkill();
             return;
         }
 
 
         if (enableAttack && heightOk &&
             distance <= attackRange &&
-            isAttackReady && !isAttack)
+            isAttackReady && !isAttack && !isHit)
         {
-            animator?.SetTrigger("ReadySkill");
-            isAttack = true;
-            isAttackReady = false;
-            
             StartAttack(); 
             return;
         }
@@ -327,6 +286,9 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     void StartAttack()
     {
         if (runningRoutine != null) StopCoroutine(runningRoutine);
+        isAttack = true;
+        isAttackReady = false;
+        animator?.SetTrigger("ReadySkill");
         runningRoutine = StartCoroutine(AttackRoutine());
     }
 
@@ -335,24 +297,24 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     {
         ChangeState(State.Attack);
         StopX();
-        
-
-        yield return new WaitForSeconds(attackDelay);
+        yield return new WaitForSeconds(readyAttackWindup);
 
         animator?.SetTrigger("Attack");
-        rb.AddForce(5f * Vector2.right * facingX, ForceMode2D.Impulse);
+        rb.AddForce(7f * Vector2.right * facingX, ForceMode2D.Impulse);
 
         yield return new WaitForSeconds(attackDuration);
 
+        isAttack = false;
         StopX();
 
-        animator?.SetTrigger("Idle");
-
-        yield return new WaitForSeconds(attackRate);
-        
         ChangeState(State.Idle);
         animator?.SetTrigger("Idle");
-        isAttack = false;
+        StartCoroutine(AttackCoolDown());
+    }
+
+    IEnumerator AttackCoolDown()
+    {
+        yield return new WaitForSeconds(attackCoolTime);
         isAttackReady = true;
     }
 
@@ -360,33 +322,31 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     public void StartSkill()
     {
         if (runningRoutine != null) StopCoroutine(runningRoutine);
+        isUsingSkill = true;
+        isSkillReady = false;
+        animator?.SetTrigger("ReadySkill");
         runningRoutine = StartCoroutine(SkillRoutine());
     }
 
     IEnumerator SkillRoutine()
     {
         ChangeState(State.Skill);
-
         spriteRenderer.color = Color.red;
         StopX();
 
         yield return new WaitForSeconds(readySkillWindup);
 
         animator.SetTrigger("Skill");
-
         rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(skillDuration);
 
-        StopX();
         isUsingSkill = false;
-        //LockX(true);
+        StopX();
+        
         spriteRenderer.color = Color.white;
-
-        yield return new WaitForSeconds(skillDelay);
-
         ChangeState(State.Idle);
-        //LockX(false);
+        animator?.SetTrigger("Idle");
 
         StartCoroutine(SkillCooldownRoutine());
     }
@@ -398,54 +358,23 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     }
     #endregion
 
-    // void ResetAllStateTriggers()
-    // {
-    //     if (!animator) return;
-    //     animator.ResetTrigger(TR_IDLE);
-    //     animator.ResetTrigger(TR_PATROL);
-    //     animator.ResetTrigger(TR_AGGRO);
-    //     animator.ResetTrigger(TR_ATTACK);
-    //     animator.ResetTrigger(TR_SKILL);
-    //     animator.ResetTrigger(TR_HIT);
-    //     animator.ResetTrigger(TR_DEAD);
-    // }
-
-// void PlayStateAnim(State s)
-// {
-//     if (!animator) return;
-
-//     // 같은 상태로 반복 호출 방지
-//     // var cur = animator.GetCurrentAnimatorStateInfo(0);
-//     // if (cur.IsName(s.ToString())) return;
-
-//     ResetAllStateTriggers();
-
-//     switch (s)
-//     {
-//         case State.Idle:      animator.SetTrigger(TR_IDLE); break;
-//         case State.Patrol:    animator.SetTrigger(TR_PATROL); break;
-//         case State.Aggro:     animator.SetTrigger(TR_AGGRO); break;
-//         case State.Attack:    animator.SetTrigger(TR_ATTACK); break;
-//         case State.Skill:     animator.SetTrigger(TR_SKILL); break;
-//         case State.TakeDamage:animator.SetTrigger(TR_HIT); break;
-//         case State.Dead:      animator.SetTrigger(TR_DEAD); break;
-//     }
-// }
-
     public void ChangeState(State next)
     {
         if (isDead && next != State.Dead) return;
 
-        stateTimer = 0f;
-        //Debug.Log($"STATE: {state} -> {next}");
+        Debug.Log($"STATE: {state} -> {next}");
         state = next;
-
-        //PlayStateAnim(state);
+        stateTimer = 0f;
+        
+        if(state != State.TakeDamage && isHit)
+        {
+            isHit = false;
+        }
     }
 
     void ApplyFlip()
     {
-        // flip�� �׻� facingX ����(���� Nightfang ���) :contentReference[oaicite:20]{index=20}
+        // flip
         transform.localScale = new Vector3(
             facingX < 0 ? originScale.x : -originScale.x,
             originScale.y,
@@ -463,15 +392,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         rb.linearVelocity = new Vector2(dirX * speed, rb.linearVelocity.y);
     }
 
-    // void LockX(bool locked)
-    // {
-    //     if (!rb) return;
-
-    //     rb.constraints = locked
-    //         ? RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation
-    //         : RigidbodyConstraints2D.FreezeRotation;
-    // }
-
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -486,12 +406,12 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void TickTakeDamage()
     {
-        if(!isAttackReady || isUsingSkill) return;
+        if(isAttack) return;
 
         if (stateTimer >= hitStunTime)
         {
             ChangeState(State.Idle);
-            animator.SetTrigger("Idle");
+            animator?.SetTrigger("Idle");
         }
     }
 
@@ -499,7 +419,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     {
         hp.TakeDamage(amount);
 
-        if (isDead) return;
+        if (isAttack || isDead) return;
 
         OnHit(transform.position - Vector3.right);
     }
@@ -508,7 +428,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     {
         hp.TakeDamage(amount);
 
-        if (isDead) return;
+        if (isAttack || isDead) return;
 
         lastHitFrom = (Vector2)attackerWorldPosition;
         OnHit((Vector2)attackerWorldPosition);
@@ -519,13 +439,11 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     public virtual void OnHit(Vector2 attackerWorldPosition)
     {
-        //StopX();
         ChangeState(State.TakeDamage);
-        animator.SetTrigger("Hit");
+        animator?.SetTrigger("Hit");
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
         dir = new Vector2(dir.x * knockBackXForce, knockBackYForce);
-        //rb.AddForce(dir, ForceMode2D.Impulse);
         rb.linearVelocity = dir;
     }
 
