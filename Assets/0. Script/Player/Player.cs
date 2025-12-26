@@ -30,7 +30,6 @@ public class Player : MonoBehaviour, IDamageable
             if (HP.IsDead) return false;
             if (isStunned) return false;
             if (isDodging) return false;
-            if (isKnockback) return false;
             return true;
         }
     }
@@ -66,7 +65,6 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     #region 넉백
-    public bool isKnockback;
     public void ApplyKnockback(float force, Vector2? attackerPos = null)
     {
         playerAttack.EndAttack();
@@ -247,11 +245,6 @@ public class Player : MonoBehaviour, IDamageable
         }
 
         isInvincible = true;
-
-        if (spriteFlash != null)
-        {
-            spriteFlash.StartInvincibleBlink();
-        }
     }
 
     // 무적 종료 (수동 종료/코루틴 종료 둘 다 여기 사용)
@@ -260,11 +253,6 @@ public class Player : MonoBehaviour, IDamageable
         if (!isInvincible && invincibleCoroutine == null) return;
             
         isInvincible = false;
-
-        if (spriteFlash != null)
-        {
-            spriteFlash.StopInvincibleBlink();
-        }
 
         // 수동 종료 시, 혹시 남아 있을 수 있는 코루틴도 끊기
         if (invincibleCoroutine != null)
@@ -318,6 +306,7 @@ public class Player : MonoBehaviour, IDamageable
         hp.Heal(amount);
     }
 
+    #region TakeDamage
     public void TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition = null)
     {
         // --- 방어 조건 ---
@@ -337,11 +326,11 @@ public class Player : MonoBehaviour, IDamageable
             case DamageType.Area:
                 StartHitStun(0.15f);
                 StartInvincibleForDuration();
+                spriteFlash.StartInvincibleBlink(0.5f);
                 break;
         }
-
-
     }
+    #endregion
 
     void HandleDie()
     {

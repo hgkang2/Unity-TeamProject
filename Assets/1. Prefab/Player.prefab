@@ -78,9 +78,9 @@ MonoBehaviour:
   playerMove: {fileID: 6797658465126727401}
   playerSprite: {fileID: 751621784933970427}
   playerPartSprite: {fileID: 79729050403937579}
-  isKnockback: 0
   dodgeEffectSprite: {fileID: 4333207113835227846}
   isDodging: 0
+  Dodgeflag: 0
   dodgeDuration: 0.5
   dodgeCooldown: 1
   airDownPrepareDuration: 0.15
@@ -108,6 +108,8 @@ MonoBehaviour:
   upHitbox: {fileID: 4931711516456578153}
   jumpHitbox: {fileID: 1864714764398149594}
   downHitbox: {fileID: 7484912635782620706}
+  basicAttackVFX: {fileID: 0}
+  basicAttackPos: {fileID: 0}
   isAttacking: 0
 --- !u!114 &6797658465126727401
 MonoBehaviour:
@@ -127,16 +129,19 @@ MonoBehaviour:
   coyoteTime: 0.12
   jumpBufferTime: 0.12
   airControlLerp: 6
+  mygravity: 0
+  maxJumpCount: 1
+  apexGravityMultiplier: 0.66
+  apexThreshold: 0.6
+  fallGravityMultiplier: 2.5
+  wallSlideGravityMultiplier: 0.25
+  airDownGravityScale: 100
   groundMask:
     serializedVersion: 2
     m_Bits: 128
   groundRayLength: 0.2
   groundRayOffsetX: 0.25
-  maxJumpCount: 1
-  apexGrav: 6
-  apexThreshold: 0.6
-  fallGravityMultiplier: 2.5
-  airDownGravityScale: 100
+  minGroundDistanceForAirAttack: 0.3
   isWallGrabbing: 0
   isWallSliding: 0
   wallMask:
@@ -146,7 +151,6 @@ MonoBehaviour:
   wallSlideSpeed: 2
   wallJumpForceX: 10
   wallJumpForceY: 15
-  minGroundDistanceForAirAttack: 0.3
 --- !u!114 &7436586581079057000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,7 +191,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c7ece7dca49f1244ac4b55434cfc369, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderers: []
+  renderers:
+  - {fileID: 751621784933970427}
+  - {fileID: 4196689503586296982}
+  - {fileID: 5517252693495351933}
+  - {fileID: 1228956059678188056}
+  - {fileID: 2184884200822861622}
+  - {fileID: 2926433054494360179}
+  - {fileID: 1651791367390675055}
+  - {fileID: 844352992556499619}
   blinkColor: {r: 1, g: 1, b: 1, a: 1}
   blinkInterval: 0.1
 --- !u!114 &6733278554063955151
@@ -238,30 +250,20 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 1a1fcf5227f563e47bec9b960ca1c1e9, type: 3}
     volume: 1
-    loopable: 0
-    pitchMin: 1
-    pitchMax: 1
   - key: 
     clips:
     - {fileID: 8300000, guid: e5f884e4db72e0b4a950b7a871711248, type: 3}
     volume: 1
-    loopable: 0
-    pitchMin: 1
-    pitchMax: 1
   - key: MoveGrass
     clips:
     - {fileID: 8300000, guid: e18cc95cf667b7140ad3cf96abc60ea6, type: 3}
     volume: 1
-    loopable: 0
-    pitchMin: 1
-    pitchMax: 1
   - key: MoveDirt
     clips:
     - {fileID: 8300000, guid: a701b7c8bfb5102449af994b0c51b633, type: 3}
     volume: 1
-    loopable: 0
-    pitchMin: 1
-    pitchMax: 1
+  pitchMin: 0.95
+  pitchMax: 1.05
 --- !u!50 &3732372594089069875
 Rigidbody2D:
   serializedVersion: 5
@@ -287,7 +289,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!95 &4763804607924707048
 Animator:

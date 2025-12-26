@@ -37,11 +37,30 @@ public class SpriteFlash : MonoBehaviour
         blinkRoutine = StartCoroutine(BlinkRoutine());
     }
 
+    public void StartInvincibleBlink(float duration)
+    {
+        if (blinkRoutine != null)
+            StopCoroutine(blinkRoutine);
+
+        blinkRoutine = StartCoroutine(BlinkForDurationRoutine(duration));
+    }
+
     public void StopInvincibleBlink()
     {
         if (blinkRoutine != null)
             StopCoroutine(blinkRoutine);
 
+        blinkRoutine = null;
+        RestoreOriginalColors();
+    }
+
+    IEnumerator BlinkForDurationRoutine(float duration)
+    {
+        Coroutine blink = StartCoroutine(BlinkRoutine());
+
+        yield return new WaitForSeconds(duration);
+
+        StopCoroutine(blink);
         blinkRoutine = null;
         RestoreOriginalColors();
     }

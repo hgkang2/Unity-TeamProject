@@ -75857,6 +75857,22 @@ PrefabInstance:
       propertyPath: baseJumpForce
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 8508408560950462055, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: blinkColor.b
+      value: 0.6886792
+      objectReference: {fileID: 0}
+    - target: {fileID: 8508408560950462055, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: blinkColor.g
+      value: 0.6886792
+      objectReference: {fileID: 0}
+    - target: {fileID: 8508408560950462055, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: blinkColor.r
+      value: 0.6886792
+      objectReference: {fileID: 0}
+    - target: {fileID: 8508408560950462055, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: blinkInterval
+      value: 0.175
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6840140161675151798, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
