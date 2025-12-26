@@ -431,16 +431,17 @@ MonoBehaviour:
   rerollButton: {fileID: 1006473198}
   rerollText: {fileID: 672858402}
   RerollNum: 10
-  first_FadeDuration: 0.3
+  first_FadeDuration: 0.15
   first_FadeInEase: 1
   radius: 200
   angleRange: 30
-  third_FadeDuration: 0.3
+  third_FadeDuration: 0.2
   third_FadeOutEase: 1
   fifth_FadeDuration: 0.7
   fifth_FadeInEase: 5
   fifth_MoveDuration: 0.7
   fifth_MoveEase: 27
+  fifth_Stagger: 0.05
   sixth_MoveDuration: 0.5
   sixth_MoveEase: 0
 --- !u!224 &46290188
@@ -51127,7 +51128,7 @@ Transform:
   m_GameObject: {fileID: 562849747}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.101778, y: 0.5348301, z: -10}
+  m_LocalPosition: {x: -8.101782, y: 0.5348301, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -72722,17 +72723,16 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 16.413872, y: -8.248162}
-      - {x: 19.89727, y: -8.303946}
-      - {x: 26.345623, y: -8.272632}
-      - {x: 41.288673, y: -3.5873032}
-      - {x: 41.309452, y: 13.828105}
-      - {x: 28.191393, y: 13.974119}
+    - - {x: 10.5491905, y: -8.042384}
+      - {x: 29.671732, y: -8.2010565}
+      - {x: 37.968876, y: -5.923337}
+      - {x: 37.954475, y: -26.053604}
+      - {x: 59.209908, y: -25.717766}
+      - {x: 59.120472, y: 18.327305}
       - {x: 28.360922, y: 18.91367}
       - {x: -18.709045, y: 14.363921}
       - {x: -18.794384, y: -5.4953747}
       - {x: 4.1684933, y: -5.4306736}
-      - {x: 9.177664, y: -6.3750677}
   m_UseDelaunayMesh: 0
 --- !u!1 &1925036928
 GameObject:
@@ -75636,6 +75636,10 @@ PrefabInstance:
     - target: {fileID: 21353070434239750, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 115294010333658088, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 115294010333658088, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: sounds.Array.size

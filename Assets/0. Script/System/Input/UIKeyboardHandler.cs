@@ -10,19 +10,23 @@ public abstract class UIKeyboardHandler : MonoBehaviour
     bool isHeld;
     float nextRepeatTime;
 
-    protected virtual void OnEnable()
+    void OnEnable()
     {
-        Subscribe();
+        SubscribeInputEvent();
+        //자식에서 OnEnable 구현하고 싶으면 이걸로
+        OnUIEnabled();
     }
 
-    protected virtual void OnDisable()
+    void OnDisable()
     {
-        UnSubscribe();
+        UnSubscribeInputEvent();
+        //자식에서 Ondisable 구현하고 싶으면 이걸로
+        OnUIDisabled();
     }
 
-    protected void Subscribe()
+    protected void SubscribeInputEvent()
     {
-        UnSubscribe();
+        UnSubscribeInputEvent();
         InputManager.Instance.UINavigateStarted += HandleNavigateStarted;
         InputManager.Instance.UINavigateCanceled += HandleNavigateCanceled;
 
@@ -30,7 +34,7 @@ public abstract class UIKeyboardHandler : MonoBehaviour
         InputManager.Instance.UIConfirmed += HandleUIConfirm;
     }
 
-    protected void UnSubscribe()
+    protected void UnSubscribeInputEvent()
     {
         InputManager.Instance.UINavigateStarted -= HandleNavigateStarted;
         InputManager.Instance.UINavigateCanceled -= HandleNavigateCanceled;
@@ -87,4 +91,8 @@ public abstract class UIKeyboardHandler : MonoBehaviour
     // 확인 / 취소는 필요할 때만 override
     protected virtual void OnUIConfirm() { }
     protected virtual void OnUICancel() { }
+
+    //자식에서 OnEnable, OnDisable 구현하고 싶을 때
+    protected virtual void OnUIEnabled() { }
+    protected virtual void OnUIDisabled() { }
 }

@@ -26,8 +26,6 @@ public class LevelUpPanel : UIKeyboardHandler
         {
             soulPanels_OriginPos[i] = soulPanels[i].transform.position;
         }
-        SubscribeChildEvent();
-        InputManager.Instance.UiRerolled += Reroll;
     }
 
     public void Initialize()
@@ -45,18 +43,25 @@ public class LevelUpPanel : UIKeyboardHandler
         {
             soulPanels[i].transform.position = soulPanels_OriginPos[i];
         }
-        
+
         DrawSoul();
         StartAnim();
     }
 
-    void OnDestroy()
+    protected override void OnUIEnabled()
+    {
+        SubscribeChildEvent();
+        InputManager.Instance.UiRerolled += Reroll;
+    }
+
+    protected override void OnUIDisabled()
     {
         UnSubscribeChildEvent();
         InputManager.Instance.UiRerolled -= Reroll;
     }
 
-    #region 영성 anim 시작
+
+    #region 영성 anim
     [Header("1. FadeIn : 시간 및 Ease")]
     [SerializeField] float first_FadeDuration = 0.4f;
     [SerializeField] Ease first_FadeInEase;
@@ -77,10 +82,15 @@ public class LevelUpPanel : UIKeyboardHandler
     [Header("4. 내려오기 : 시간 및 Ease")]
     [SerializeField] float fifth_MoveDuration = 0.4f;
     [SerializeField] Ease fifth_MoveEase;
+    [SerializeField] float fifth_Stagger = 0.05f; // 패널 간 내려오는 시간차
 
     [Header("5. 회전 : 시간 및 Ease")]
     [SerializeField] float sixth_MoveDuration = 0.4f;
     [SerializeField] Ease sixth_MoveEase;
+
+    //필드
+    Sequence animSequence;
+    bool isAnimating;
 
     void StartAnim()
     {
@@ -89,14 +99,18 @@ public class LevelUpPanel : UIKeyboardHandler
         // 연출 중 입력 차단
         DisableInput();
 
+        isAnimating = true;
+
+        animSequence?.Kill();          // 혹시 남아있으면 정리
+        animSequence = DOTween.Sequence();
+        animSequence.SetUpdate(true);
+
         // 부채꼴 각도 세팅
         float startAngle = -angleRange * 0.5f;
         float step = (panelNum > 1) ? (angleRange / (panelNum - 1)) : 0f;
         float centerIndex = (panelNum - 1) * 0.5f;
 
-        // 시퀀스 생성
-        Sequence seq = DOTween.Sequence();
-        seq.SetUpdate(true);
+        animSequence.SetUpdate(true);
 
 
         // 연출 시작
@@ -163,16 +177,21 @@ public class LevelUpPanel : UIKeyboardHandler
                 rect.DORotate(new Vector3(0f, 0f, 0f), 0.1f, RotateMode.Fast)
             );
 
+            float leftOrder01 = Mathf.InverseLerp(-(centerIndex), +(centerIndex), t); // 0(왼쪽)~1(오른쪽)
+            float fifthDelay = fifth_Stagger * leftOrder01 * (panelNum - 1);
+
             //5단계 : Fade In + Down
             cardSeq.Append(
                 cg.DOFade(1f, fifth_FadeDuration)
-                  .SetEase(fifth_FadeInEase)
+                    .SetEase(fifth_FadeInEase)
+                    .SetDelay(fifthDelay)
             );
 
             targetPos = new Vector2(500 * t, 0);
             cardSeq.Join(
                 rect.DOAnchorPos(targetPos, fifth_MoveDuration)
-                  .SetEase(fifth_MoveEase)
+                    .SetEase(fifth_MoveEase)
+                    .SetDelay(fifthDelay)
             );
 
             // 6단계 : 회전 + 내용 보이기
@@ -194,16 +213,29 @@ public class LevelUpPanel : UIKeyboardHandler
 
             );
 
-            seq.Join(cardSeq);
+            animSequence.Join(cardSeq);
         }
 
-        seq.OnComplete(() =>
+        animSequence.OnComplete(() =>
         {
+            isAnimating = false;
             EnableInput();
         });
     }
+
+    void CancelAnim()
+    {
+        animSequence?.Kill();
+        animSequence = null;
+
+        isAnimating = false;
+
+        // 연출 강제 종료 시 상태 정리
+        EnableInput();
+    }
     #endregion
 
+    #region 리롤
     SoulData[] candidates;
     public void Reroll()
     {
@@ -263,6 +295,7 @@ public class LevelUpPanel : UIKeyboardHandler
         .Append(rerollButton.transform.DOScale(1f, 0.25f).SetEase(Ease.InQuart))
         .SetUpdate(true);
     }
+    #endregion
 
     //영성 뽑기(현재 활성화된 panel 만큼)
     void DrawSoul()
@@ -418,6 +451,11 @@ public class LevelUpPanel : UIKeyboardHandler
 
     protected override void OnUICancel()
     {
+        if (isAnimating && animSequence != null && animSequence.IsActive())
+        {
+            animSequence.Complete(true); // ★ 최종 값으로 스냅 + 콜백 실행
+            return;
+        }
         curIndex = null;
         HandleDeSelectSoul();
     }
