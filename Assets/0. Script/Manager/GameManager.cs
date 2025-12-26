@@ -1,8 +1,12 @@
+using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] CanvasGroup fade;
+
     static GameManager instance;
     public static GameManager Instance
     {
@@ -46,13 +50,58 @@ public class GameManager : MonoBehaviour
         switch (scene.name)
         {
             case "Stage1":
+                if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 break;
         }
     }
 
+    public IEnumerator TeleportRoutine(Player p, Transform targetPosition)
+    {
+        TimeManager.Pause();
 
+        yield return FadeOutRoutine(1f);   // 끝날 때까지 대기
 
+        p.transform.position = targetPosition.position;
+        Camera.main.transform.position = targetPosition.position;
+
+        yield return FadeInRoutine(1f);    // 끝날 때까지 대기
+
+        TimeManager.Resume();
+    }
+
+    IEnumerator FadeOutRoutine(float duration)
+    {
+        fade.blocksRaycasts = true;
+
+        float t = 0f;
+        float start = fade.alpha;
+
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            fade.alpha = Mathf.Lerp(start, 1f, t / duration);
+            yield return null;
+        }
+
+        fade.alpha = 1f;
+    }
+
+    IEnumerator FadeInRoutine(float duration)
+    {
+        float t = 0f;
+        float start = fade.alpha;
+
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            fade.alpha = Mathf.Lerp(start, 0f, t / duration);
+            yield return null;
+        }
+
+        fade.alpha = 0f;
+        fade.blocksRaycasts = false;
+    }
 
     public void QuitGame()
     {

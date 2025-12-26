@@ -1,59 +1,53 @@
 using UnityEngine;
 using UnityEngine.InputSystem.XR.Haptics;
 
-public class Elevator : IInteractable
+public class Elevator : MonoBehaviour, IInteractable
 {
     [SerializeField] Animator leverAnimator;
+    [SerializeField] Transform leverPos;
+    [SerializeField] Transform targetPos;
 
     private void Awake()
-    {
-
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    public bool CanInteract()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void Exit()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public Vector2 GetInteractPoint()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void Interact(Player user)
-    {
-        leverAnimator.SetTrigger("Interact");
-    }
-
-    public bool IsAvailable()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnFocus()
     {
         
     }
 
+    public bool CanInteract()
+    {
+        return true;
+    }
+
+    public void Exit()
+    {
+        
+    }
+
+    public Vector2 GetInteractPoint()
+    {
+        return leverPos.position;
+    }
+
+    public void Interact(Player player)
+    {
+        leverAnimator.SetTrigger("Interact");
+        leverAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+        StartCoroutine(GameManager.Instance.TeleportRoutine(player, targetPos));
+    }
+
+    public bool IsAvailable()
+    {
+        return true;
+    }
+
+    public void OnFocus()
+    {
+        leverAnimator.SetTrigger("OnPocus");
+        leverAnimator.updateMode = AnimatorUpdateMode.Normal;
+    }
+
     public void OnUnfocus()
     {
-        throw new System.NotImplementedException();
+        
     }
 
 }

@@ -97,6 +97,12 @@ public class InputManager : MonoBehaviour
     }
     #endregion
 
+    public event Action InteractPressed;
+    void OnInteractPerformed(InputAction.CallbackContext ctx)
+    {
+        InteractPressed?.Invoke();
+    }
+
     #region UI Input
     public event Action<Vector2> UINavigateStarted;
     void OnUINavigatePerformed(InputAction.CallbackContext ctx)
@@ -187,6 +193,7 @@ public class InputManager : MonoBehaviour
         input.Player.Move.canceled += OnMoveCancel;
         input.Player.Jump.performed += OnJumpPerformed;
         input.Player.Dodge.performed += OnDodgePerformed;
+        input.Player.Interact.performed += OnInteractPerformed;
 
         //Player Attack 입력 이벤트
         input.Player.Attack.performed += OnAttackPerformed;
@@ -212,6 +219,7 @@ public class InputManager : MonoBehaviour
         input.Player.Move.canceled -= OnMoveCancel;
         input.Player.Jump.performed -= OnJumpPerformed;
         input.Player.Dodge.performed -= OnDodgePerformed;
+        input.Player.Interact.performed -= OnInteractPerformed;
 
         input.UI.Navigate.performed -= OnUINavigatePerformed;
         input.UI.Navigate.canceled -= OnUINavigateCanceled;
