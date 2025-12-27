@@ -129,26 +129,26 @@ public class PlayerAttack : MonoBehaviour
         if (inputDir.y > 0.5f)
         {
             type = AttackType.Up;
-            sfxKey = "AttackVoice";
+            sfxKey = "Attack";
         }
         // 아래 방향키 + 공중일경우만
         else if (inputDir.y < -0.5f && !playerMove.isGrounded)
         {
             type = AttackType.Down;
-            sfxKey = "SkillAttackVoice";
+            sfxKey = "SpecialAttack";
         }
         // 점프 버튼 + 공중일경우만
         else if (InputManager.Instance.IsJumpHeld && !playerMove.isGrounded)
         {
             type = AttackType.Jump;
-            sfxKey = "AttackVoice";
+            sfxKey = "Attack";
         }
         else
         {
             type = AttackType.Normal;
             attackVFX = basicAttackVFX;
             attackVFXPos = basicAttackPos;
-            sfxKey = "AttackVoice";
+            sfxKey = "Attack";
         }
         
 

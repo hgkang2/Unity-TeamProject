@@ -233,7 +233,7 @@ public class PlayerMove : MonoBehaviour
 
         isGrounded = false;
         anim.SetTrigger("Jump");
-        sfx.Play("JumpVoice");
+        sfx.Play("Jump");
     }
 
     void HandleWallJump()

@@ -22,6 +22,7 @@ public class Player : MonoBehaviour, IDamageable
     Animator anim;
 
     SpriteFlash spriteFlash;
+    LocalSFX sfx;
 
     public bool CanControl
     {
@@ -44,7 +45,7 @@ public class Player : MonoBehaviour, IDamageable
         playerAttack = GetComponent<PlayerAttack>();
         anim = GetComponent<Animator>();
         spriteFlash = GetComponent<SpriteFlash>();
-        
+        sfx = GetComponent<LocalSFX>();
     }
 
     void OnEnable()
@@ -322,6 +323,7 @@ public class Player : MonoBehaviour, IDamageable
         {
             case DamageType.Normal:
                 ApplyKnockback(10f, attackerWorldPosition);
+                sfx.Play("Hit");
                 goto case DamageType.Area;
             case DamageType.Area:
                 StartHitStun(0.15f);
@@ -335,6 +337,7 @@ public class Player : MonoBehaviour, IDamageable
     void HandleDie()
     {
         playerMove.HandleDieMotion();
+        sfx.Play("Die");
         // + 기타 사망 연출
         Destroy(gameObject, 2f);
     }
