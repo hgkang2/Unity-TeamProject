@@ -3,89 +3,101 @@ using UnityEngine;
 
 public class NightfangStandalone : MonoBehaviour, IDamageable
 {
-    HP hp;
-
-    public enum State { Idle, Patrol, Aggro, Attack, Skill, TakeDamage, Dead }
-
-    // === Animator Trigger Names ===
-    const string TR_IDLE   = "Idle";
-    const string TR_PATROL = "Patrol";
-    const string TR_AGGRO  = "Aggro";
-    const string TR_ATTACK = "Attack";
-    const string TR_SKILL  = "ReadySkill";
-    const string TR_HIT    = "Hit";
-    const string TR_DEAD   = "Dead";
-
-    [Header("Debug Step Test (�ܰ躰�� �ѱ�)")]
+    [Header("Debug Test")]
     public bool enablePatrol = false;
     public bool enableAggro = false;
     public bool enableAttack = false;
     public bool enableSkill = false;
 
+    public enum State { Idle, Patrol, Aggro, Attack, Skill, TakeDamage, Dead }
+    [Header("State")]
+    public State state = State.Idle;
+    public float stateTimer;
+
+    #region Variables
     [Header("Refs")]
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Animator animator;
     [SerializeField] public SpriteRenderer spriteRenderer;
+    LocalSFX sfx;
+    HP hp;
 
-    [Header("Optional")]
-    [SerializeField] public GameObject skillHitBoxObj;   // ���� ��Ʈ�ڽ�(������ �Ѱ�/����)
+    [Header("Hitbox")]
+    [SerializeField] public GameObject skillHitBoxObj;   // 스킬 공격시 사용하는 히트박스
     [SerializeField] public GameObject attackHitboxObj;
 
-    [Header("Detect")]
-    [SerializeField] Transform player;      // ���� �ڵ� Ž��
-    public string playerTag = "Player";
-    public LayerMask playerMask;
-    public float deadZoneX = 0.1f;
+    [Header("Idle")]
+    [SerializeField] float idleTime = 1.0f;       // Idle(대기)상태 지속 시간
 
-    [Header("Stats")]
-    public float idleTime = 1.0f;
+    [Header("Patrol")]
+    [SerializeField] float patrolSpeed = 2.0f;    // Patrol(순찰) 이동 속도
+    [SerializeField] float patrolTime = 2.0f;     // Patrol(순찰) 시간 시간
+    int patrolDirX = 1;
 
-    public float patrolSpeed = 2.0f;
-    public float patrolTime = 2.0f;
+    [Header("Aggro")]
+    [SerializeField] float aggroRange = 6.0f;     // Aggro 범위
+    [SerializeField] float aggroSpeed = 3.5f;     // Aggro 상태 이동 속도
+    [SerializeField] float maxHeightDiffForAttack = 0.8f;
+    int moveDirX = 1;
 
-    public float aggroRange = 6.0f;
-    public float aggroSpeed = 3.5f;
-
-    public float maxHeightDiffForAttack = 0.8f;
-
-    public float attackRange = 1.2f;
-    public float readyAttackWindup = 1f;
-    public float attackCoolTime = 1.0f;
-
-    public float skillActiveRange = 3.5f;
-    public float skillCoolTime = 0.2f;     //
-    public float skillDuration;
-    public float readySkillWindup = 0.25f;
-    public float hitStunTime = 0.25f;
-
-
-
-    [Header("Runtime")]
-    public State state = State.Idle;
-    public float stateTimer;
-
-    // detector ���(���� MonsterDetector ����) :contentReference[oaicite:10]{index=10}
-    public float distance;
-    public float dx;
-    public int moveDirX = 1;
-
-    // facing/flip (���� Nightfang.Update�� flip ����) :contentReference[oaicite:11]{index=11}
-    int facingX = 1;
-    Vector3 originScale;
-
-    // flags (���� MonsterBase flags) :contentReference[oaicite:12]{index=12}
-    bool isAttack;
+    [Header("Attack")]
+    [SerializeField] float attackRange = 1.2f;    
+    [Tooltip("일반 공격 선딜레이")]
+    [SerializeField] float readyAttackWindup = 1f;
+    [SerializeField] float attackCoolTime = 1.0f;
+    [Tooltip("일반 공격 지속 시간")]
+    [SerializeField] float attackDuration = 1f;
+    bool isAttacking;
     bool isAttackReady = true;
+
+    [Header("Skill")]
+    [SerializeField] float skillRange = 3.5f;
+    [Tooltip("스킬 선딜레이")]
+    [SerializeField] float readySkillWindup = 0.25f;
+    [SerializeField] float skillCoolTime = 0.2f;
+    [Tooltip("스킬 지속 시간")]
+    [SerializeField] float skillDuration;
     bool isUsingSkill;
     bool isSkillReady = true;
 
-    int patrolDirX = 1;
-    bool isDead;
+    [Header("딜레이 시간")]
+    [Tooltip("공격(스킬 or 일반공격)시전 후 다음 공격까지 필요한 시간")]
+    [SerializeField] float delayTime;
+    [Tooltip("공격(스킬 or 일반공격)시전 후 정지 상태로 대기하는 시간")]
+    [SerializeField] float standByTime;
+    bool isActionLocked = false; // 연속 공격 방지
+    bool canMove = true;    // 대기 도중 이동 방지
+
+    [Header("Hit")]
+    [Tooltip("몹이 피격 시 경직에 걸리는 시간")]
+    [SerializeField] float hitStunTime = 0.25f;
+    [SerializeField]float knockBackXForce = 5f;
+    [SerializeField]float knockBackYForce = 1f;
     public bool isHit;
-
-    Coroutine runningRoutine;
-
     Vector2 lastHitFrom;
+
+    [Header("Detect")]
+    [SerializeField] Transform player;
+    [SerializeField] LayerMask playerMask;
+    [Tooltip("플레이어까지의 거리")]
+    [SerializeField] float distance;
+
+    [Header("FreezeZone")]
+    [Tooltip("플레이어와 거리가 freezeZoneX보다 작을 경우 몹의 이동 제한")]
+    [SerializeField] float freezeZoneX = 0.1f;
+    float dx;  // 좌우 방향 + 좌우 거리
+    
+    // facing/flip 
+    int facingX = 1;
+    Vector3 originScale;
+
+    // 사망 여부
+    bool isDead;
+
+    // 코루틴 중복 방지
+    Coroutine runningRoutine;
+    Coroutine lockActionRoutine; // 공격(스킬 or 일반 공격) 후 연속 공격 방지
+    #endregion
 
     void Reset()
     {
@@ -100,6 +112,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (!spriteRenderer) spriteRenderer = GetComponent<SpriteRenderer>();
         if (!animator) animator = GetComponentInChildren<Animator>();
         if (!hp) hp = GetComponent<HP>();
+        if (!sfx) sfx = GetComponent<LocalSFX>();
 
         isDead = false;
 
@@ -130,8 +143,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         RunFSM();
 
         ApplyFlip();
-
-        if (Input.GetKeyDown(KeyCode.F1)) TakeDamage(10f);
     }
 
     void PlayerDetect()
@@ -148,7 +159,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
                 dx = 0f;
                 return;
             }
-            
         }
 
         if(!player.gameObject.activeInHierarchy)
@@ -166,21 +176,20 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         dx = toPlayer.x;
         distance = toPlayer.magnitude;
 
-        if (Mathf.Abs(dx) > deadZoneX)
+        if (Mathf.Abs(dx) > freezeZoneX)
             moveDirX = dx > 0f ? 1 : -1;
     }
-
+    
     void RunFSM()
     {
         switch (state)
         {
-            case State.Idle: TickIdle(); break;
+            case State.Idle: TickIdle();; break;
             case State.Patrol: TickPatrol(); break;
             case State.Aggro: TickAggro(); break;
             case State.Attack: break;
             case State.Skill: break;
-            case State.TakeDamage : TickTakeDamage();
-                break;
+            case State.TakeDamage : TickTakeDamage(); break;
             case State.Dead: break;
         }
     }
@@ -188,11 +197,12 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     void TickIdle()
     {
         StopX();
-        //animator.SetTrigger("Idle");
-
+        
         if (!enablePatrol && !enableAggro) return;
 
-        if (enableAggro && isAttackReady &&distance <= aggroRange && !isHit)
+        if(!canMove) return;
+
+        if (enableAggro && distance <= aggroRange && !isHit)
         {
             ChangeState(State.Aggro);
             animator?.SetTrigger("Aggro");
@@ -210,8 +220,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void TickPatrol()
     {
-        // if (isAttack || isUsingSkill) return;
-
         if (enableAggro && distance <= aggroRange)
         {
             StopX();
@@ -225,6 +233,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             StopX();
             ChangeState(State.Idle);
             animator?.SetTrigger("Idle");
+            sfx.Play("IdleSound");
         }
 
         MoveX(patrolDirX, patrolSpeed);
@@ -233,24 +242,23 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void TickAggro()
     {
-        //if(isAttack) return;
-
         float dy = player
         ? Mathf.Abs(player.position.y - transform.position.y)
         : float.PositiveInfinity;
 
         bool heightOk = dy <= maxHeightDiffForAttack;
-
-        if (!isAttack && !isUsingSkill)
+        if (!isAttacking && !isUsingSkill)
         {
             float deadZone = 0.05f;
             if (Mathf.Abs(dx) > deadZone) facingX = moveDirX;
         }
 
         float stopDeadZone = 0.1f;
-        if (Mathf.Abs(dx) <= stopDeadZone)
+        
+        if (Mathf.Abs(dx) <= stopDeadZone)// || !heightOk)
         {
             StopX();
+            Debug.Log("cantgo");
         }
         else
         {
@@ -261,55 +269,63 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         {
             ChangeState(State.Idle);
             animator?.SetTrigger("Idle");
+            sfx.Play("IdleSound");
             return;
         }
 
         if (enableSkill && heightOk &&
-            distance <= skillActiveRange &&
-            distance >= attackRange &&
+            distance <= skillRange &&
+            distance >= attackRange && !isActionLocked &&
             isSkillReady && !isUsingSkill && !isHit)
         {
             StartSkill();
             return;
         }
 
-
         if (enableAttack && heightOk &&
-            distance <= attackRange &&
-            isAttackReady && !isAttack && !isHit)
+            distance <= attackRange && !isActionLocked &&
+            isAttackReady && !isAttacking && !isHit)
         {
             StartAttack(); 
             return;
         }
     }
 
+    #region Attack / Skill
     void StartAttack()
     {
         if (runningRoutine != null) StopCoroutine(runningRoutine);
-        isAttack = true;
+        if (lockActionRoutine != null) StopCoroutine(lockActionRoutine);
+        isAttacking = true;
         isAttackReady = false;
+        isActionLocked = true;
+        canMove = false;
         animator?.SetTrigger("ReadySkill");
         runningRoutine = StartCoroutine(AttackRoutine());
     }
 
-    [SerializeField] float attackDuration = 1f;
     IEnumerator AttackRoutine()
     {
         ChangeState(State.Attack);
         StopX();
         yield return new WaitForSeconds(readyAttackWindup);
 
+        sfx.Play("AttackSound");
         animator?.SetTrigger("Attack");
         rb.AddForce(7f * Vector2.right * facingX, ForceMode2D.Impulse);
 
         yield return new WaitForSeconds(attackDuration);
 
-        isAttack = false;
+        isAttacking = false;
         StopX();
-
         ChangeState(State.Idle);
         animator?.SetTrigger("Idle");
+
+        lockActionRoutine = StartCoroutine(LockActionRoutine());
         StartCoroutine(AttackCoolDown());
+
+        yield return new WaitForSeconds(standByTime);
+        canMove = true;
     }
 
     IEnumerator AttackCoolDown()
@@ -318,12 +334,13 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         isAttackReady = true;
     }
 
-    #region Skill
     public void StartSkill()
     {
         if (runningRoutine != null) StopCoroutine(runningRoutine);
         isUsingSkill = true;
         isSkillReady = false;
+        isActionLocked = true;
+        canMove = false;
         animator?.SetTrigger("ReadySkill");
         runningRoutine = StartCoroutine(SkillRoutine());
     }
@@ -336,19 +353,23 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(readySkillWindup);
 
-        animator.SetTrigger("Skill");
+        sfx.Play("AttackSound");
+        animator?.SetTrigger("Skill");
         rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
 
         yield return new WaitForSeconds(skillDuration);
 
         isUsingSkill = false;
         StopX();
-        
         spriteRenderer.color = Color.white;
         ChangeState(State.Idle);
         animator?.SetTrigger("Idle");
 
+        lockActionRoutine = StartCoroutine(LockActionRoutine());
         StartCoroutine(SkillCooldownRoutine());
+
+        yield return new WaitForSeconds(standByTime);
+        canMove = true;
     }
 
     IEnumerator SkillCooldownRoutine()
@@ -356,13 +377,19 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         yield return new WaitForSeconds(skillCoolTime);
         isSkillReady = true;
     }
+
+    IEnumerator LockActionRoutine()
+    {
+        yield return new WaitForSeconds(delayTime);
+        isActionLocked = false;
+    }
     #endregion
 
     public void ChangeState(State next)
     {
         if (isDead && next != State.Dead) return;
 
-        Debug.Log($"STATE: {state} -> {next}");
+        //Debug.Log($"STATE: {state} -> {next}");
         state = next;
         stateTimer = 0f;
         
@@ -382,6 +409,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         );
     }
 
+    #region Movement
     void StopX()
     {
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
@@ -391,6 +419,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     {
         rb.linearVelocity = new Vector2(dirX * speed, rb.linearVelocity.y);
     }
+    #endregion
 
     void OnDrawGizmosSelected()
     {
@@ -401,12 +430,13 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         Gizmos.DrawWireSphere(transform.position, attackRange);
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, skillActiveRange);
+        Gizmos.DrawWireSphere(transform.position, skillRange);
     }
 
+    #region Damage Control
     void TickTakeDamage()
     {
-        if(isAttack) return;
+        if(isAttacking || isUsingSkill) return;
 
         if (stateTimer >= hitStunTime)
         {
@@ -418,8 +448,9 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         hp.TakeDamage(amount);
+        sfx.Play("HitSound");
 
-        if (isAttack || isDead) return;
+        if (isAttacking || isUsingSkill || isDead) return;
 
         OnHit(transform.position - Vector3.right);
     }
@@ -427,15 +458,12 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
         hp.TakeDamage(amount);
-
-        if (isAttack || isDead) return;
+        sfx.Play("HitSound");
+        if (isAttacking || isUsingSkill || isDead) return;
 
         lastHitFrom = (Vector2)attackerWorldPosition;
         OnHit((Vector2)attackerWorldPosition);
     }
-
-    [SerializeField]float knockBackXForce = 5f;
-    [SerializeField]float knockBackYForce = 1f;
 
     public virtual void OnHit(Vector2 attackerWorldPosition)
     {
@@ -446,6 +474,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         dir = new Vector2(dir.x * knockBackXForce, knockBackYForce);
         rb.linearVelocity = dir;
     }
+    #endregion
 
     public virtual void OnDied()
     {

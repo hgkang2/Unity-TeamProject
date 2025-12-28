@@ -9,10 +9,12 @@ public class SkillHitBox : MonoBehaviour
     public Collider2D col;
 
     public event Action<IDamageable> OnHit;
+    LocalSFX sfx;
 
     private void Awake()
     {
         col = GetComponent<Collider2D>();
+        sfx = GetComponent<LocalSFX>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -22,7 +24,7 @@ public class SkillHitBox : MonoBehaviour
             Vector2 hitPos = transform.position;
             damageable.TakeDamage(damage, damageType, hitPos);
             //OnHit?.Invoke(damageable);
-            Debug.Log("Damage");
+            sfx.Play("DamageSound");
         }
     }
 }
