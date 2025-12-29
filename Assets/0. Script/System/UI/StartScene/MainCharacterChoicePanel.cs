@@ -3,6 +3,11 @@ using UnityEngine;
 public class MainCharacterChoicePanel : UIKeyboardHandler
 {
     CanvasGroup cg;
+    void Awake()
+    {
+        cg = GetComponent<CanvasGroup>();
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

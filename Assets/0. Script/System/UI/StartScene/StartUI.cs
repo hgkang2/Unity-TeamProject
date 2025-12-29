@@ -1,18 +1,16 @@
 using System.Linq;
 using DG.Tweening;
 using Unity.Collections;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Video;
 
 public class StartUI : UIKeyboardHandler
 {
     [SerializeField] Image openingImage;
 
     [SerializeField] MainPanel mainPanel;
-    [SerializeField] MainLoadSlotPanel mainLoadSlotPanel;
+    [SerializeField] MainLoadPanel mainLoadPanel;
     [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
     [SerializeField] MainExitPanel mainExitPanel;
 
@@ -20,18 +18,22 @@ public class StartUI : UIKeyboardHandler
 
     bool isOpeningPhase = true;
 
-
     void Awake()
     {
-        // 다른 UI들 숨긴 상태로 시작
-        mainPanel.Close();
-        mainLoadSlotPanel.Close();
-        mainCharacterChoicePanel.Close();
-        mainExitPanel.Close();
+        mainPanel.gameObject.SetActive(true);
+        mainLoadPanel.gameObject.SetActive(true);
+        mainCharacterChoicePanel.gameObject.SetActive(true);
+        mainExitPanel.gameObject.SetActive(true);
     }
 
     void Start()
     {
+        // 다른 UI들 숨긴 상태로 시작
+        mainPanel.Close();
+        mainLoadPanel.Close();
+        mainCharacterChoicePanel.Close();
+        mainExitPanel.Close();
+
         // 오프닝은 보이게
         openingImage.gameObject.SetActive(true);
         OpeningStart();
@@ -42,7 +44,6 @@ public class StartUI : UIKeyboardHandler
     public void OpeningStart()
     {
         openingSequence = DOTween.Sequence();
-
         openingSequence.AppendInterval(2f);
 
         // 1) Opening fade-out
@@ -56,10 +57,7 @@ public class StartUI : UIKeyboardHandler
         // 3) 메뉴 fade-in
         openingSequence.Append(
             mainPanel.cg.DOFade(1f, 1f)
-                .OnComplete(() =>
-                {
-                    ShowMenuImmediate();   // 최종 상태 정리 공용 함수
-                })
+                .OnComplete(() => {ShowMenuImmediate();})
         );
     }
     #endregion
@@ -94,13 +92,13 @@ public class StartUI : UIKeyboardHandler
         {
             ShowMenuImmediate();
         }
-        // 종료 하시겠습니까? UI 띄우기
-        else
-        {
-            mainExitPanel.Open();
-        }
     }
     #endregion
+
+    public void OpenMainLoadPanel()
+    {
+        mainLoadPanel.Open();
+    }
 
     public void Quit()
     {

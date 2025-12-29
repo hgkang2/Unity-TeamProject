@@ -2,10 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public abstract class UIPointerHandler : MonoBehaviour
-{
-}
-
+public abstract class UIPointerHandler : MonoBehaviour{}
 public abstract class UIPointerHandler<T> : UIPointerHandler,
     IPointerEnterHandler,
     IPointerExitHandler
