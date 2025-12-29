@@ -25,6 +25,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [Header("Hitbox")]
     [SerializeField] public GameObject skillHitBoxObj;   // 스킬 공격시 사용하는 히트박스
     [SerializeField] public GameObject attackHitboxObj;
+    [SerializeField] GameObject boxCollider;
 
     [Header("Idle")]
     [SerializeField] float idleTime = 1.0f;       // Idle(대기)상태 지속 시간
@@ -97,6 +98,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     // 코루틴 중복 방지
     Coroutine runningRoutine;
     Coroutine lockActionRoutine; // 공격(스킬 or 일반 공격) 후 연속 공격 방지
+
+    bool heightOk;
     #endregion
 
     void Reset()
@@ -186,7 +189,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         {
             case State.Idle: TickIdle();; break;
             case State.Patrol: TickPatrol(); break;
-            case State.Aggro: TickAggro(); break;
+            case State.Aggro:TickAggro(); break;
             case State.Attack: break;
             case State.Skill: break;
             case State.TakeDamage : TickTakeDamage(); break;
@@ -242,30 +245,21 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void TickAggro()
     {
-        float dy = player
-        ? Mathf.Abs(player.position.y - transform.position.y)
-        : float.PositiveInfinity;
+        float dy = player ? Mathf.Abs(player.position.y - transform.position.y) : float.PositiveInfinity;
 
-        bool heightOk = dy <= maxHeightDiffForAttack;
+        heightOk = dy <= maxHeightDiffForAttack;
+        
+        float stopDeadZone = 0.1f;
+        
         if (!isAttacking && !isUsingSkill)
         {
             float deadZone = 0.05f;
             if (Mathf.Abs(dx) > deadZone) facingX = moveDirX;
         }
 
-        float stopDeadZone = 0.1f;
-        
-        if (Mathf.Abs(dx) <= stopDeadZone)// || !heightOk)
-        {
-            StopX();
-            Debug.Log("cantgo");
-        }
-        else
-        {
-            MoveX(moveDirX, aggroSpeed);
-        }
+        MoveX(moveDirX, aggroSpeed);
 
-        if (distance >= aggroRange * 1.2f)
+        if (distance >= aggroRange)
         {
             ChangeState(State.Idle);
             animator?.SetTrigger("Idle");
@@ -348,7 +342,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     IEnumerator SkillRoutine()
     {
         ChangeState(State.Skill);
-        spriteRenderer.color = Color.red;
+        
         StopX();
 
         yield return new WaitForSeconds(readySkillWindup);
@@ -361,7 +355,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         isUsingSkill = false;
         StopX();
-        spriteRenderer.color = Color.white;
+        
         ChangeState(State.Idle);
         animator?.SetTrigger("Idle");
 
@@ -496,5 +490,10 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         FindFirstObjectByType<Player>().Exp.AddExp(10);
 
         GameObject.Destroy(this.gameObject, 3f);
+    }
+
+    void WallCheck()
+    {
+        
     }
 }

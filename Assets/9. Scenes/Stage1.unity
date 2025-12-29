@@ -49889,6 +49889,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 469355152}
   m_CullTransparentMesh: 1
+--- !u!1 &489886302 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3578710920004201130, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+  m_PrefabInstance: {fileID: 1974459552}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &493808070
 GameObject:
   m_ObjectHideFlags: 0
@@ -73816,11 +73821,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -10.8
+      value: -10.53
       objectReference: {fileID: 0}
     - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.83
+      value: -4.88
       objectReference: {fileID: 0}
     - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: m_LocalPosition.z
@@ -73856,12 +73861,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4374579463350917064, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: delayTime
-      value: 4
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 4374579463350917064, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: skillRange
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 4374579463350917064, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: boxCollider
+      value: 
+      objectReference: {fileID: 489886302}
     - target: {fileID: 4374579463350917064, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: enableAggro
       value: 1
@@ -73872,7 +73881,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4374579463350917064, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: standByTime
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4374579463350917064, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: enableAttack
@@ -73897,6 +73906,18 @@ PrefabInstance:
     - target: {fileID: 4374579463350917064, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: readyAttackWindup
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4706650381876820821, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4706650381876820821, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5378892132954568225, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_Material
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7052323503559932824, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
       propertyPath: m_Name
@@ -76437,6 +76458,14 @@ PrefabInstance:
     - target: {fileID: 5517252693495351933, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: m_SortingOrder
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6386387516130476832, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 22.76
+      objectReference: {fileID: 0}
+    - target: {fileID: 6386387516130476832, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.67
       objectReference: {fileID: 0}
     - target: {fileID: 6568192216305126023, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: m_LocalPosition.x
