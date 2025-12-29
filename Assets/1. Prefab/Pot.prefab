@@ -109,6 +109,8 @@ MonoBehaviour:
   - {fileID: 1157946522709448411, guid: 9c5f2048e7ab56a499113c86e3331742, type: 3}
   - {fileID: 3562214253192847631, guid: 4f09977d41cc84941bc7033d3639111d, type: 3}
   - {fileID: 7387059032564988730, guid: 3a1170bf85577194faa08fd0a4a0e9d6, type: 3}
+  minDropCount: 3
+  maxDropCount: 6
   dropForce: 5
 --- !u!114 &904376574426576868
 MonoBehaviour:
