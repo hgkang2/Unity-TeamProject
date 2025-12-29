@@ -10,8 +10,6 @@ public class PotObject : MonoBehaviour, IDamageable
     LocalSFX sfx;
 
     public List<GameObject> itemPrefabs;
-    public int minDropCount;
-    public int maxDropCount;
     public float dropForce = 5f;
 
     private bool isBroken = false;
@@ -59,7 +57,7 @@ public class PotObject : MonoBehaviour, IDamageable
         int randomIndex = Random.Range(0,itemPrefabs.Count);
         GameObject selectedItem = itemPrefabs[randomIndex];
         Vector2 dropPosition = transform.position + new Vector3(0,0.5f,0);
-        int ItemsDrop = Random.Range(minDropCount,maxDropCount);
+        int ItemsDrop = Random.Range(1,6);
         for (int i = 0; i < ItemsDrop; i++)
         {
             GameObject droppedItem = Instantiate(selectedItem,dropPosition,Quaternion.identity);

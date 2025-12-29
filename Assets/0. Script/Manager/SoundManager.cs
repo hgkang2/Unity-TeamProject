@@ -29,25 +29,21 @@ public class SoundManager : MonoBehaviour
     [Range(0f, 1f)] public float bgmVolume = 1f;
     [Range(0f, 1f)] public float sfxVolume = 1f;
 
-    readonly Dictionary<string, ClipEntry> bgmLibrary = new();
-    readonly Dictionary<string, ClipEntry> uiLibrary = new();
+    Dictionary<string, AudioClip> bgmLibrary = new();
+    Dictionary<string, AudioClip> uiLibrary = new();
 
     public event System.Action OnVolumeChanged;
 
 
     [System.Serializable]
-    public class ClipEntry
+    public class NamedClip
     {
         public string key;
         public AudioClip clip;
-        [Range(0f, 1f)]
-        public float clipVolume = 1f;
     }
 
-    [SerializeField] List<ClipEntry> bgmClips = new();
-    [SerializeField] List<ClipEntry> uiClips = new();
-
-      float currentBgmClipVolume = 1f;
+    [SerializeField] List<NamedClip> bgmClips = new();
+    [SerializeField] List<NamedClip> uiClips = new();
 
     void Awake()
     {
@@ -56,58 +52,40 @@ public class SoundManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        BuildLibrary(bgmClips, bgmLibrary);
-        BuildLibrary(uiClips, uiLibrary);
-
-        UpdateVolumes();
-    }
-
-    void BuildLibrary(List<ClipEntry> list, Dictionary<string, ClipEntry> dict)
-    {
-        dict.Clear();
-        for (int i = 0; i < list.Count; i++)
+        foreach (NamedClip pair in bgmClips)
         {
-            ClipEntry entry = list[i];
-            if (entry == null) continue;
-            if (string.IsNullOrEmpty(entry.key)) continue;
-            if (entry.clip == null) continue;
+            if (pair.clip != null && !bgmLibrary.ContainsKey(pair.key))
+                bgmLibrary.Add(pair.key, pair.clip);
+        }
 
-            if (!dict.ContainsKey(entry.key))
-            {
-                dict.Add(entry.key, entry);
-            }
-            else
-            {
-                Debug.LogWarning($"[SoundManager] Duplicate key ignored: {entry.key}");
-            }
+        foreach (NamedClip pair in uiClips)
+        {
+            if (pair.clip != null && !uiLibrary.ContainsKey(pair.key))
+                uiLibrary.Add(pair.key, pair.clip);
         }
     }
+
     // SoundManager에 등록된 클립을 사용
     public void PlayBGM(string key, bool loop = true)
     {
-        if (!bgmLibrary.TryGetValue(key, out ClipEntry entry) || entry.clip == null)
+        if (!bgmLibrary.TryGetValue(key, out AudioClip clip) || clip == null)
         {
             Debug.LogWarning($"[SoundManager] BGM key not found: {key}");
             return;
         }
-
-        PlayBGM(entry.clip, entry.clipVolume, loop);
+        PlayBGM(clip, loop);
     }
 
     // 개별 클립 사용
-    public void PlayBGM(AudioClip clip, float clipVolume = 1f, bool loop = true)
+    public void PlayBGM(AudioClip clip, bool loop = true)
     {
         if (clip == null) return;
-
-        currentBgmClipVolume = Mathf.Clamp01(clipVolume);
-
         bgmSource.clip = clip;
         bgmSource.loop = loop;
-        UpdateVolumes();
+        bgmSource.volume = masterVolume * bgmVolume;
         bgmSource.Play();
     }
 
@@ -117,30 +95,20 @@ public class SoundManager : MonoBehaviour
     }
 
 
-    public void PlayUI(string key)
+    public void PlayUI(AudioClip clip)
     {
-        if (!uiLibrary.TryGetValue(key, out ClipEntry entry) || entry.clip == null)
+        if (clip == null) return;
+        uiSource.PlayOneShot(clip, masterVolume * sfxVolume);
+    }
+
+    public void PlayUI(string key, bool loop = true)
+    {
+        if (!uiLibrary.TryGetValue(key, out AudioClip clip) || clip == null)
         {
             Debug.LogWarning($"[SoundManager] UI key not found: {key}");
             return;
         }
-
-        PlayUI(entry.clip, entry.clipVolume);
-    }
-
-    public void PlayUI(AudioClip clip, float clipVolume = 1f)
-    {
-        if (clip == null) return;
-
-        float v = masterVolume * sfxVolume * Mathf.Clamp01(clipVolume);
-        uiSource.PlayOneShot(clip, v);
-    }
-
-
-    void UpdateVolumes()
-    {
-        bgmSource.volume = masterVolume * bgmVolume * currentBgmClipVolume;
-        // SFX는 PlayOneShot 때 계산해서 적용
+        PlayUI(clip);
     }
 
     public void SetMasterVolume(float volume)
@@ -150,6 +118,11 @@ public class SoundManager : MonoBehaviour
         OnVolumeChanged?.Invoke();
     }
 
+    void UpdateVolumes()
+    {
+        bgmSource.volume = masterVolume * bgmVolume;
+        // SFX는 각 LocalSoundVFX가 개별적으로 적용
+    }
     public float GetGlobalSfxVolume()
     {
         return masterVolume * sfxVolume;
