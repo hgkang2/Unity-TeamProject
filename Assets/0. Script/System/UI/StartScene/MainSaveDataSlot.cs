@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class MainLoadSlot : MonoBehaviour, IInteractiveView<SaveData>
+public class MainSaveDataSlot : MonoBehaviour, IInteractiveView<SaveData>
 {
     [SerializeField] CanvasGroup newTravelCG;
     [SerializeField] CanvasGroup loadTravelCG;
@@ -21,33 +21,53 @@ public class MainLoadSlot : MonoBehaviour, IInteractiveView<SaveData>
     public UIClickHandler ClickHandler { get; private set; }
     public UIDragHandler DragHandler => null;
 
-    UIPointerHandler<SaveData> myPointerHandler;
-
     public RectTransform Rect { get; private set; }
     public GameObject GO => gameObject;
 
-    SaveData saveData = new SaveData();
+    SaveData saveData;
 
     void Awake()
     {
         Rect = transform as RectTransform;
 
-        myPointerHandler = GetComponent<UIPointerHandler<SaveData>>();
+        UIPointerHandler<SaveData> myPointerHandler = GetComponent<UIPointerHandler<SaveData>>();
         PointerHandler = myPointerHandler;
 
-        // 핸들러가 데이터를 읽어갈 수 있도록 델리게이트 연결
         myPointerHandler.GetData = () => saveData;
         myPointerHandler.GetRect = () => Rect;
 
-        // 이제 구독 가능
         myPointerHandler.PointerEntered += HandlePointerEnter;
         myPointerHandler.PointerExited += HandlePointerExit;
+
+
+        UIClickHandler<SaveData> myClickHandler = GetComponent<UIClickHandler<SaveData>>();
+        ClickHandler = myClickHandler;
+
+        myClickHandler.GetData = () => saveData;
+
+
     }
 
 
     public void Bind(SaveData data)
     {
-        //saveData = new SaveData();
+        // TODO 불러오기 로직 적용후 채우기!!!
+        saveData = data;
+        if (saveData == null)
+        {
+            Clear();
+        }
+        else
+        {
+
+            loadTravelCG.alpha = 1;
+            loadTravelCG.blocksRaycasts = true;
+            loadTravelCG.interactable = true;
+
+            newTravelCG.alpha = 1;
+            newTravelCG.blocksRaycasts = false;
+            newTravelCG.interactable = false;
+        }
     }
 
     public void Clear()
@@ -61,22 +81,31 @@ public class MainLoadSlot : MonoBehaviour, IInteractiveView<SaveData>
         newTravelCG.interactable = true;
     }
 
-    public float hoverScale = 1.05f;
-    public float tweenDuration = 0.15f;
 
     void HandlePointerEnter(SaveData data, RectTransform rect, PointerEventData eventData)
     {
-        rect.DOKill(); // 기존 트윈 제거
-        rect.DOScale(hoverScale, tweenDuration)
-            .SetEase(Ease.OutBack);
+        Selected();
     }
 
     void HandlePointerExit()
     {
-        RectTransform rect = Rect; // 슬롯 자기 자신
-        rect.DOKill();
-        rect.DOScale(0.95f, tweenDuration)
-            .SetEase(Ease.OutQuad);
+        DeSelected();
     }
 
+    
+    public float hoverScale = 1.05f;
+    public float tweenDuration = 0.15f;
+    void Selected()
+    {
+        Rect.DOKill(); // 기존 트윈 제거
+        Rect.DOScale(hoverScale, tweenDuration)
+            .SetEase(Ease.OutBack);
+    }
+
+    void DeSelected()
+    {
+        Rect.DOKill();
+        Rect.DOScale(0.95f, tweenDuration)
+            .SetEase(Ease.OutQuad);
+    }
 }

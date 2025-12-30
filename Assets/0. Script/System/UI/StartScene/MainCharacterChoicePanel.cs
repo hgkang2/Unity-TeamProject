@@ -2,23 +2,27 @@ using UnityEngine;
 
 public class MainCharacterChoicePanel : UIKeyboardHandler
 {
-    CanvasGroup cg;
+    [HideInInspector] public CanvasGroup cg;
+    [SerializeField] MainCharacterChoiceSlot[] slots;
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
+
+        foreach(var slot in slots)
+        {
+            slot.characterSelected += GameStart;
+        }
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    // TODO 확인창 이후 Start로 바꾸기?
+    public void GameStart(CharacterId id)
     {
-
+        GameManager.Instance.curcharacter = id;
+        SceneLoader.LoadScene("Stage1");
+        
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
     public void Open()
     {
         cg.alpha = 1f;
@@ -38,5 +42,9 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
     protected override void OnUIMove(Vector2 dir)
     {
 
+    }
+    protected override void OnUICancel()
+    {
+        Close();
     }
 }

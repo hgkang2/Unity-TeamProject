@@ -1,27 +1,32 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class MainLoadPanel : UIKeyboardHandler
+public class MainSaveDataPanel : UIKeyboardHandler
 {
 
-    CanvasGroup cg;
-    LoadPanelEventAggregator aggregator;
+    [HideInInspector] public CanvasGroup cg;
 
-    [SerializeField] MainLoadSlot[] slots;
+    [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
+    SaveDataEventAggregator aggregator;
+
+    [SerializeField] MainSaveDataSlot[] slots;
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
-        aggregator = GetComponent<LoadPanelEventAggregator>();
+        aggregator = GetComponent<SaveDataEventAggregator>();
     }
 
     void Start()
     {
+        aggregator.RebuildViews();
         foreach (var slot in slots)
         {
-            slot.Clear();
+            slot.Bind(null);
         }
+
     }
 
-    void OnEnable()
+    protected override void OnUIEnabled()
     {
         if (aggregator != null)
         {
@@ -31,7 +36,7 @@ public class MainLoadPanel : UIKeyboardHandler
         }
     }
 
-    void OnDisable()
+    protected override void OnUIDisabled()
     {
         if (aggregator != null)
         {
@@ -42,7 +47,7 @@ public class MainLoadPanel : UIKeyboardHandler
     }
     void HandleSlotEnter(SlotEventArgs<SaveData> args)
     {
-        // 여기서 패널 단위 로직 처리 (프리뷰 패널 갱신 등)
+
     }
 
     void HandleSlotExit(SlotEventArgs<SaveData> args)
@@ -51,6 +56,14 @@ public class MainLoadPanel : UIKeyboardHandler
 
     void HandleSlotLeftClick(SlotEventArgs<SaveData> args)
     {
+        if (args.Data == null)
+        {
+            mainCharacterChoicePanel.Open();
+        }
+        else
+        {
+            Debug.Log($"저장 불러오기");
+        }
     }
 
     public void Open()
@@ -71,6 +84,20 @@ public class MainLoadPanel : UIKeyboardHandler
 
     protected override void OnUIMove(Vector2 dir)
     {
+    }
+    protected override void OnUICancel()
+    {
+        if (mainCharacterChoicePanel.cg.blocksRaycasts)
+        {
+            return;
+        }
+        Close();
+    }   
 
+    //X 버튼 눌렀을 때
+    public void ButtonCancel()
+    {
+        mainCharacterChoicePanel.Close();
+        Close();
     }
 }

@@ -35,7 +35,7 @@ public class StageUI : MonoBehaviour
         haveSoulsUI.gameObject.SetActive(true);
         
 
-        characterName.text = SelectedCharacter.CurCharacter.ToString();
+        characterName.text = GameManager.Instance.curcharacter.ToString();
     }
 
     void Start()
@@ -133,7 +133,7 @@ public class StageUI : MonoBehaviour
     //버튼 연결 이벤트
     public void GoToCharacterChoiceScene()
     {
-        SelectedCharacter.CurCharacter = CharacterId.None;
+        GameManager.Instance.curcharacter = CharacterId.None;
         SceneManager.LoadScene("CharacterChoice");
     }
 }

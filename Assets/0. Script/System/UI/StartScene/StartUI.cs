@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Linq;
 using DG.Tweening;
 using Unity.Collections;
@@ -10,7 +11,7 @@ public class StartUI : UIKeyboardHandler
     [SerializeField] Image openingImage;
 
     [SerializeField] MainPanel mainPanel;
-    [SerializeField] MainLoadPanel mainLoadPanel;
+    [SerializeField] MainSaveDataPanel mainLoadPanel;
     [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
     [SerializeField] MainExitPanel mainExitPanel;
 
@@ -91,7 +92,18 @@ public class StartUI : UIKeyboardHandler
         if (isOpeningPhase)
         {
             ShowMenuImmediate();
+            return;
         }
+        if (mainLoadPanel.cg.blocksRaycasts)
+        {
+            return;
+        }
+        if (mainExitPanel.cg.blocksRaycasts)
+        {
+            return;
+        }
+        mainExitPanel.Open();
+        
     }
     #endregion
 

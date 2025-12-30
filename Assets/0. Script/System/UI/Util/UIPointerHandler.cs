@@ -17,9 +17,7 @@ public abstract class UIPointerHandler<T> : UIPointerHandler,
     void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
     {
         if (GetData == null) return;
-
         T data = GetData();
-        if (data == null) return;
 
         if (GetRect == null) return;
         RectTransform rect = GetRect();

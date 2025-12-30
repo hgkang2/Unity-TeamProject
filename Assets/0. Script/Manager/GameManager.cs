@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public CharacterId curcharacter;
     static GameManager instance;
     public static GameManager Instance
     {
@@ -53,6 +54,11 @@ public class GameManager : MonoBehaviour
 
 
 
+    public void SetCharacter(int num)
+    {
+        // 1 : serena, 2 : luna, 3 : 미출시
+        curcharacter = (CharacterId)(num);
+    }
 
     public void QuitGame()
     {

@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class MainPanel : UIKeyboardHandler
 {
     public CanvasGroup cg;
-    [SerializeField] MainExitPanel mainExitPanel;
 
     Button[] menuButtons;
     [SerializeField] Transform ButtonSelectImage;
@@ -137,7 +136,6 @@ public class MainPanel : UIKeyboardHandler
             curIndex = null;
             UpdateButtonHighlight();
         }
-        mainExitPanel.Open();
     }
 
     public void Open()
