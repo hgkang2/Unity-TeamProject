@@ -11,6 +11,7 @@ public class MainPanel : UIKeyboardHandler
 
     private void Awake()
     {
+        cg = GetComponent<CanvasGroup>();
         int i = 0;
         menuButtons = transform.Cast<Transform>()
             .Select(t =>
@@ -83,6 +84,7 @@ public class MainPanel : UIKeyboardHandler
 
     protected override void OnUIMove(Vector2 dir)
     {
+        
         // 현재 아무것도 선택되지 않은 상태라면
         if (curIndex == null)
         {
@@ -107,6 +109,7 @@ public class MainPanel : UIKeyboardHandler
         //강조된 버튼 변경
         UpdateButtonHighlight();
     }
+
     //버튼 선택만 해제
     public void QuitButtonSelect()
     {
