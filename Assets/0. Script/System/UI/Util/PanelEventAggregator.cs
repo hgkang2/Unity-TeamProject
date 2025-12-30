@@ -44,7 +44,7 @@ public abstract class PanelEventAggregator<T> : MonoBehaviour
 
     protected void BuildViewList()
     {
-        Debug.Log("Build View List");
+        
         views.Clear();
 
         // 인터페이스라 GetComponentsInChildren<IInteractiveView<T>>()가 안 먹을 수도 있으므로
@@ -56,6 +56,7 @@ public abstract class PanelEventAggregator<T> : MonoBehaviour
             IInteractiveView<T> view = mb as IInteractiveView<T>;
             if (view != null && views.Contains(view) == false)
             {
+                //Debug.Log($"Build View List. {mb.name}");
                 views.Add(view);
             }
         }

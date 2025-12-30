@@ -2,10 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public abstract class UIPointerHandler : MonoBehaviour
-{
-}
-
+public abstract class UIPointerHandler : MonoBehaviour{}
 public abstract class UIPointerHandler<T> : UIPointerHandler,
     IPointerEnterHandler,
     IPointerExitHandler
@@ -20,9 +17,7 @@ public abstract class UIPointerHandler<T> : UIPointerHandler,
     void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
     {
         if (GetData == null) return;
-
         T data = GetData();
-        if (data == null) return;
 
         if (GetRect == null) return;
         RectTransform rect = GetRect();

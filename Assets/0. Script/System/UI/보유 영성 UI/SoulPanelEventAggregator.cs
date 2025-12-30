@@ -1,7 +1,2 @@
 using UnityEngine;
-
-public class SoulPanelEventAggregator : PanelEventAggregator<SoulData>
-{
-    
-
-}
+public class SoulPanelEventAggregator : PanelEventAggregator<SoulData>{}

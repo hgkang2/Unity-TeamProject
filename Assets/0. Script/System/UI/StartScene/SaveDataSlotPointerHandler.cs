@@ -1,0 +1,1 @@
+public class SaveDataSlotPointerHandler : UIPointerHandler<SaveData>{}

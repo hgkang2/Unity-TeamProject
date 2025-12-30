@@ -16,7 +16,6 @@ public class UIClickHandler<T> : UIClickHandler, IPointerClickHandler
         if (GetData == null) return;
 
         T data = GetData();
-        if (data == null) return;
 
         if (eventData.button == PointerEventData.InputButton.Left)
         {
