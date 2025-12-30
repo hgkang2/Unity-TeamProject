@@ -21,10 +21,6 @@ public class StartUI : UIKeyboardHandler
 
     void Awake()
     {
-        QualitySettings.vSyncCount = 0; // VSync OFF
-        Application.targetFrameRate = 30;
-
-
         mainPanel.gameObject.SetActive(true);
         mainLoadPanel.gameObject.SetActive(true);
         mainCharacterChoicePanel.gameObject.SetActive(true);
