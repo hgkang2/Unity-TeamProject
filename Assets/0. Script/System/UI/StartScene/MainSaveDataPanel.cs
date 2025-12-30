@@ -85,14 +85,6 @@ public class MainSaveDataPanel : UIKeyboardHandler
     protected override void OnUIMove(Vector2 dir)
     {
     }
-    protected override void OnUICancel()
-    {
-        if (mainCharacterChoicePanel.cg.blocksRaycasts)
-        {
-            return;
-        }
-        Close();
-    }   
 
     //X 버튼 눌렀을 때
     public void ButtonCancel()

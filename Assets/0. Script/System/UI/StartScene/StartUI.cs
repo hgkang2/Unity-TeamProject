@@ -21,6 +21,10 @@ public class StartUI : UIKeyboardHandler
 
     void Awake()
     {
+        QualitySettings.vSyncCount = 0; // VSync OFF
+        Application.targetFrameRate = 30;
+
+
         mainPanel.gameObject.SetActive(true);
         mainLoadPanel.gameObject.SetActive(true);
         mainCharacterChoicePanel.gameObject.SetActive(true);
@@ -58,7 +62,7 @@ public class StartUI : UIKeyboardHandler
         // 3) 메뉴 fade-in
         openingSequence.Append(
             mainPanel.cg.DOFade(1f, 1f)
-                .OnComplete(() => {ShowMenuImmediate();})
+                .OnComplete(() => { ShowMenuImmediate(); })
         );
     }
     #endregion
@@ -94,23 +98,25 @@ public class StartUI : UIKeyboardHandler
             ShowMenuImmediate();
             return;
         }
-        if (mainLoadPanel.cg.blocksRaycasts)
-        {
-            return;
-        }
         if (mainExitPanel.cg.blocksRaycasts)
         {
+            mainExitPanel.Close();
+            return;
+        }
+        if (mainCharacterChoicePanel.cg.blocksRaycasts)
+        {
+            mainCharacterChoicePanel.Close();
+            return;
+        }
+        if (mainLoadPanel.cg.blocksRaycasts)
+        {
+            mainLoadPanel.Close();
             return;
         }
         mainExitPanel.Open();
-        
     }
     #endregion
 
-    public void OpenMainLoadPanel()
-    {
-        mainLoadPanel.Open();
-    }
 
     public void Quit()
     {

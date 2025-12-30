@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class MainPanel : UIKeyboardHandler
 {
     public CanvasGroup cg;
-
     Button[] menuButtons;
     [SerializeField] Transform ButtonSelectImage;
 
@@ -84,7 +83,7 @@ public class MainPanel : UIKeyboardHandler
 
     protected override void OnUIMove(Vector2 dir)
     {
-        
+
         // 현재 아무것도 선택되지 않은 상태라면
         if (curIndex == null)
         {
@@ -137,7 +136,7 @@ public class MainPanel : UIKeyboardHandler
             UpdateButtonHighlight();
         }
     }
-
+    
     public void Open()
     {
         cg.alpha = 1f;

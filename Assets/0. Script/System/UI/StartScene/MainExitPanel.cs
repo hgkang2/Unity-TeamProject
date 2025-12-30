@@ -18,11 +18,6 @@ public class MainExitPanel : UIKeyboardHandler
         //else if (dir.x > 0.1f) ;
     }
 
-    protected override void OnUICancel()
-    {
-        Close();
-    }
-
     protected override void OnUIConfirm()
     {
         // 상호작용 키 눌러서 선택된 버튼 확인

@@ -43,8 +43,4 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
     {
 
     }
-    protected override void OnUICancel()
-    {
-        Close();
-    }
 }
