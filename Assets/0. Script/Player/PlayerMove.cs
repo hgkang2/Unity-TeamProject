@@ -112,7 +112,8 @@ public class PlayerMove : MonoBehaviour
         if (TimeManager.IsPaused) return;
 
         anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
-        anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
+        anim.SetFloat("InputX", Mathf.Abs(inputVec.x));
+        anim.SetFloat("MoveX", Mathf.Abs(rb.linearVelocity.x));
 
         anim.SetBool("IsGrounded", isGrounded);
         anim.SetBool("IsWallGrabbing", isWallGrabbing || isWallSliding);
@@ -189,6 +190,19 @@ public class PlayerMove : MonoBehaviour
             newX = isGrounded
                 ? targetX
                 : Mathf.Lerp(rb.linearVelocity.x, targetX, Time.fixedDeltaTime * airControlLerp);
+
+            // 발끝이 벽에 걸리면 움직이지 않기
+            if (!isGrounded && isFootTouchingWall && !isWallGrabbing && !isWallSliding)
+            {
+                bool inputTowardWall =
+                    (isRightFacing && inputVec.x > 0.1f) ||
+                    (!isRightFacing && inputVec.x < -0.1f);
+
+                if (inputTowardWall)
+                {
+                    newX = 0f;
+                }
+            }
         }
 
         // 최종 적용
@@ -440,6 +454,11 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] float wallSlideSpeed = 2f;
     [SerializeField] float wallJumpForceX = 10f;
     [SerializeField] float wallJumpForceY = 15f;
+
+
+    public bool isFootTouchingWall = false;
+    [SerializeField] float footWallCheckDistance = 0.08f; // 0.03~0.12 사이로 취향 조절
+    [SerializeField] float footWallCheckYOffset = 0.05f;  // b.min.y에서 살짝 위(발끝)
     bool wasWallSliding;
     void HandleWallCheck()
     {
@@ -447,23 +466,24 @@ public class PlayerMove : MonoBehaviour
         {
             isWallGrabbing = false;
             isWallSliding = false;
+        isFootTouchingWall = false;
             return;
         }
 
         wasWallSliding = isWallSliding;
 
         Bounds b = col.bounds;
+
+        // 벽 판정용 중앙 레이
         Vector2 rayOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, b.center.y);
         Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
 
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, wallCheckDistance, wallMask);
 
+#if UNITY_EDITOR
         Color color = hit.collider != null ? Color.red : Color.green;
-        Debug.DrawLine(
-            rayOrigin,
-            rayOrigin + rayDirection * wallCheckDistance,
-            color
-        );
+        Debug.DrawLine(rayOrigin, rayOrigin + rayDirection * wallCheckDistance, color);
+#endif
 
 
         bool isTouchingWall = (hit.collider != null);
@@ -474,6 +494,7 @@ public class PlayerMove : MonoBehaviour
 
         bool allowWallState = (rb.linearVelocity.y < 0f) || isWallGrabbing || isWallSliding;
 
+        // 중앙 레이가 맞았으면 벽잡기 상태로 진입
         if (isTouchingWall && allowWallState)
         {
             if (inputTowardWall)
@@ -486,12 +507,27 @@ public class PlayerMove : MonoBehaviour
                 isWallSliding = true;
                 isWallGrabbing = false;
             }
+
+            isFootTouchingWall = false;
+            return;
         }
+
+        // 중앙 레이가 안 맞으면 벽잡기 상태 해제
         else
         {
             isWallGrabbing = false;
             isWallSliding = false;
         }
+        
+        // 하체에만 벽이 있을때 스턱 방지용 발끝 레이
+        Vector2 footOrigin = new Vector2(rayOrigin.x, b.min.y + footWallCheckYOffset);
+        RaycastHit2D footHit = Physics2D.Raycast(footOrigin, rayDirection, footWallCheckDistance, wallMask);
+        isFootTouchingWall = (footHit.collider != null);
+
+#if UNITY_EDITOR
+        Color footColor = isFootTouchingWall ? Color.magenta : Color.cyan;
+        Debug.DrawLine(footOrigin, footOrigin + rayDirection * footWallCheckDistance, footColor);
+#endif
     }
     #endregion
 

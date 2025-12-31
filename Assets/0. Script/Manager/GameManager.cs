@@ -1,5 +1,4 @@
 using System.Collections;
-using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,7 +23,6 @@ public class GameManager : MonoBehaviour
             return instance;
         }
     }
-    [SerializeField] CinemachineCamera cam;
 
     void Awake()
     {
@@ -50,19 +48,15 @@ public class GameManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if(cinemachineCamera == null)
-        {
-            cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
-        }
         switch (scene.name)
         {
             case "Stage1":
+                if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
-                cam = FindFirstObjectByType<CinemachineCamera>();
+                cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
                 break;
         }
     }
-
 
     public IEnumerator TeleportRoutine(Player p, Transform targetPosition)
     {
@@ -75,11 +69,10 @@ public class GameManager : MonoBehaviour
         Vector3 delta = newPos - oldPos;
 
         p.transform.position = newPos;
-        cam.OnTargetObjectWarped(p.transform, delta);
+        cinemachineCamera.OnTargetObjectWarped(p.transform, delta);
 
         TimeManager.Resume();
         yield return FadeInRoutine(1f);    // 끝날 때까지 대기
-
     }
 
     IEnumerator FadeOutRoutine(float duration)

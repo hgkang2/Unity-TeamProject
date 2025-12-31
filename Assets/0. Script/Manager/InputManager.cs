@@ -103,6 +103,12 @@ public class InputManager : MonoBehaviour
     }
     #endregion
 
+    public event Action InteractPressed;
+    void OnInteractPerformed(InputAction.CallbackContext ctx)
+    {
+        InteractPressed?.Invoke();
+    }
+
     #region UI Input
     public event Action<Vector2> UINavigateStarted;
     void OnUINavigatePerformed(InputAction.CallbackContext ctx)

@@ -21,20 +21,25 @@ public class Interactor : MonoBehaviour
 
     void Awake() {
         player = GetComponent<Player>();
-        InputManager.Instance.InteractPressed += Interact;
     }
 
     float timer;
+
     void Update()
     {
-        if(Time.time > timer + 0.2f)
+        if(timer < Time.time + 0.1f)
         {
             timer = Time.time;
             Scan();
         }
     }
 
-    void OnDestroy()
+    void OnEnable()
+    {
+        InputManager.Instance.InteractPressed += Interact;
+    }
+
+    void OnDisable()
     {
         InputManager.Instance.InteractPressed -= Interact;
     }
