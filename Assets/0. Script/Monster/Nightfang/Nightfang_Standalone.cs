@@ -25,7 +25,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [Header("Hitbox")]
     [SerializeField] public GameObject skillHitBoxObj;   // 스킬 공격시 사용하는 히트박스
     [SerializeField] public GameObject attackHitboxObj;
-    [SerializeField] GameObject boxCollider;
+    [SerializeField] BoxCollider2D boxCollider;
 
     [Header("Idle")]
     [SerializeField] float idleTime = 1.0f;       // Idle(대기)상태 지속 시간
@@ -100,6 +100,9 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     Coroutine lockActionRoutine; // 공격(스킬 or 일반 공격) 후 연속 공격 방지
 
     bool heightOk;
+    [SerializeField] LayerMask groundMask;
+    [SerializeField] Transform rayOrigin;
+    [SerializeField] bool isGroundAhead;
     #endregion
 
     void Reset()
@@ -125,6 +128,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         facingX = 1;
         patrolDirX = 1;
 
+        Physics2D.queriesStartInColliders = false;
+
         if (skillHitBoxObj) skillHitBoxObj.SetActive(false);
         if (attackHitboxObj) attackHitboxObj.SetActive(false);
 
@@ -144,8 +149,13 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         stateTimer += Time.deltaTime;
         RunFSM();
-
+        
         ApplyFlip();
+        MonsterGroundCheck();
+    }
+
+    private void FixedUpdate() {
+        //MonsterGroundCheck();
     }
 
     void PlayerDetect()
@@ -214,15 +224,23 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (enablePatrol && stateTimer >= idleTime && !isHit)
         {
-            patrolDirX *= -1;
             ApplyFlip();
-            ChangeState(State.Patrol);
+            patrolDirX *= -1;
             animator?.SetTrigger("Patrol");
+            ChangeState(State.Patrol);
         }
     }
 
     void TickPatrol()
     {
+        if (stateTimer >= patrolTime)
+        {
+            StopX();
+            animator?.SetTrigger("Idle");
+            ChangeState(State.Idle);
+            sfx.Play("IdleSound");
+        }
+
         if (enableAggro && distance <= aggroRange)
         {
             StopX();
@@ -231,16 +249,9 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             return;
         }
 
-        if (stateTimer >= patrolTime)
-        {
-            StopX();
-            ChangeState(State.Idle);
-            animator?.SetTrigger("Idle");
-            sfx.Play("IdleSound");
-        }
-
         MoveX(patrolDirX, patrolSpeed);
         facingX = patrolDirX;
+        
     }
 
     void TickAggro()
@@ -417,14 +428,16 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, aggroRange);
+        // Gizmos.color = Color.red;
+        // Gizmos.DrawWireSphere(transform.position, aggroRange);
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        // Gizmos.color = Color.green;
+        // Gizmos.DrawWireSphere(transform.position, attackRange);
 
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, skillRange);
+        // Gizmos.color = Color.blue;
+        // Gizmos.DrawWireSphere(transform.position, skillRange);
+        
+        
     }
 
     #region Damage Control
@@ -492,8 +505,40 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         GameObject.Destroy(this.gameObject, 3f);
     }
 
-    void WallCheck()
+    bool cliffStopped = false;
+    [SerializeField] float rayLength;
+    [SerializeField] float forwardPadding;
+    [SerializeField] float bottomPadding;
+
+    void MonsterGroundCheck()
     {
-        
+        if(state != State.Patrol && state != State.Aggro && state != State.TakeDamage) return;
+
+        Bounds b = boxCollider.bounds;
+
+        float dirX = Mathf.Sign(patrolDirX); //transform.localScale.x >= 0f ? 1f : -1f;
+
+        Vector2 rayStart = new Vector2((dirX > 0f ? b.max.x : b.min.x) + dirX * forwardPadding,b.min.y + bottomPadding);
+
+        RaycastHit2D hit = Physics2D.Raycast(rayStart, Vector2.down, rayLength, groundMask);
+
+        Debug.DrawRay(rayStart, Vector2.down * rayLength, Color.red);
+
+        isGroundAhead = (hit.collider == null);
+
+        if (isGroundAhead)
+        {
+            if (!cliffStopped)
+            {
+                cliffStopped = true;
+                ChangeState(State.Idle);
+                animator?.ResetTrigger("Patrol");
+                animator?.SetTrigger("Idle");
+            }
+        }
+        else
+        {
+            cliffStopped = false; 
+        }
     }
 }
