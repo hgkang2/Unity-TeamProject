@@ -138,11 +138,14 @@ public class PlayerMove : MonoBehaviour
     }
 
     #region 속도 적용
+    public void StopMoveOnce()
+    {
+        rb.linearVelocity = Vector2.zero;
+    }
     void ApplyVelocity()
     {
         float newX = rb.linearVelocity.x;
         float newY = rb.linearVelocity.y;
-
         // 벽 잡기
         if (isWallGrabbing)
         {
