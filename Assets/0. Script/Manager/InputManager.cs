@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class InputManager : MonoBehaviour
 {
-    public static InputManager Instance {get; private set;}
+    public static InputManager Instance { get; private set; }
     [SerializeField] VFXManager vfxManager;
     [SerializeField] Camera mainCamera;
 
@@ -57,7 +57,7 @@ public class InputManager : MonoBehaviour
     }
 
 
-    #region PlayerMove
+    #region Player
     public Vector2 Move { get; private set; }
     void OnMove(InputAction.CallbackContext ctx)
     {
@@ -80,6 +80,12 @@ public class InputManager : MonoBehaviour
     void OnDodgePerformed(InputAction.CallbackContext ctx)
     {
         DodgePressed?.Invoke();
+    }
+
+    public event Action InteractPressed;
+    void OnInteractPerformed(InputAction.CallbackContext ctx)
+    {
+        InteractPressed?.Invoke();
     }
     #endregion
 
@@ -182,11 +188,12 @@ public class InputManager : MonoBehaviour
         if (input == null) return;
         UnSubscribe();
 
-        //Player Move 입력 이벤트
+        //Player 입력 이벤트
         input.Player.Move.performed += OnMove;
         input.Player.Move.canceled += OnMoveCancel;
         input.Player.Jump.performed += OnJumpPerformed;
         input.Player.Dodge.performed += OnDodgePerformed;
+        input.Player.Interact.performed += OnInteractPerformed;
 
         //Player Attack 입력 이벤트
         input.Player.Attack.performed += OnAttackPerformed;
@@ -212,6 +219,7 @@ public class InputManager : MonoBehaviour
         input.Player.Move.canceled -= OnMoveCancel;
         input.Player.Jump.performed -= OnJumpPerformed;
         input.Player.Dodge.performed -= OnDodgePerformed;
+        input.Player.Interact.performed -= OnInteractPerformed;
 
         input.UI.Navigate.performed -= OnUINavigatePerformed;
         input.UI.Navigate.canceled -= OnUINavigateCanceled;

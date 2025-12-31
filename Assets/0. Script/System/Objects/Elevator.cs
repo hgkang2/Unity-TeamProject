@@ -1,13 +1,16 @@
-using ChocDino.UIFX;
+using System.Collections;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.InputSystem.XR.Haptics;
 
 public class Elevator : MonoBehaviour, IInteractable
 {
+    [Header("순간이동할 위치")]
+    [SerializeField] Transform targetPos;
+
+
+    [Header("아래는 초기화용 건들지말기")]
     [SerializeField] Animator leverAnimator;
     [SerializeField] SpriteRenderer leverSprite;
-    [SerializeField] Transform targetPos;
 
 
     private void Awake()
@@ -28,6 +31,14 @@ public class Elevator : MonoBehaviour, IInteractable
         leverAnimator.SetTrigger("Interact");
         leverAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
         StartCoroutine(GameManager.Instance.TeleportRoutine(player, targetPos));
+        StartCoroutine(Initialize());
+    }
+    IEnumerator Initialize()
+    {
+        yield return new WaitForSeconds(5);
+        leverAnimator.SetTrigger("Initialize");
+        leverAnimator.updateMode = AnimatorUpdateMode.Normal;
+        HighlightOff();
     }
 
     public bool IsAvailable()
@@ -39,7 +50,6 @@ public class Elevator : MonoBehaviour, IInteractable
     {
         HighlightOn();
         leverAnimator.SetTrigger("OnFocus");
-        leverAnimator.updateMode = AnimatorUpdateMode.Normal;
     }
 
     public void OnUnfocus()

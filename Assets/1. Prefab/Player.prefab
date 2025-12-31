@@ -171,9 +171,6 @@ MonoBehaviour:
   wallSlideSpeed: 2
   wallJumpForceX: 10
   wallJumpForceY: 15
-  isFootTouchingWall: 0
-  footWallCheckDistance: 0.02
-  footWallCheckYOffset: 0
 --- !u!114 &7436586581079057000
 MonoBehaviour:
   m_ObjectHideFlags: 0
