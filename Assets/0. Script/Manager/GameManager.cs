@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] CanvasGroup fade;
+    CinemachineCamera cinemachineCamera;
     public CharacterId curcharacter;
     static GameManager instance;
     public static GameManager Instance
@@ -49,7 +50,10 @@ public class GameManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-
+        if(cinemachineCamera == null)
+        {
+            cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+        }
         switch (scene.name)
         {
             case "Stage1":
@@ -65,7 +69,6 @@ public class GameManager : MonoBehaviour
 
         TimeManager.Pause();
         yield return FadeOutRoutine(1f);   // 끝날 때까지 대기
-
 
         Vector3 oldPos = p.transform.position;
         Vector3 newPos = targetPosition.position;

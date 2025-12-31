@@ -1,15 +1,17 @@
+using ChocDino.UIFX;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem.XR.Haptics;
 
 public class Elevator : MonoBehaviour, IInteractable
 {
     [SerializeField] Animator leverAnimator;
-    [SerializeField] Transform leverPos;
+    [SerializeField] SpriteRenderer leverSprite;
     [SerializeField] Transform targetPos;
+
 
     private void Awake()
     {
-        
     }
 
     public bool CanInteract()
@@ -19,14 +21,8 @@ public class Elevator : MonoBehaviour, IInteractable
 
     public void Exit()
     {
-        
-    }
 
-    public Vector2 GetInteractPoint()
-    {
-        return leverPos.position;
     }
-
     public void Interact(Player player)
     {
         leverAnimator.SetTrigger("Interact");
@@ -41,13 +37,31 @@ public class Elevator : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        leverAnimator.SetTrigger("OnPocus");
+        HighlightOn();
+        leverAnimator.SetTrigger("OnFocus");
         leverAnimator.updateMode = AnimatorUpdateMode.Normal;
     }
 
     public void OnUnfocus()
     {
-        
+        HighlightOff();
+    }
+
+    Tween highlightTween;
+
+    public void HighlightOn()
+    {
+        highlightTween?.Kill();
+        highlightTween = leverSprite.DOColor(
+            new Color(1.5f, 1.5f, 1.5f, 1f),
+            0.15f
+        );
+    }
+
+    public void HighlightOff()
+    {
+        highlightTween?.Kill();
+        highlightTween = leverSprite.DOColor(Color.white, 0.15f);
     }
 
 }
