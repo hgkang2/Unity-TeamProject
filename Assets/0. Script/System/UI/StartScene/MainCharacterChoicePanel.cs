@@ -4,6 +4,8 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
 {
     [HideInInspector] public CanvasGroup cg;
     [SerializeField] MainCharacterChoiceSlot[] slots;
+    int focusedIndex = -1;
+    int selectedIndex = -1;
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
@@ -41,6 +43,14 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
 
     protected override void OnUIMove(Vector2 dir)
     {
-
+        
+    }
+    protected override void OnUICancel()
+    {
+        
+    }
+    protected override void OnUIConfirm()
+    {
+        
     }
 }

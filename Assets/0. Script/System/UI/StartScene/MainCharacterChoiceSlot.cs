@@ -1,9 +1,13 @@
 using System;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainCharacterChoiceSlot : MonoBehaviour
 {
+    [SerializeField] Image deSelectedImage;
+    [SerializeField] Image selectedImage;
+    [SerializeField] Image lockedImage;
     RectTransform rect;
 
     public event Action<CharacterId> characterSelected;
