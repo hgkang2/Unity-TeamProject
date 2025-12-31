@@ -210,7 +210,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1704646973}
         m_TargetAssemblyTypeName: UIDeveloperTool, Assembly-CSharp
         m_MethodName: ChangeTakeDamageValueText
         m_Mode: 1
@@ -49383,7 +49383,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1704646973}
         m_TargetAssemblyTypeName: UIDeveloperTool, Assembly-CSharp
         m_MethodName: ChangeTimeScaleValueText
         m_Mode: 1
@@ -51452,14 +51452,14 @@ MonoBehaviour:
   m_FillRect: {fileID: 1566826739}
   m_HandleRect: {fileID: 1648489755}
   m_Direction: 0
-  m_MinValue: -100
+  m_MinValue: 0
   m_MaxValue: 100
   m_WholeNumbers: 1
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1704646973}
         m_TargetAssemblyTypeName: UIDeveloperTool, Assembly-CSharp
         m_MethodName: ChangeGetExpValueText
         m_Mode: 1
@@ -51654,7 +51654,7 @@ GameObject:
   - component: {fileID: 604984126}
   - component: {fileID: 604984127}
   m_Layer: 3
-  m_Name: GameObject
+  m_Name: WallColliderLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73170,7 +73170,7 @@ GameObject:
   - component: {fileID: 1711617055}
   - component: {fileID: 1711617056}
   m_Layer: 3
-  m_Name: GameObject (1)
+  m_Name: WallColliderRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77546,7 +77546,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1704646973}
         m_TargetAssemblyTypeName: UIDeveloperTool, Assembly-CSharp
         m_MethodName: ChangeHealValueText
         m_Mode: 1
