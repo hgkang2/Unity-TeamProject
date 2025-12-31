@@ -40,10 +40,10 @@ public class StageUI : MonoBehaviour
 
     void Start()
     {
-        //모든 ui 닫기
+        //모든 ui 닫기(닫기 말고 CanvasGroup으로 되게 수정하기)
         escpanel.gameObject.SetActive(false);
         settingPanel.gameObject.SetActive(false);
-        levelUpPanel.gameObject.SetActive(false);
+        levelUpPanel.Hide();
         haveSoulsUI.gameObject.SetActive(false);
     }
     void OnDestroy()
@@ -120,14 +120,12 @@ public class StageUI : MonoBehaviour
     public void ShowLevelupPanel()
     {
         TimeManager.Pause();
-
-        levelUpPanel.gameObject.SetActive(true);
+        levelUpPanel.Show();
         levelUpPanel.Initialize();
     }
     public void HideLevelupPanel()
     {
-        levelUpPanel.gameObject.SetActive(false);
-
+        levelUpPanel.Hide();
         TimeManager.Resume();
     }
     //버튼 연결 이벤트

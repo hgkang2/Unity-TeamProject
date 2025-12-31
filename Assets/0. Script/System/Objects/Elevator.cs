@@ -1,59 +1,77 @@
+using System.Collections;
+using DG.Tweening;
 using UnityEngine;
-using UnityEngine.InputSystem.XR.Haptics;
 
-public class Elevator : IInteractable
+public class Elevator : MonoBehaviour, IInteractable
 {
+    [Header("순간이동할 위치")]
+    [SerializeField] Transform targetPos;
+
+
+    [Header("아래는 초기화용 건들지말기")]
     [SerializeField] Animator leverAnimator;
+    [SerializeField] SpriteRenderer leverSprite;
+
 
     private void Awake()
     {
-
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public bool CanInteract()
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public void Exit()
     {
-        throw new System.NotImplementedException();
-    }
 
-    public Vector2 GetInteractPoint()
-    {
-        throw new System.NotImplementedException();
     }
-
-    public void Interact(Player user)
+    public void Interact(Player player)
     {
         leverAnimator.SetTrigger("Interact");
+        leverAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+        StartCoroutine(GameManager.Instance.TeleportRoutine(player, targetPos));
+        StartCoroutine(Initialize());
+    }
+    IEnumerator Initialize()
+    {
+        yield return new WaitForSeconds(5);
+        leverAnimator.SetTrigger("Initialize");
+        leverAnimator.updateMode = AnimatorUpdateMode.Normal;
+        HighlightOff();
     }
 
     public bool IsAvailable()
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public void OnFocus()
     {
-        
+        HighlightOn();
+        leverAnimator.SetTrigger("OnFocus");
     }
 
     public void OnUnfocus()
     {
-        throw new System.NotImplementedException();
+        HighlightOff();
+    }
+
+    Tween highlightTween;
+
+    public void HighlightOn()
+    {
+        highlightTween?.Kill();
+        highlightTween = leverSprite.DOColor(
+            new Color(1.5f, 1.5f, 1.5f, 1f),
+            0.15f
+        );
+    }
+
+    public void HighlightOff()
+    {
+        highlightTween?.Kill();
+        highlightTween = leverSprite.DOColor(Color.white, 0.15f);
     }
 
 }

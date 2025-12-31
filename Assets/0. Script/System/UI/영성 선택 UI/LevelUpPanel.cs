@@ -6,6 +6,7 @@ using DG.Tweening;
 
 public class LevelUpPanel : UIKeyboardHandler
 {
+    public CanvasGroup cg;
     [SerializeField] SoulManager soulManager;
     SoulPanel[] soulPanels;
     [SerializeField] Button rerollButton;
@@ -21,6 +22,7 @@ public class LevelUpPanel : UIKeyboardHandler
     Vector3[] soulPanels_OriginPos = new Vector3[3];
     void Awake()
     {
+        cg = GetComponent<CanvasGroup>();
         soulPanels = GetComponentsInChildren<SoulPanel>();
         for (int i = 0; i < 3; i++)
         {
@@ -397,17 +399,27 @@ public class LevelUpPanel : UIKeyboardHandler
     }
     #endregion
 
+    public void Show()
+    {
+        cg.alpha = 1;
+        EnableInput();
+    }
+    public void Hide()
+    {
+        cg.alpha = 0;
+        DisableInput();
+    }
     bool canInput = false;
     void EnableInput()
     {
-        SubscribeChildEvent();
-        rerollButton.gameObject.SetActive(true);
+        cg.blocksRaycasts = true;
+        cg.interactable = true;
         canInput = true;
     }
     void DisableInput()
     {
-        UnSubscribeChildEvent();
-        rerollButton.gameObject.SetActive(false);
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
         canInput = false;
     }
     

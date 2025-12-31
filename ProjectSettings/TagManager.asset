@@ -17,9 +17,9 @@ TagManager:
   - UI
   - Player
   - Ground
+  - Bead
   - 
-  - 
-  - 
+  - IInteractable
   - 
   - 
   - 

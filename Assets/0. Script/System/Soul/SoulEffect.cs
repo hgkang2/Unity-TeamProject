@@ -32,10 +32,11 @@ public class SoulEffect
     [Label("습득 스킬")]
     public CharacterSkills skillToLearn;
 
-    [ShowIf("ShowSoulEtcEffect")]
-    [AllowNesting]
-    [Label("기타 효과")]
-    public SoulETCEffect soulEtcEffect;
+    // 나중에 ETC가 필요해질 만큼 많이 생기면 적용
+    // [ShowIf("ShowSoulEtcEffect")]
+    // [AllowNesting]
+    // [Label("기타 효과")]
+    // public SoulETCEffect soulEtcEffect;
 
     [ShowIf("ShowHealAmount")]
     [AllowNesting]

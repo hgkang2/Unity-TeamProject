@@ -1,8 +1,13 @@
+using System.Collections;
+using DG.Tweening;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] CanvasGroup fade;
+    CinemachineCamera cinemachineCamera;
     public CharacterId curcharacter;
     static GameManager instance;
     public static GameManager Instance
@@ -19,6 +24,7 @@ public class GameManager : MonoBehaviour
             return instance;
         }
     }
+    [SerializeField] CinemachineCamera cam;
 
     void Awake()
     {
@@ -44,15 +50,70 @@ public class GameManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if(cinemachineCamera == null)
+        {
+            cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+        }
         switch (scene.name)
         {
             case "Stage1":
                 SoundManager.Instance.PlayBGM("Stage1");
+                cam = FindFirstObjectByType<CinemachineCamera>();
                 break;
         }
     }
 
 
+    public IEnumerator TeleportRoutine(Player p, Transform targetPosition)
+    {
+
+        TimeManager.Pause();
+        yield return FadeOutRoutine(1f);   // 끝날 때까지 대기
+
+        Vector3 oldPos = p.transform.position;
+        Vector3 newPos = targetPosition.position;
+        Vector3 delta = newPos - oldPos;
+
+        p.transform.position = newPos;
+        cam.OnTargetObjectWarped(p.transform, delta);
+
+        TimeManager.Resume();
+        yield return FadeInRoutine(1f);    // 끝날 때까지 대기
+
+    }
+
+    IEnumerator FadeOutRoutine(float duration)
+    {
+        fade.blocksRaycasts = true;
+
+        float t = 0f;
+        float start = fade.alpha;
+
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            fade.alpha = Mathf.Lerp(start, 1f, t / duration);
+            yield return null;
+        }
+
+        fade.alpha = 1f;
+    }
+
+    IEnumerator FadeInRoutine(float duration)
+    {
+        float t = 0f;
+        float start = fade.alpha;
+
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            fade.alpha = Mathf.Lerp(start, 0f, t / duration);
+            yield return null;
+        }
+
+        fade.alpha = 0f;
+        fade.blocksRaycasts = false;
+    }
 
     public void SetCharacter(int num)
     {
