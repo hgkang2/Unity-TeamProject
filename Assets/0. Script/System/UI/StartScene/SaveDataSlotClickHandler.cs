@@ -1,1 +1,0 @@
-public class SaveDataSlotClickHandler : UIClickHandler<SaveData>{}

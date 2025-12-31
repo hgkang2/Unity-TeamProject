@@ -1,3 +1,5 @@
+using System;
+using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -7,58 +9,48 @@ public class MainSaveDataPanel : UIKeyboardHandler
     [HideInInspector] public CanvasGroup cg;
 
     [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
-    SaveDataEventAggregator aggregator;
 
     [SerializeField] MainSaveDataSlot[] slots;
+    int? focusedIndex;
+    
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
-        aggregator = GetComponent<SaveDataEventAggregator>();
+        foreach(var slot in slots)
+        {
+            slot.slotFocused += HandleSlotEnter;
+            slot.slotUnFocused += HandleSlotExit;
+            slot.slotselected += HandleSlotLeftClick;
+        }
     }
 
     void Start()
     {
-        aggregator.RebuildViews();
+        // 나중에 세이브 로드 구현시 제대로 하기
         foreach (var slot in slots)
         {
             slot.Bind(null);
         }
-
     }
 
-    protected override void OnUIEnabled()
+    void HandleSlotEnter(int index)
     {
-        if (aggregator != null)
-        {
-            aggregator.MouseEntered += HandleSlotEnter;
-            aggregator.MouseExited += HandleSlotExit;
-            aggregator.LeftClicked += HandleSlotLeftClick;
-        }
+        focusedIndex = index;
+        UpdatFocusHighlight();
     }
 
-    protected override void OnUIDisabled()
+    void HandleSlotExit(int index)
     {
-        if (aggregator != null)
-        {
-            aggregator.MouseEntered -= HandleSlotEnter;
-            aggregator.MouseExited -= HandleSlotExit;
-            aggregator.LeftClicked -= HandleSlotLeftClick;
-        }
-    }
-    void HandleSlotEnter(SlotEventArgs<SaveData> args)
-    {
-
+        focusedIndex = null;
+        UpdatFocusHighlight();
     }
 
-    void HandleSlotExit(SlotEventArgs<SaveData> args)
+    void HandleSlotLeftClick(int index)
     {
-    }
-
-    void HandleSlotLeftClick(SlotEventArgs<SaveData> args)
-    {
-        if (args.Data == null)
+        if (slots[index].SaveData == null)
         {
             mainCharacterChoicePanel.Open();
+            this.enabled = false;
         }
         else
         {
@@ -84,6 +76,45 @@ public class MainSaveDataPanel : UIKeyboardHandler
 
     protected override void OnUIMove(Vector2 dir)
     {
+                // 현재 아무것도 선택되지 않은 상태라면
+        if (focusedIndex == null)
+        {
+            // 위쪽 → 0번 선택
+            if (dir.y > 0.1f) focusedIndex = 0;
+            // 아래쪽 → 마지막 선택
+            else if (dir.y < -0.1f) focusedIndex = slots.Length - 1;
+
+            UpdatFocusHighlight();
+            return;
+        }
+
+        //위쪽 방향키시 위쪽 방향으로
+        if (dir.y > 0.1f) focusedIndex--;
+        //아래쪽 방향키시 아래쪽 방향으로
+        else if (dir.y < -0.1f) focusedIndex++;
+
+        //min, max 처리
+        if (focusedIndex < 0) focusedIndex = 0;
+        else if (focusedIndex >= slots.Length) focusedIndex = slots.Length - 1;
+
+        //강조된 버튼 변경
+        UpdatFocusHighlight();
+    }
+    protected override void OnUIConfirm()
+    {
+        if(focusedIndex == null) return;
+        HandleSlotLeftClick((int)focusedIndex);
+    }
+    void UpdatFocusHighlight()
+    {
+        foreach(var slot in slots)
+        {
+            slot.UnFocused();
+        }
+        if(focusedIndex != null)
+        {
+            slots[(int)focusedIndex].Focused();
+        }
     }
 
     //X 버튼 눌렀을 때

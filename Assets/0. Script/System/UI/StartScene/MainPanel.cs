@@ -29,18 +29,10 @@ public class MainPanel : UIKeyboardHandler
             .Where(b => b != null)
             .ToArray();
     }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    
     void Start()
     {
-
         ButtonSelectImage.gameObject.SetActive(false);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     void OnDestroy()
@@ -87,19 +79,19 @@ public class MainPanel : UIKeyboardHandler
         // 현재 아무것도 선택되지 않은 상태라면
         if (curIndex == null)
         {
-            // 왼쪽/위쪽 → 0번 선택
-            if (dir.x < -0.1f || dir.y > 0.1f) curIndex = 0;
-            // 오른쪽/아래쪽 → 마지막 선택
-            else if (dir.x > 0.1f || dir.y < -0.1f) curIndex = menuButtons.Length - 1;
+            // 위쪽 → 0번 선택
+            if (dir.y > 0.1f) curIndex = 0;
+            // 아래쪽 → 마지막 선택
+            else if (dir.y < -0.1f) curIndex = menuButtons.Length - 1;
 
             UpdateButtonHighlight();
             return;
         }
 
-        //왼쪽 or 위쪽 방향키시 위쪽 방향으로
-        if (dir.x < -0.1f || dir.y > 0.1) curIndex--;
-        //오른쪽 or 아래쪽 방향키시 아래쪽 방향으로
-        else if (dir.x > 0.1f || dir.y < -0.1) curIndex++;
+        //위쪽 방향키시 위쪽 방향으로
+        if (dir.y > 0.1) curIndex--;
+        //아래쪽 방향키시 아래쪽 방향으로
+        else if (dir.y < -0.1) curIndex++;
 
         //min, max 처리
         if (curIndex < 0) curIndex = 0;
@@ -118,7 +110,7 @@ public class MainPanel : UIKeyboardHandler
             UpdateButtonHighlight();
         }
     }
-
+    
     protected override void OnUIConfirm()
     {
         //선택 버튼이 없으면 무시

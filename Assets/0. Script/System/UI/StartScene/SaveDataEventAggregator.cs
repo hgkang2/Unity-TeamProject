@@ -1,1 +1,0 @@
-public class SaveDataEventAggregator : PanelEventAggregator<SaveData>{}

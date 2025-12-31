@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] CanvasGroup fade;
     CinemachineCamera cinemachineCamera;
-    public CharacterId curcharacter;
+    public CharacterId curcharacter = CharacterId.None;
     static GameManager instance;
     public static GameManager Instance
     {

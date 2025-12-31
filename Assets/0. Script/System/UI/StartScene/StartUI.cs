@@ -11,19 +11,21 @@ public class StartUI : UIKeyboardHandler
     [SerializeField] Image openingImage;
 
     [SerializeField] MainPanel mainPanel;
-    [SerializeField] MainSaveDataPanel mainLoadPanel;
+    [SerializeField] MainSaveDataPanel mainSaveDataPanel;
     [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
+    [SerializeField] MainCharacterConfirmPanel mainCharacterConfirmPanel;
     [SerializeField] MainExitPanel mainExitPanel;
 
-    DG.Tweening.Sequence openingSequence;
+    Sequence openingSequence;
 
     bool isOpeningPhase = true;
 
     void Awake()
     {
         mainPanel.gameObject.SetActive(true);
-        mainLoadPanel.gameObject.SetActive(true);
+        mainSaveDataPanel.gameObject.SetActive(true);
         mainCharacterChoicePanel.gameObject.SetActive(true);
+        mainCharacterConfirmPanel.gameObject.SetActive(true);
         mainExitPanel.gameObject.SetActive(true);
     }
 
@@ -31,8 +33,9 @@ public class StartUI : UIKeyboardHandler
     {
         // 다른 UI들 숨긴 상태로 시작
         mainPanel.Close();
-        mainLoadPanel.Close();
+        mainSaveDataPanel.Close();
         mainCharacterChoicePanel.Close();
+        mainCharacterConfirmPanel.Close();
         mainExitPanel.Close();
 
         // 오프닝은 보이게
@@ -86,6 +89,10 @@ public class StartUI : UIKeyboardHandler
         // 얘는 esc만 받기
     }
 
+    public void UICancel()
+    {
+        OnUICancel();
+    }
     protected override void OnUICancel()
     {
         //오프닝이라면 스킵
@@ -97,23 +104,37 @@ public class StartUI : UIKeyboardHandler
         if (mainExitPanel.cg.blocksRaycasts)
         {
             mainExitPanel.Close();
+            mainPanel.enabled = true;
+            return;
+        }
+        if (mainCharacterConfirmPanel.cg.blocksRaycasts)
+        {
+            mainCharacterConfirmPanel.Close();
+            mainCharacterChoicePanel.enabled = true;
             return;
         }
         if (mainCharacterChoicePanel.cg.blocksRaycasts)
         {
             mainCharacterChoicePanel.Close();
+            mainSaveDataPanel.enabled = true;
             return;
         }
-        if (mainLoadPanel.cg.blocksRaycasts)
+        if (mainSaveDataPanel.cg.blocksRaycasts)
         {
-            mainLoadPanel.Close();
+            mainSaveDataPanel.Close();
+            mainPanel.enabled = true;
             return;
         }
+        mainPanel.enabled = false;
         mainExitPanel.Open();
     }
     #endregion
 
-
+    public void OpenMainSaveDatePanel()
+    {
+        mainSaveDataPanel.Open();
+        mainPanel.enabled = false;
+    }
     public void Quit()
     {
         GameManager.Instance.QuitGame();

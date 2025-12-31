@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class MainSaveDataSlot : MonoBehaviour, IInteractiveView<SaveData>
+public class MainSaveDataSlot : MonoBehaviour
 {
     [SerializeField] CanvasGroup newTravelCG;
     [SerializeField] CanvasGroup loadTravelCG;
@@ -16,38 +16,24 @@ public class MainSaveDataSlot : MonoBehaviour, IInteractiveView<SaveData>
     [SerializeField] TMP_Text PlayTime;
     [SerializeField] TMP_Text Chapter;
 
-
-    public UIPointerHandler PointerHandler { get; private set; }
-    public UIClickHandler ClickHandler { get; private set; }
-    public UIDragHandler DragHandler => null;
-
     public RectTransform Rect { get; private set; }
-    public GameObject GO => gameObject;
 
     SaveData saveData;
+    public SaveData SaveData => saveData;
+
+    public int myIndex;
+
+    public event Action<int> slotselected;
+    public void RaiseSlotSelected() => slotselected?.Invoke(myIndex);
+    public event Action<int> slotFocused;
+    public void RaiseSlotFocused() => slotFocused?.Invoke(myIndex);
+    public event Action<int> slotUnFocused;
+    public void RaiseSlotUnFocused() => slotUnFocused?.Invoke(myIndex);
 
     void Awake()
     {
         Rect = transform as RectTransform;
-
-        UIPointerHandler<SaveData> myPointerHandler = GetComponent<UIPointerHandler<SaveData>>();
-        PointerHandler = myPointerHandler;
-
-        myPointerHandler.GetData = () => saveData;
-        myPointerHandler.GetRect = () => Rect;
-
-        myPointerHandler.PointerEntered += HandlePointerEnter;
-        myPointerHandler.PointerExited += HandlePointerExit;
-
-
-        UIClickHandler<SaveData> myClickHandler = GetComponent<UIClickHandler<SaveData>>();
-        ClickHandler = myClickHandler;
-
-        myClickHandler.GetData = () => saveData;
-
-
     }
-
 
     public void Bind(SaveData data)
     {
@@ -59,7 +45,6 @@ public class MainSaveDataSlot : MonoBehaviour, IInteractiveView<SaveData>
         }
         else
         {
-
             loadTravelCG.alpha = 1;
             loadTravelCG.blocksRaycasts = true;
             loadTravelCG.interactable = true;
@@ -82,27 +67,16 @@ public class MainSaveDataSlot : MonoBehaviour, IInteractiveView<SaveData>
     }
 
 
-    void HandlePointerEnter(SaveData data, RectTransform rect, PointerEventData eventData)
-    {
-        Selected();
-    }
-
-    void HandlePointerExit()
-    {
-        DeSelected();
-    }
-
-    
     public float hoverScale = 1.05f;
     public float tweenDuration = 0.15f;
-    void Selected()
+    public void Focused()
     {
         Rect.DOKill(); // 기존 트윈 제거
         Rect.DOScale(hoverScale, tweenDuration)
             .SetEase(Ease.OutBack);
     }
 
-    void DeSelected()
+    public void UnFocused()
     {
         Rect.DOKill();
         Rect.DOScale(0.95f, tweenDuration)

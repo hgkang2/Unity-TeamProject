@@ -1,30 +1,108 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MainCharacterChoicePanel : UIKeyboardHandler
 {
     [HideInInspector] public CanvasGroup cg;
     [SerializeField] MainCharacterChoiceSlot[] slots;
-    int focusedIndex = -1;
-    int selectedIndex = -1;
+    [SerializeField] MainCharacterConfirmPanel confirmPanel;
+
+    public bool CanClose => !confirmPanel.cg.blocksRaycasts;
+
+    public int? focusedIndex = -1;
+    public int? selectedIndex = -1;
+    
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
 
         foreach(var slot in slots)
         {
-            slot.characterSelected += GameStart;
+            slot.slotselected += SelectSlot;
+            slot.slotFocused += FocusSlot;
+            slot.slotUnFocused += UnFocusSlot;
+            slot.UnFocus();
         }
     }
-
-
-    // TODO 확인창 이후 Start로 바꾸기?
-    public void GameStart(CharacterId id)
+    private void Start()
     {
-        GameManager.Instance.curcharacter = id;
-        SceneLoader.LoadScene("Stage1");
-        
+        confirmPanel.Close();
+    }
+    void FocusSlot(CharacterId id)
+    {
+        focusedIndex = (int)id-1;
+        slots[(int)id-1].Focus();
     }
 
+    void UnFocusSlot(CharacterId id)
+    {
+        focusedIndex = null;
+        slots[(int)id-1].UnFocus();
+    }
+
+    void SelectSlot(CharacterId id)
+    {
+        OnUIConfirm();
+    }
+
+
+    // ConfirmPanel->ConfirmButton OnClick Event
+    public void GameStart()
+    {
+        Debug.Log((selectedIndex+1));
+        GameManager.Instance.curcharacter = (CharacterId)(selectedIndex+1);
+        SceneLoader.LoadScene("Stage1");
+    }
+
+    protected override void OnUIMove(Vector2 dir)
+    {
+        // 현재 아무것도 선택되지 않은 상태라면
+        if (focusedIndex == null)
+        {
+            // 왼쪽 → 0번 선택
+            if (dir.x < -0.1f) focusedIndex = 0;
+            // 오른쪽 → 마지막 선택
+            else if (dir.x > 0.1f) focusedIndex = slots.Length - 1;
+
+            UpdatFocusHighlight();
+            return;
+        }
+
+        //왼쪽 방향키시 위쪽 방향으로
+        if (dir.x < -0.1f) focusedIndex--;
+        //오른쪽 방향키시 아래쪽 방향으로
+        else if (dir.x > 0.1f) focusedIndex++;
+
+        //min, max 처리
+        if (focusedIndex < 0) focusedIndex = 0;
+        else if (focusedIndex >= slots.Length) focusedIndex = slots.Length - 1;
+
+        //강조된 버튼 변경
+        UpdatFocusHighlight();
+    }
+    void UpdatFocusHighlight()
+    {
+        foreach(var slot in slots) slot.UnFocus();
+        if(focusedIndex != null)
+        {
+            slots[(int)focusedIndex].Focus();
+        }
+    }
+    protected override void OnUIConfirm()
+    {
+        if(focusedIndex == null) return;
+        selectedIndex = focusedIndex;
+        focusedIndex = null;
+        UpdatFocusHighlight();
+        
+        confirmPanel.Open();
+        confirmPanel.Set(slots[(int)selectedIndex].id.ToString());
+
+        this.enabled = false;
+    }
+
+
+    
     public void Open()
     {
         cg.alpha = 1f;
@@ -39,18 +117,5 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
         cg.blocksRaycasts = false;
         cg.interactable = false;
         enabled = false;
-    }
-
-    protected override void OnUIMove(Vector2 dir)
-    {
-        
-    }
-    protected override void OnUICancel()
-    {
-        
-    }
-    protected override void OnUIConfirm()
-    {
-        
     }
 }
