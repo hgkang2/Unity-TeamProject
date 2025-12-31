@@ -26,6 +26,10 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        if(cinemachineCamera == null)
+        {
+            cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+        }
         // 중복 방지
         if (instance != null && instance != this)
         {

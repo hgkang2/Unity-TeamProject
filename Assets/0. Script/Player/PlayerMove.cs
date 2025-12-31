@@ -451,6 +451,7 @@ public class PlayerMove : MonoBehaviour
     public bool isWallSliding = false;
     public LayerMask wallMask;
     [SerializeField] float wallCheckDistance = 0.5f;
+    [SerializeField] float wallCheckYOffset = 0f;
     [SerializeField] float wallSlideSpeed = 2f;
     [SerializeField] float wallJumpForceX = 10f;
     [SerializeField] float wallJumpForceY = 15f;
@@ -475,7 +476,8 @@ public class PlayerMove : MonoBehaviour
         Bounds b = col.bounds;
 
         // 벽 판정용 중앙 레이
-        Vector2 rayOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, b.center.y);
+        float rayY = b.center.y + wallCheckYOffset;
+        Vector2 rayOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, rayY);
         Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
 
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, wallCheckDistance, wallMask);
@@ -518,15 +520,38 @@ public class PlayerMove : MonoBehaviour
             isWallGrabbing = false;
             isWallSliding = false;
         }
-        
-        // 하체에만 벽이 있을때 스턱 방지용 발끝 레이
-        Vector2 footOrigin = new Vector2(rayOrigin.x, b.min.y + footWallCheckYOffset);
-        RaycastHit2D footHit = Physics2D.Raycast(footOrigin, rayDirection, footWallCheckDistance, wallMask);
-        isFootTouchingWall = (footHit.collider != null);
+
+        // 전방 머리나 하체쪽에 벽이 있을때 스턱 방지용 면 체크
+        Vector2 castOrigin = b.center;
+        Vector2 castSize = b.size;
+
+        hit = Physics2D.BoxCast(
+            castOrigin,
+            castSize,
+            0f,
+            rayDirection,
+            footWallCheckDistance,
+            wallMask
+        );
+
+        isFootTouchingWall = (hit.collider != null);
 
 #if UNITY_EDITOR
         Color footColor = isFootTouchingWall ? Color.magenta : Color.cyan;
-        Debug.DrawLine(footOrigin, footOrigin + rayDirection * footWallCheckDistance, footColor);
+
+        // 박스 윤곽 + 캐스트 방향 표시
+        Vector2 half = castSize * 0.5f;
+        Vector2 p1 = castOrigin + new Vector2(-half.x, -half.y);
+        Vector2 p2 = castOrigin + new Vector2(-half.x, half.y);
+        Vector2 p3 = castOrigin + new Vector2(half.x, half.y);
+        Vector2 p4 = castOrigin + new Vector2(half.x, -half.y);
+
+        Debug.DrawLine(p1, p2, footColor);
+        Debug.DrawLine(p2, p3, footColor);
+        Debug.DrawLine(p3, p4, footColor);
+        Debug.DrawLine(p4, p1, footColor);
+
+        Debug.DrawLine(castOrigin, castOrigin + rayDirection * footWallCheckDistance, footColor);
 #endif
     }
     #endregion
