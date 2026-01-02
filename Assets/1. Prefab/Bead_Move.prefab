@@ -108,9 +108,8 @@ MonoBehaviour:
     targetStat: 4
     flatValue: 0
     percentValue: 0
-    bonusValue: 1
+    bonusValue: 0.1
     skillToLearn: 0
-    soulEtcEffect: 0
     healAmount: 0
 --- !u!58 &7816902692215733894
 CircleCollider2D:
