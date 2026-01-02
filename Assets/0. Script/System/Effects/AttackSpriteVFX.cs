@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SerenaBasicAttackVFX : MonoBehaviour
+public class AttackSpriteVFX : MonoBehaviour
 {
     void Start()
     {

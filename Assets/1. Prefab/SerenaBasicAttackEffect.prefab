@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4995499123744489233}
   - component: {fileID: 3650728419969054519}
   m_Layer: 0
-  m_Name: SerenaBasicAttackVFX
+  m_Name: SerenaBasicAttackEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

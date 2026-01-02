@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a5f1d76786c83214d9a7ec4548cab063
+guid: b4be3e7ddb1ef1748928dcfb87f71372
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -163367579769906063
-    second: "UI \uBAB8\uD1B5_0"
+      213: -3213338478731498277
+    second: d2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "UI \uBAB8\uD1B5_0"
+      name: d2_0
       rect:
         serializedVersion: 2
-        x: 484
-        y: 118
-        width: 952
-        height: 713
+        x: 461
+        y: 95
+        width: 102
+        height: 475
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 17cdfff3d0a9bbdf0800000000000000
-      internalID: -163367579769906063
+      spriteID: bdc6d18bdade763d0800000000000000
+      internalID: -3213338478731498277
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "UI \uBAB8\uD1B5_0": -163367579769906063
+      d2_0: -3213338478731498277
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -126,7 +126,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normalHitbox: {fileID: 3068524302203164029}
   upHitbox: {fileID: 4931711516456578153}
-  jumpHitbox: {fileID: 1864714764398149594}
   downHitbox: {fileID: 7484912635782620706}
   basicAttackVFX: {fileID: 6225071935297065222, guid: 1de816a5707f6de4b87623b5bce4cf86, type: 3}
   basicAttackPos: {fileID: 4482612463717817495}
@@ -151,6 +150,7 @@ MonoBehaviour:
   airControlLerp: 6
   mygravity: 0
   maxJumpCount: 1
+  wallJumpForceX: 5
   apexGravityMultiplier: 0.66
   apexThreshold: 0.6
   fallGravityMultiplier: 2.5
@@ -170,8 +170,6 @@ MonoBehaviour:
   wallCheckDistance: 0.03
   wallCheckYOffset: -0.22
   wallSlideSpeed: 2
-  wallJumpForceX: 10
-  wallJumpForceY: 15
   isFootTouchingWall: 0
   footWallCheckDistance: 0.02
   footWallCheckYOffset: 0

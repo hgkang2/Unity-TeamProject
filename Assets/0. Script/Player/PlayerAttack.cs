@@ -17,7 +17,7 @@ public class PlayerAttack : MonoBehaviour
     [Header("각 공격별 히트박스")]
     [SerializeField] PlayerHitBox normalHitbox;
     [SerializeField] PlayerHitBox upHitbox;
-    [SerializeField] PlayerHitBox jumpHitbox;
+    //[SerializeField] PlayerHitBox jumpHitbox;
     [SerializeField] PlayerHitBox downHitbox;
     //[SerializeField] PlayerHitBox specialHitbox;
 
@@ -47,7 +47,7 @@ public class PlayerAttack : MonoBehaviour
     {
         normalHitbox.OnHit += HandleHit;
         upHitbox.OnHit += HandleHit;
-        jumpHitbox.OnHit += HandleHit;
+        //jumpHitbox.OnHit += HandleHit;
         downHitbox.OnHit += HandleHit;
         //specialHitbox.OnHit += HandleHit;
         InputManager.Instance.AttackPressed += HandleAttackPressed;
@@ -57,7 +57,7 @@ public class PlayerAttack : MonoBehaviour
     {
         normalHitbox.OnHit -= HandleHit;
         upHitbox.OnHit -= HandleHit;
-        jumpHitbox.OnHit -= HandleHit;
+        //jumpHitbox.OnHit -= HandleHit;
         downHitbox.OnHit -= HandleHit;
         //specialHitbox.OnHit -= HandleHit;
         InputManager.Instance.AttackPressed -= HandleAttackPressed;
@@ -138,11 +138,11 @@ public class PlayerAttack : MonoBehaviour
             sfxKey = "SpecialAttack";
         }
         // 점프 버튼 + 공중일경우만
-        else if (InputManager.Instance.IsJumpHeld && !playerMove.isGrounded)
-        {
-            type = AttackType.Jump;
-            sfxKey = "Attack";
-        }
+        // else if (InputManager.Instance.IsJumpHeld && !playerMove.isGrounded)
+        // {
+        //     type = AttackType.Jump;
+        //     sfxKey = "Attack";
+        // }
         else
         {
             type = AttackType.Normal;
@@ -223,9 +223,9 @@ public class PlayerAttack : MonoBehaviour
             case AttackType.Up:
                 if (upHitbox != null) upHitbox.col.enabled = true;
                 break;
-            case AttackType.Jump:
-                if (jumpHitbox != null) jumpHitbox.col.enabled = true;
-                break;
+            // case AttackType.Jump:
+            //     if (jumpHitbox != null) jumpHitbox.col.enabled = true;
+            //     break;
             case AttackType.Down:
                 if (downHitbox != null) downHitbox.col.enabled = true;
                 break;
@@ -240,7 +240,7 @@ public class PlayerAttack : MonoBehaviour
         if (normalHitbox != null) normalHitbox.col.enabled = false;
         if (upHitbox != null) upHitbox.col.enabled = false;
         if (downHitbox != null) downHitbox.col.enabled = false;
-        if (jumpHitbox != null) jumpHitbox.col.enabled = false;
+        //if (jumpHitbox != null) jumpHitbox.col.enabled = false;
         //if (specialHitbox != null) specialHitbox.enabled = false;
     }
 

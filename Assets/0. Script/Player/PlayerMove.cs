@@ -66,7 +66,8 @@ public class PlayerMove : MonoBehaviour
         if (TimeManager.IsPaused) return;
         if (player.HP.IsDead) return;
 
-        if (!player.CanControl)
+        // 플레이어 조작 불가 상태 or 벽점프후 0.25초 이내
+        if (!player.CanControl || Time.time < wallJumpTime + 0.25f)
         {
             inputVec = Vector2.zero;
             return;
@@ -90,7 +91,7 @@ public class PlayerMove : MonoBehaviour
         GetGroundDistance();
 
         // 2) 점프
-        bool canNormalControl = !player.isDodging && player.CanControl && !player.isAirDownAttack && !isWallGrabbing && !isWallSliding;
+        bool canNormalControl = player.CanControl && !player.isAirDownAttack;
         if (canNormalControl)
         {
             HandleJump();
@@ -137,6 +138,8 @@ public class PlayerMove : MonoBehaviour
         if (playerAttack.isAttacking) return;
         lastJumpPressedTime = Time.time;
     }
+
+    float wallJumpTime;
 
     #region 속도 적용
     public void StopMoveOnce()
@@ -190,7 +193,10 @@ public class PlayerMove : MonoBehaviour
             newX = isGrounded
                 ? targetX
                 : Mathf.Lerp(rb.linearVelocity.x, targetX, Time.fixedDeltaTime * airControlLerp);
-
+            if(Time.time < wallJumpTime + 0.25f)
+            {
+                newX = rb.linearVelocityX;
+            }
             // 발끝이 벽에 걸리면 움직이지 않기
             if (!isGrounded && isFootTouchingWall && !isWallGrabbing && !isWallSliding)
             {
@@ -253,6 +259,7 @@ public class PlayerMove : MonoBehaviour
         sfx.Play("Jump");
     }
 
+    public float wallJumpForceX = 5;
     void HandleWallJump()
     {
         isWallGrabbing = false;
@@ -263,11 +270,12 @@ public class PlayerMove : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
 
-        Vector2 wallJumpVec = new Vector2(wallJumpForceX * jumpDir, wallJumpForceY);
+        Vector2 wallJumpVec = new Vector2(wallJumpForceX * jumpDir, stats.curJumpForce);
         rb.AddForce(wallJumpVec, ForceMode2D.Impulse);
         sfx.Play("JumpVoice");
 
         currentJumpCount--;
+        wallJumpTime = Time.time;
     }
     #endregion
 
@@ -453,8 +461,6 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] float wallCheckDistance = 0.5f;
     [SerializeField] float wallCheckYOffset = 0f;
     [SerializeField] float wallSlideSpeed = 2f;
-    [SerializeField] float wallJumpForceX = 10f;
-    [SerializeField] float wallJumpForceY = 15f;
 
 
     public bool isFootTouchingWall = false;
