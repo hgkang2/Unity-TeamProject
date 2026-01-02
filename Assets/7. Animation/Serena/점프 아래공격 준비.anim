@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: "\uC810\uD504 \uC544\uB798\uACF5\uACA9"
+  m_Name: "\uC810\uD504 \uC544\uB798\uACF5\uACA9 \uC900\uBE44"
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,7 +21,7 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 21300000, guid: adab2a67da3e08642844ba049c6212e7, type: 3}
+      value: {fileID: 21300000, guid: 0f99ad935b28fca4cb74c79d6f96c2a5, type: 3}
     attribute: m_Sprite
     path: PlayerSprite
     classID: 212
@@ -44,7 +44,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
-    - {fileID: 21300000, guid: adab2a67da3e08642844ba049c6212e7, type: 3}
+    - {fileID: 21300000, guid: 0f99ad935b28fca4cb74c79d6f96c2a5, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -71,9 +71,9 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0
-    functionName: OnHitboxOn
+    functionName: UsePlayerSprite
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
-    intParameter: 3
+    intParameter: 0
     messageOptions: 0

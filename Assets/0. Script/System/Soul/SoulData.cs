@@ -87,7 +87,7 @@ public class SoulData : ScriptableObject
         switch (effect.type)
         {
             case SoulEffectType.StatFlat:
-                return effect.flatValue;
+                return (int)effect.flatValue;
             case SoulEffectType.StatPercent:
                 return effect.percentValue;
             case SoulEffectType.IncreaseJumpNum:

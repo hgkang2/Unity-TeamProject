@@ -274,7 +274,7 @@ public class PlayerMove : MonoBehaviour
         rb.AddForce(wallJumpVec, ForceMode2D.Impulse);
         sfx.Play("JumpVoice");
 
-        currentJumpCount--;
+        currentJumpCount = 0;
         wallJumpTime = Time.time;
     }
     #endregion

@@ -1,4 +1,5 @@
 using System.Globalization;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ public class PlayerAttack : MonoBehaviour
     HitVfx hitVfx;
     LocalSFX sfx;
     string sfxKey;
+    string vfxKey;
 
     //Player 아래에 각 공격 범위 별로 히트박스 만들기 후 
     //4개다 Player-PlayerAttack 인스펙터에 끝어다 넣기(Player 하위에 만들어논거 참고)
@@ -130,12 +132,14 @@ public class PlayerAttack : MonoBehaviour
         {
             type = AttackType.Up;
             sfxKey = "Attack";
+            vfxKey = "UpAttack";
         }
         // 아래 방향키 + 공중일경우만
         else if (inputDir.y < -0.5f && !playerMove.isGrounded)
         {
             type = AttackType.Down;
             sfxKey = "SpecialAttack";
+            vfxKey = "DownAttack";
         }
         // 점프 버튼 + 공중일경우만
         // else if (InputManager.Instance.IsJumpHeld && !playerMove.isGrounded)
@@ -146,20 +150,14 @@ public class PlayerAttack : MonoBehaviour
         else
         {
             type = AttackType.Normal;
-            attackVFX = basicAttackVFX;
             attackVFXPos = basicAttackPos;
             sfxKey = "Attack";
+            vfxKey = "Attack";
         }
-        
-
         StartAttack(type);
+        
     }
-    GameObject attackVFX; Transform attackVFXPos;
-    public void PlayAttackVFX()
-    {
-        GameObject obj = Instantiate(attackVFX, attackVFXPos);
-        obj.transform.SetParent(null);
-    }
+    Transform attackVFXPos;
 
     void HandleSpecialAttackPressed()
     {
@@ -182,19 +180,12 @@ public class PlayerAttack : MonoBehaviour
         isAttacking = true;
     }
 
-    // 각 공격 애니메이션의 첫 프레임에 연결 (꼭 숫자도 채우기)
-    // HeroKnight_Attack animation 참고
-    public void OnAttackStart(int attackId)
-    {
-        //isAttacking = true; 이미 위에 있음
-        //추후 공격 시작시 필요한 것 추가하기
-    }
-
     // 각 공격 애니메이션의 공격 시작 프레임에 연결
     public void OnHitboxOn(int attackId)
     {
         AttackType type = (AttackType)attackId;
         EnableHitbox(type);
+        VFXManager.Instance.PlayAttackSpriteVFX(vfxKey, player.transform, player.transform.position, Quaternion.identity);
     }
 
     // 각 공격 애니메이션의 공격 끝 프레임에 연결

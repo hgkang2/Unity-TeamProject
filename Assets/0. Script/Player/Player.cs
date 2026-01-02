@@ -158,6 +158,7 @@ public class Player : MonoBehaviour, IDamageable
     IEnumerator AirDownRoutine()
     {
         // 준비 시간 동안 대기
+        
         while (Time.time < airDownPrepareEndTime)
         {
             yield return null;
@@ -167,12 +168,17 @@ public class Player : MonoBehaviour, IDamageable
         isAirDownPrepare = false;
 
         // PlayerMove에서 낙하를 처리 중이므로, 착지까지 기다리기
+        anim.SetInteger("AttackType", 4);
         while (!playerMove.isGrounded)
         {
             yield return null;
         }
 
-        // 착지 순간 도착
+        // 착지 후 딜레이
+        VFXManager.Instance.PlayAttackSpriteVFX("ImpactWave", transform, transform.position, Quaternion.identity);
+        yield return new WaitForSeconds(0.25f);;
+
+        // 공격 끝
         EndAirDownAttack();
     }
     
@@ -183,8 +189,10 @@ public class Player : MonoBehaviour, IDamageable
     void EndAirDownAttack()
     {
         isAirDownAttack = false;
+        playerAttack.EndAttack();
         EndInvincible();
         anim.ResetTrigger("Land");
+        anim.SetTrigger("AttackEnd");
         CameraManager.Instance.Shake(cameraShakeAmplitude, cameraShakeFrequency, cameraShakeDuration);
     }
     #endregion

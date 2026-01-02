@@ -15,7 +15,7 @@ public class SoulEffect
     [ShowIf("ShowFlatValue")]
     [AllowNesting]
     [Label("고정 증가량")]
-    public int flatValue;
+    public float flatValue;
 
     [ShowIf("ShowPercentValue")]
     [AllowNesting]
@@ -25,7 +25,7 @@ public class SoulEffect
     [ShowIf("ShowBonusValue")]
     [AllowNesting]
     [Label("보너스 증가량")]
-    public int bonusValue;
+    public float bonusValue;
 
     [ShowIf("ShowSkillToLearn")]
     [AllowNesting]
