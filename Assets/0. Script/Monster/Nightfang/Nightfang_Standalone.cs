@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class NightfangStandalone : MonoBehaviour, IDamageable
 {
@@ -33,7 +34,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [Header("Patrol")]
     [SerializeField] float patrolSpeed = 2.0f;    // Patrol(순찰) 이동 속도
     [SerializeField] float patrolTime = 2.0f;     // Patrol(순찰) 시간 시간
-    int patrolDirX = 1;
 
     [Header("Aggro")]
     [SerializeField] float aggroRange = 6.0f;     // Aggro 범위
@@ -74,6 +74,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] float hitStunTime = 0.25f;
     [SerializeField]float knockBackXForce = 5f;
     [SerializeField]float knockBackYForce = 1f;
+    float hitLockTimer = 0f;
+    [SerializeField] float hitLockDuration = 0.15f;
     public bool isHit;
     Vector2 lastHitFrom;
 
@@ -102,7 +104,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     bool heightOk;
     [SerializeField] LayerMask groundMask;
     [SerializeField] Transform rayOrigin;
-    [SerializeField] bool isGroundAhead;
+    [SerializeField] bool isCliffAhead;
     #endregion
 
     void Reset()
@@ -126,7 +128,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         originScale = transform.localScale;
         facingX = 1;
-        patrolDirX = 1;
+        moveDirX = 1;
 
         Physics2D.queriesStartInColliders = false;
 
@@ -152,10 +154,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         
         ApplyFlip();
         MonsterGroundCheck();
-    }
-
-    private void FixedUpdate() {
-        //MonsterGroundCheck();
+        hitLockTimer -= Time.deltaTime;
     }
 
     void PlayerDetect()
@@ -200,8 +199,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             case State.Idle: TickIdle();; break;
             case State.Patrol: TickPatrol(); break;
             case State.Aggro:TickAggro(); break;
-            case State.Attack: break;
-            case State.Skill: break;
+            case State.Attack: if(cliffStopped) {StopX(); animator?.SetBool("Aggro_Idle", true); } break;
+            case State.Skill: if(cliffStopped) {StopX(); animator?.SetBool("Aggro_Idle", true); } break;
             case State.TakeDamage : TickTakeDamage(); break;
             case State.Dead: break;
         }
@@ -225,9 +224,10 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (enablePatrol && stateTimer >= idleTime && !isHit)
         {
             ApplyFlip();
-            patrolDirX *= -1;
+            moveDirX *= -1;
             animator?.SetTrigger("Patrol");
             ChangeState(State.Patrol);
+            return;
         }
     }
 
@@ -239,6 +239,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             animator?.SetTrigger("Idle");
             ChangeState(State.Idle);
             sfx.Play("IdleSound");
+            return;
         }
 
         if (enableAggro && distance <= aggroRange)
@@ -249,9 +250,15 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             return;
         }
 
-        MoveX(patrolDirX, patrolSpeed);
-        facingX = patrolDirX;
-        
+        if(cliffStopped)
+        {
+            StopX();
+            animator?.SetBool("Aggro_Idle", true);
+            return;
+        }
+
+        MoveX(moveDirX, patrolSpeed);
+        facingX = moveDirX;
     }
 
     void TickAggro()
@@ -259,16 +266,18 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         float dy = player ? Mathf.Abs(player.position.y - transform.position.y) : float.PositiveInfinity;
 
         heightOk = dy <= maxHeightDiffForAttack;
-        
-        float stopDeadZone = 0.1f;
-        
+
+        if (hitLockTimer > 0f)
+        {
+            StopX();                 
+            return;
+        }
+
         if (!isAttacking && !isUsingSkill)
         {
             float deadZone = 0.05f;
             if (Mathf.Abs(dx) > deadZone) facingX = moveDirX;
         }
-
-        MoveX(moveDirX, aggroSpeed);
 
         if (distance >= aggroRange)
         {
@@ -278,10 +287,20 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             return;
         }
 
+        if(cliffStopped)
+        {
+            StopX();
+            animator?.SetBool("Aggro_Idle", true);
+
+            return;
+        }
+
+        MoveX(moveDirX, aggroSpeed);
+
         if (enableSkill && heightOk &&
             distance <= skillRange &&
             distance >= attackRange && !isActionLocked &&
-            isSkillReady && !isUsingSkill && !isHit)
+            isSkillReady && !isUsingSkill && !isHit && !cliffStopped)
         {
             StartSkill();
             return;
@@ -289,7 +308,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (enableAttack && heightOk &&
             distance <= attackRange && !isActionLocked &&
-            isAttackReady && !isAttacking && !isHit)
+            isAttackReady && !isAttacking && !isHit && !cliffStopped)
         {
             StartAttack(); 
             return;
@@ -330,6 +349,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         StartCoroutine(AttackCoolDown());
 
         yield return new WaitForSeconds(standByTime);
+        
         canMove = true;
     }
 
@@ -447,6 +467,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (stateTimer >= hitStunTime)
         {
+            hitLockTimer = hitLockDuration;
             ChangeState(State.Idle);
             animator?.SetTrigger("Idle");
         }
@@ -479,6 +500,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
         dir = new Vector2(dir.x * knockBackXForce, knockBackYForce);
+
+        if(isCliffAhead) return;
         rb.linearVelocity = dir;
     }
     #endregion
@@ -512,11 +535,24 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void MonsterGroundCheck()
     {
-        if(state != State.Patrol && state != State.Aggro && state != State.TakeDamage) return;
+        if(state == State.Dead) return;
 
         Bounds b = boxCollider.bounds;
 
-        float dirX = Mathf.Sign(patrolDirX); //transform.localScale.x >= 0f ? 1f : -1f;
+        float dirX;
+
+        // lastHitFrom 기반으로 밀려나는 방향 쪽으로 레이 시작점 이동
+        if (state == State.TakeDamage)
+        {
+            float dx = ((Vector2)transform.position - lastHitFrom).x;
+            dirX = Mathf.Sign(dx);
+            if (dirX == 0f) dirX = 1f; // 안전장치
+        }
+        else
+        {
+            dirX = Mathf.Sign(facingX);
+            if (dirX == 0f) dirX = 1f;
+        }
 
         Vector2 rayStart = new Vector2((dirX > 0f ? b.max.x : b.min.x) + dirX * forwardPadding,b.min.y + bottomPadding);
 
@@ -524,21 +560,11 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         Debug.DrawRay(rayStart, Vector2.down * rayLength, Color.red);
 
-        isGroundAhead = (hit.collider == null);
+        isCliffAhead = (hit.collider == null);
 
-        if (isGroundAhead)
-        {
-            if (!cliffStopped)
-            {
-                cliffStopped = true;
-                ChangeState(State.Idle);
-                animator?.ResetTrigger("Patrol");
-                animator?.SetTrigger("Idle");
-            }
-        }
-        else
-        {
-            cliffStopped = false; 
-        }
+        cliffStopped = isCliffAhead;
+
+        if(state == State.TakeDamage) return;
+        animator?.SetBool("Aggro_Idle", cliffStopped);
     }
 }
