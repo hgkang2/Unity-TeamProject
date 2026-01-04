@@ -341,21 +341,75 @@ public class Player : MonoBehaviour, IDamageable
         }
     }
     #endregion
+    private Vector2 lastSafePosition; 
+    private bool isTrapDeath = false; 
 
+    void Start()
+    {
+        // 게임 시작 시 현재 위치를 안전 위치로 저장
+        lastSafePosition = transform.position;
+    }
+
+    
+    public void TakeTrapDamage()
+    {
+        if (isInvincible || HP.IsDead) return;
+    
+        isTrapDeath = true;
+        hp.Kill();
+    }
     void HandleDie()
     {
         playerMove.HandleDieMotion();
         sfx.Play("Die");
         // + 기타 사망 연출
-        Destroy(gameObject, 2f);
+       if (!isTrapDeath)
+        {
+            Destroy(gameObject, 2f);
+        }
     }
 
     //사망 후 처리 (애니메이션 프레임 이벤트로 호출)
     public void OnEndDieAnimation()
     {
-        SceneLoader.LoadScene("Start");
-        playerSprite.enabled = false;
+        if (isTrapDeath)
+        {
+            // 함정 사망이면 부활 로직 실행
+            Respawn();
+        }
+        else
+        {
+            // 일반 사망이면 기존처럼 씬 이동
+            SceneLoader.LoadScene("Start");
+            playerSprite.enabled = false;
+        }
     }
+    private void Respawn()
+    {
+        isTrapDeath = false;
+    
+        // 1. 위치 이동
+        transform.position = lastSafePosition;
+    
+        // 2. 물리 및 상태 복구
+        hp.ResetHP(); 
+        playerMove.ResetAfterDeath();
+    
+        // 3. 애니메이션 초기화
+        anim.Rebind(); 
+        anim.Update(0f);
+    
+        // 4. 시각적 복구
+        UsePlayerSprite(); 
+    
+        // 5. 부활 시 짧은 무적 시간 부여
+        StartInvincibleForDuration(1f);
+    }
+
+public void UpdateSafePosition(Vector2 newPos)
+{
+    lastSafePosition = newPos;
+}
 
     public void UsePlayerSprite()
     {
@@ -368,5 +422,5 @@ public class Player : MonoBehaviour, IDamageable
         playerSprite.enabled = false;
         playerPartSprite.SetActive (true);
     }
-  
+    
 }

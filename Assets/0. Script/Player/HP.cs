@@ -149,4 +149,9 @@ public class HP : MonoBehaviour
         // 기본 구현: 아무것도 안 함
         // 몬스터는 여기서 애니/파티클/풀 반환 같은 것 할 수 있음
     }
+
+    internal void TakeDamage(object currentHP)
+    {
+        throw new NotImplementedException();
+    }
 }

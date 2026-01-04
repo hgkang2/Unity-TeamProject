@@ -589,4 +589,10 @@ public class PlayerMove : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
     }
+    public void ResetAfterDeath()
+    {
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.linearVelocity = Vector2.zero;
+        isGrounded = true; 
+    }
 }

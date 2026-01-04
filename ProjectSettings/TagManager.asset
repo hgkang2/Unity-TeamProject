@@ -8,6 +8,8 @@ TagManager:
   - Enemy
   - Ground
   - VFXCamera
+  - Trap
+  - CheckPoint
   layers:
   - Default
   - TransparentFX
