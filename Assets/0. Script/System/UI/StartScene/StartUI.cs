@@ -43,6 +43,10 @@ public class StartUI : UIKeyboardHandler
         OpeningStart();
     }
 
+    private void OnDisable() {
+        SoundManager.Instance.StopBGM();
+    }
+
 
     #region 오프닝 재생
     public void OpeningStart()

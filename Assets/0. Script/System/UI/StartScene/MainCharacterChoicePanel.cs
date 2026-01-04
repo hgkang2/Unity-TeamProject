@@ -5,9 +5,10 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
 {
     [HideInInspector] public CanvasGroup cg;
     [SerializeField] MainCharacterChoiceSlot[] slots;
-    [SerializeField] MainCharacterConfirmPanel confirmPanel;
-
-    public bool CanClose => !confirmPanel.cg.blocksRaycasts;
+    [SerializeField] MainCharacterConfirmPanel[] confirmPanels;
+    public bool CanClose => !confirmPanels[0].cg.blocksRaycasts
+                            && !confirmPanels[1].cg.blocksRaycasts
+                            && !confirmPanels[2].cg.blocksRaycasts;
 
     public int? focusedIndex = -1;
     public int? selectedIndex = -1;
@@ -26,7 +27,11 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
     }
     private void Start()
     {
-        confirmPanel.Close();
+        foreach(var panel in confirmPanels)
+        {
+            panel.gameObject.SetActive(true);
+            panel.Close();
+        }
     }
     void FocusSlot(CharacterId id)
     {
@@ -51,7 +56,7 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
     {
         Debug.Log((selectedIndex+1));
         GameManager.Instance.curcharacter = (CharacterId)(selectedIndex+1);
-        SceneLoader.LoadScene("Stage1");
+        SceneLoader.NoLoadingScene("IngameIntro");
     }
 
     protected override void OnUIMove(Vector2 dir)
@@ -91,17 +96,15 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
     protected override void OnUIConfirm()
     {
         if(focusedIndex == null) return;
+        if(slots[(int)focusedIndex].isLocked) return;
         selectedIndex = focusedIndex;
         focusedIndex = null;
         UpdatFocusHighlight();
         
-        confirmPanel.Open();
-        confirmPanel.Set(slots[(int)selectedIndex].id.ToString());
+        confirmPanels[(int)selectedIndex].Open();                  
 
         this.enabled = false;
     }
-
-
     
     public void Open()
     {
@@ -113,6 +116,10 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
 
     public void Close()
     {
+        focusedIndex = null;
+        selectedIndex = null;
+        UpdatFocusHighlight();
+
         cg.alpha = 0f;
         cg.blocksRaycasts = false;
         cg.interactable = false;
