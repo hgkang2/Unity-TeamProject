@@ -9,8 +9,8 @@ public class Elevator : MonoBehaviour, IInteractable
 
 
     [Header("아래는 초기화용 건들지말기")]
-    [SerializeField] Animator leverAnimator;
-    [SerializeField] SpriteRenderer leverSprite;
+    //[SerializeField] Animator leverAnimator;
+    [SerializeField] SpriteRenderer buttonSprite;
 
 
     private void Awake()
@@ -28,16 +28,16 @@ public class Elevator : MonoBehaviour, IInteractable
     }
     public void Interact(Player player)
     {
-        leverAnimator.SetTrigger("Interact");
-        leverAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+        //leverAnimator.SetTrigger("Interact");
+        //leverAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
         StartCoroutine(GameManager.Instance.TeleportRoutine(player, targetPos));
         StartCoroutine(Initialize());
     }
     IEnumerator Initialize()
     {
         yield return new WaitForSeconds(5);
-        leverAnimator.SetTrigger("Initialize");
-        leverAnimator.updateMode = AnimatorUpdateMode.Normal;
+        //leverAnimator.SetTrigger("Initialize");
+        //leverAnimator.updateMode = AnimatorUpdateMode.Normal;
         HighlightOff();
     }
 
@@ -49,7 +49,7 @@ public class Elevator : MonoBehaviour, IInteractable
     public void OnFocus()
     {
         HighlightOn();
-        leverAnimator.SetTrigger("OnFocus");
+        //leverAnimator.SetTrigger("OnFocus");
     }
 
     public void OnUnfocus()
@@ -62,8 +62,8 @@ public class Elevator : MonoBehaviour, IInteractable
     public void HighlightOn()
     {
         highlightTween?.Kill();
-        highlightTween = leverSprite.DOColor(
-            new Color(1.5f, 1.5f, 1.5f, 1f),
+        highlightTween = buttonSprite.DOColor(
+            new Color(1.8f, 1.8f, 1.8f, 1f),
             0.15f
         );
     }
@@ -71,7 +71,7 @@ public class Elevator : MonoBehaviour, IInteractable
     public void HighlightOff()
     {
         highlightTween?.Kill();
-        highlightTween = leverSprite.DOColor(Color.white, 0.15f);
+        highlightTween = buttonSprite.DOColor(Color.white, 0.15f);
     }
 
 }
