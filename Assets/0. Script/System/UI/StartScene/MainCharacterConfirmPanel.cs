@@ -9,15 +9,11 @@ public class MainCharacterConfirmPanel : UIKeyboardHandler
     [HideInInspector] public CanvasGroup cg;
     [SerializeField] Button confirmButton;
     [SerializeField] Button cancelButton;
-    [SerializeField] TMP_Text characterName;
     Button curButton;
 
-    private void Awake() {
-        cg = GetComponent<CanvasGroup>();
-    }
-    public void Set(string name)
+    private void Awake()
     {
-        characterName.SetText(name);
+        cg = GetComponent<CanvasGroup>();
     }
 
     protected override void OnUIMove(Vector2 dir)
@@ -28,7 +24,7 @@ public class MainCharacterConfirmPanel : UIKeyboardHandler
             curButton = confirmButton;
         }
         //오른쪽 방향키시 아니오 버튼
-        else
+        else if(dir.x > 0.1f)
         {
             curButton = cancelButton;
         }
@@ -43,11 +39,6 @@ public class MainCharacterConfirmPanel : UIKeyboardHandler
         }
     }
 
-    protected override void OnUICancel()
-    {
-        curButton = null;
-    }
-
     public void Open()
     {
         cg.alpha = 1f;
@@ -58,6 +49,8 @@ public class MainCharacterConfirmPanel : UIKeyboardHandler
 
     public void Close()
     {
+        curButton = null;
+
         cg.alpha = 0f;
         cg.blocksRaycasts = false;
         cg.interactable = false;

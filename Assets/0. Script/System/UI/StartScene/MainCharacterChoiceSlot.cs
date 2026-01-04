@@ -12,6 +12,7 @@ public class MainCharacterChoiceSlot : MonoBehaviour
     [SerializeField] Image selectedImage;
     [SerializeField] Image lockedImage;
     RectTransform rect;
+    public bool isLocked;
 
     public event Action<CharacterId> slotselected;
     public void RaiseSlotSelected() => slotselected?.Invoke(id);
@@ -30,6 +31,7 @@ public class MainCharacterChoiceSlot : MonoBehaviour
 
     public void SetSlot(bool isLockedCharacter)
     {
+        isLocked = isLockedCharacter;
         if (isLockedCharacter)
         {
             lockedImage.enabled = false;
@@ -44,6 +46,7 @@ public class MainCharacterChoiceSlot : MonoBehaviour
 
     public void Focus()
     {
+        if(isLocked) return;
         deSelectedImage.enabled = false;
         selectedImage.enabled = true;
         rect.DOKill(); // 기존 트윈 제거
@@ -53,6 +56,7 @@ public class MainCharacterChoiceSlot : MonoBehaviour
 
     public void UnFocus()
     {
+        if(isLocked) return;
         deSelectedImage.enabled = true;
         selectedImage.enabled = false;
         rect.DOKill();
