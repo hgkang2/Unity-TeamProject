@@ -15,21 +15,13 @@ public class TutorialRunner : MonoBehaviour
     ITutorialStep currentStep;
     int stepIndex;
     bool isRunning;
-    Player player;
+    public Player player;
 
 
     void OnEnable()
     {
         if (InputManager.Instance != null)
             InputManager.Instance.UIConfirmed += OnUIConfirm;
-        if (dialoguePanel == null)
-        {
-            dialoguePanel = FindFirstObjectByType<DialoguePanel>();
-        }
-        if (player == null)
-        {
-            player = FindFirstObjectByType<Player>();
-        }
     }
 
     void OnDisable()
@@ -100,8 +92,7 @@ public class TutorialRunner : MonoBehaviour
     // -----------------------
 
     [Header("Player의 튜토리얼 collider 붙이기")]
-    [SerializeField] TargetTrackerEmitter2D visionEmitter;
-    [SerializeField] Transform targetMonster;
+    public TargetTrackerEmitter2D visionEmitter;
 
     void BuildSteps()
     {

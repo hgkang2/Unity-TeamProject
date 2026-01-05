@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour
         switch (scene.name)
         {
             case "IngameIntro":
+                SoundManager.Instance.StopBGM();
                 fade.alpha = 1;
                 StartCoroutine(FadeInRoutine(3));
                 break;
@@ -67,13 +68,18 @@ public class GameManager : MonoBehaviour
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+                tutorialRunner.player = FindFirstObjectByType<Player>();
+                tutorialRunner.dialoguePanel = FindFirstObjectByType<DialoguePanel>();
+                tutorialRunner.visionEmitter = FindFirstObjectByType<TargetTrackerEmitter2D>();
                 tutorialRunner.StartTutorial();
                 break;
             case "Stage1_Test":
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+                tutorialRunner.player = FindFirstObjectByType<Player>();
                 tutorialRunner.dialoguePanel = FindFirstObjectByType<DialoguePanel>();
+                tutorialRunner.visionEmitter = FindFirstObjectByType<TargetTrackerEmitter2D>();
                 tutorialRunner.StartTutorial();
                 break;
         }
