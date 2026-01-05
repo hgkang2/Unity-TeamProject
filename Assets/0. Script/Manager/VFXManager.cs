@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,6 +12,13 @@ public class VFXManager : MonoBehaviour
     [SerializeField] Camera vfxCamera;
     public Camera VFXCamera => vfxCamera;
     Camera mainCamera;
+
+
+    [Header("Attack Sprite VFX")]
+    [SerializeField] AttackVFXLibrary attackVFXLibrary;
+    [SerializeField] Transform attackPoolRoot;
+    [SerializeField] int prewarmEach = 3;
+    Dictionary<GameObject, GameObjectPool> poolsByPrefab = new Dictionary<GameObject, GameObjectPool>();
 
     void Awake()
     {
@@ -96,4 +104,67 @@ public class VFXManager : MonoBehaviour
         }
         Destroy(go);
     }
+    #region 공격이펙트풀링
+    public void PlayAttackSpriteVFX(
+        string key,
+        Transform followParent,
+        Vector3 position,
+        Quaternion rotation)
+    {
+        if (attackVFXLibrary == null) return;
+
+        AttackVFXLibrary.Entry entry = attackVFXLibrary.Get(key);
+        if (entry == null || entry.prefab == null)
+        {
+            Debug.LogWarning($"AttackVFX key not found: {key}");
+            return;
+        }
+
+        GameObjectPool pool = GetOrCreatePool(entry.prefab);
+        GameObject go = pool.Rent();
+
+        if (entry.followOwner && followParent != null)
+        {
+            // 1) 따라가는 VFX
+            //    부모에 붙이고 로컬 기준으로 관리
+            go.transform.SetParent(followParent, false);
+
+            // 월드 기준 위치/회전을 그대로 맞추고 싶으면 이렇게
+            go.transform.localPosition = entry.localOffset;
+            go.transform.rotation = rotation;
+
+            // 또는, followParent 기준 localOffset/localRotation을 쓰는 구조라면
+            // go.transform.localPosition = entry.localOffset;
+            // go.transform.localRotation = entry.localRotation;
+        }
+        else
+        {
+            // 2) 월드 고정 VFX
+            go.transform.SetParent(null, false);
+            Vector3 worldPos = position + rotation * entry.localOffset;
+            Quaternion worldRot = rotation * Quaternion.Euler(entry.localEuler);
+            go.transform.localScale = followParent.lossyScale;
+
+            go.transform.SetPositionAndRotation(worldPos, worldRot);
+        }
+
+        // 3) 활성화 → OnEnable에서 애니메이션 재생
+        go.SetActive(true);
+    }
+
+
+
+    GameObjectPool GetOrCreatePool(GameObject prefab)
+    {
+        GameObjectPool pool;
+        if (poolsByPrefab.TryGetValue(prefab, out pool))
+        {
+            return pool;
+        }
+
+        pool = new GameObjectPool(prefab, attackPoolRoot, prewarmEach);
+        poolsByPrefab.Add(prefab, pool);
+        return pool;
+    }
+    #endregion
 }

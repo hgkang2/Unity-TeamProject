@@ -35,15 +35,15 @@ public class StageUI : MonoBehaviour
         haveSoulsUI.gameObject.SetActive(true);
         
 
-        characterName.text = SelectedCharacter.CurCharacter.ToString();
+        characterName.text = GameManager.Instance.curcharacter.ToString();
     }
 
     void Start()
     {
-        //모든 ui 닫기
+        //모든 ui 닫기(닫기 말고 CanvasGroup으로 되게 수정하기)
         escpanel.gameObject.SetActive(false);
         settingPanel.gameObject.SetActive(false);
-        levelUpPanel.gameObject.SetActive(false);
+        levelUpPanel.Hide();
         haveSoulsUI.gameObject.SetActive(false);
     }
     void OnDestroy()
@@ -120,20 +120,18 @@ public class StageUI : MonoBehaviour
     public void ShowLevelupPanel()
     {
         TimeManager.Pause();
-
-        levelUpPanel.gameObject.SetActive(true);
+        levelUpPanel.Show();
         levelUpPanel.Initialize();
     }
     public void HideLevelupPanel()
     {
-        levelUpPanel.gameObject.SetActive(false);
-
+        levelUpPanel.Hide();
         TimeManager.Resume();
     }
     //버튼 연결 이벤트
     public void GoToCharacterChoiceScene()
     {
-        SelectedCharacter.CurCharacter = CharacterId.None;
-        SceneManager.LoadScene("CharacterChoice");
+        GameManager.Instance.curcharacter = CharacterId.None;
+        SceneManager.LoadScene("Start");
     }
 }

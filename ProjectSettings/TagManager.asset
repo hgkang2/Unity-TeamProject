@@ -8,6 +8,8 @@ TagManager:
   - Enemy
   - Ground
   - VFXCamera
+  - Trap
+  - CheckPoint
   layers:
   - Default
   - TransparentFX
@@ -17,9 +19,9 @@ TagManager:
   - UI
   - Player
   - Ground
+  - NoWallClimb
   - 
-  - 
-  - 
+  - IInteractable
   - 
   - 
   - 

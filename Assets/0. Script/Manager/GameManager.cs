@@ -1,8 +1,17 @@
+using System.Collections;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(CanvasGroup))]
+[RequireComponent(typeof(TutorialRunner))]
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] CanvasGroup fade;
+    CinemachineCamera cinemachineCamera;
+    public CharacterId curcharacter = CharacterId.None;
+    TutorialRunner tutorialRunner;
+
     static GameManager instance;
     public static GameManager Instance
     {
@@ -21,6 +30,11 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        tutorialRunner = GetComponent<TutorialRunner>();
+        if (cinemachineCamera == null)
+        {
+            cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+        }
         // 중복 방지
         if (instance != null && instance != this)
         {
@@ -45,14 +59,88 @@ public class GameManager : MonoBehaviour
     {
         switch (scene.name)
         {
+            case "IngameIntro":
+                SoundManager.Instance.StopBGM();
+                fade.alpha = 1;
+                StartCoroutine(FadeInRoutine(3));
+                break;
             case "Stage1":
+                if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
+                cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+                tutorialRunner.player = FindFirstObjectByType<Player>();
+                tutorialRunner.dialoguePanel = FindFirstObjectByType<DialoguePanel>();
+                tutorialRunner.visionEmitter = FindFirstObjectByType<TargetTrackerEmitter2D>();
+                tutorialRunner.StartTutorial();
+                break;
+            case "Stage1_Test":
+                if (SoundManager.Instance == null) return;
+                SoundManager.Instance.PlayBGM("Stage1");
+                cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+                tutorialRunner.player = FindFirstObjectByType<Player>();
+                tutorialRunner.dialoguePanel = FindFirstObjectByType<DialoguePanel>();
+                tutorialRunner.visionEmitter = FindFirstObjectByType<TargetTrackerEmitter2D>();
+                tutorialRunner.StartTutorial();
                 break;
         }
+
     }
 
+    public IEnumerator TeleportRoutine(Player p, Transform targetPosition)
+    {
 
+        TimeManager.Pause();
+        yield return FadeOutRoutine(1f);   // 끝날 때까지 대기
 
+        Vector3 oldPos = p.transform.position;
+        Vector3 newPos = targetPosition.position;
+        Vector3 delta = newPos - oldPos;
+
+        p.transform.position = newPos;
+        cinemachineCamera.OnTargetObjectWarped(p.transform, delta);
+
+        TimeManager.Resume();
+        yield return FadeInRoutine(1f);    // 끝날 때까지 대기
+    }
+
+    IEnumerator FadeOutRoutine(float duration)
+    {
+        fade.blocksRaycasts = true;
+
+        float t = 0f;
+        float start = fade.alpha;
+
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            fade.alpha = Mathf.Lerp(start, 1f, t / duration);
+            yield return null;
+        }
+
+        fade.alpha = 1f;
+    }
+
+    IEnumerator FadeInRoutine(float duration)
+    {
+        float t = 0f;
+        float start = fade.alpha;
+
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            fade.alpha = Mathf.Lerp(start, 0f, t / duration);
+            yield return null;
+        }
+
+        fade.alpha = 0f;
+        fade.blocksRaycasts = false;
+    }
+
+    public void SetCharacter(int num)
+    {
+        // 1 : serena, 2 : luna, 3 : 미출시
+        curcharacter = (CharacterId)(num);
+    }
 
     public void QuitGame()
     {

@@ -107,9 +107,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemPrefabs:
   - {fileID: 1157946522709448411, guid: 9c5f2048e7ab56a499113c86e3331742, type: 3}
-  - {fileID: 3562214253192847631, guid: 4f09977d41cc84941bc7033d3639111d, type: 3}
-  - {fileID: 7387059032564988730, guid: 3a1170bf85577194faa08fd0a4a0e9d6, type: 3}
-  dropForce: 5
+  - {fileID: 1157946522709448411, guid: 73f28b90df12c3247832ffa03323e0d9, type: 3}
+  - {fileID: 1157946522709448411, guid: 4a6d5edbbf7081d4fb642dc0cc924bce, type: 3}
 --- !u!114 &904376574426576868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,7 +273,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

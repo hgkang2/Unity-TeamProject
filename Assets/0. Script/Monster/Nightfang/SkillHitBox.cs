@@ -25,6 +25,7 @@ public class SkillHitBox : MonoBehaviour
             damageable.TakeDamage(damage, damageType, hitPos);
             //OnHit?.Invoke(damageable);
             sfx.Play("DamageSound");
+            //Debug.Log("Damage");
         }
     }
 }

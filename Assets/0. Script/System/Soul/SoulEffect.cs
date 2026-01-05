@@ -15,7 +15,7 @@ public class SoulEffect
     [ShowIf("ShowFlatValue")]
     [AllowNesting]
     [Label("고정 증가량")]
-    public int flatValue;
+    public float flatValue;
 
     [ShowIf("ShowPercentValue")]
     [AllowNesting]
@@ -25,17 +25,18 @@ public class SoulEffect
     [ShowIf("ShowBonusValue")]
     [AllowNesting]
     [Label("보너스 증가량")]
-    public int bonusValue;
+    public float bonusValue;
 
     [ShowIf("ShowSkillToLearn")]
     [AllowNesting]
     [Label("습득 스킬")]
     public CharacterSkills skillToLearn;
 
-    [ShowIf("ShowSoulEtcEffect")]
-    [AllowNesting]
-    [Label("기타 효과")]
-    public SoulETCEffect soulEtcEffect;
+    // 나중에 ETC가 필요해질 만큼 많이 생기면 적용
+    // [ShowIf("ShowSoulEtcEffect")]
+    // [AllowNesting]
+    // [Label("기타 효과")]
+    // public SoulETCEffect soulEtcEffect;
 
     [ShowIf("ShowHealAmount")]
     [AllowNesting]

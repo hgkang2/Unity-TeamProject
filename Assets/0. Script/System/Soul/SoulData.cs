@@ -49,7 +49,7 @@ public class SoulData : ScriptableObject
     {
         // 1) 캐릭터 타입 제한
         if (soulCharacterType != CharacterId.None &&
-            soulCharacterType != SelectedCharacter.CurCharacter)
+            soulCharacterType != GameManager.Instance.curcharacter)
             return false;
 
         // 2) 필요 조건 체크 (레벨, 특정 스킬, 특정 아이템…)
@@ -87,7 +87,7 @@ public class SoulData : ScriptableObject
         switch (effect.type)
         {
             case SoulEffectType.StatFlat:
-                return effect.flatValue;
+                return (int)effect.flatValue;
             case SoulEffectType.StatPercent:
                 return effect.percentValue;
             case SoulEffectType.IncreaseJumpNum:

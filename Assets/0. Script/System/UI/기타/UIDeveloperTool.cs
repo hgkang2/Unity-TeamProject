@@ -36,7 +36,11 @@ public class UIDeveloperTool : MonoBehaviour
         TimeManager.SetTimeScale(getTimeScaleSlider.value);
     }
 
-    [SerializeField] Player player;
+    Player player;
+
+    private void Awake() {
+        player = FindFirstObjectByType<Player>();
+    }
 
     void Start()
     {

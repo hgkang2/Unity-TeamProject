@@ -27,11 +27,11 @@ public class MouseTrailVFX : MonoBehaviour
 
     void Update()
     {
-        
         if (!initialized)
         {
             return;
         }
+        if(VFXManager.Instance.VFXCamera == null) return;
 
         // 1. 마우스 이동량 (픽셀 단위) 읽기
         Vector2 delta = Mouse.current.delta.ReadValue();

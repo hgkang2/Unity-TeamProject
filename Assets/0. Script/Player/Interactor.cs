@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Interactor : MonoBehaviour
 {
+    Player player;
+
     [Header("Scan (2D)")]
     [SerializeField] float overlapRadius = 1.2f;
     [SerializeField] Vector2 offset = Vector2.zero;
@@ -17,7 +19,31 @@ public class Interactor : MonoBehaviour
 
     public event Action<IInteractable> SelectedChanged;
 
-    [Obsolete]
+    void Awake() {
+        player = GetComponent<Player>();
+    }
+
+    float timer;
+
+    void Update()
+    {
+        if(timer < Time.time + 0.1f)
+        {
+            timer = Time.time;
+            Scan();
+        }
+    }
+
+    void OnEnable()
+    {
+        InputManager.Instance.InteractPressed += Interact;
+    }
+
+    void OnDisable()
+    {
+        InputManager.Instance.InteractPressed -= Interact;
+    }
+
     public void Scan()
     {
         // 상호작용 중이면 선택 갱신 중단 + UI 정리
@@ -33,7 +59,13 @@ public class Interactor : MonoBehaviour
         }
 
         Vector2 scanCenter = (Vector2)transform.position + offset;
-        int count = Physics2D.OverlapCircleNonAlloc(scanCenter, overlapRadius, buffer, interactableLayer);
+
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.useLayerMask = true;
+        filter.layerMask = interactableLayer;
+        filter.useTriggers = true; // 트리거 콜라이더도 감지하고 싶으면 true, 아니면 false
+
+        int count = Physics2D.OverlapCircle(scanCenter, overlapRadius, filter, buffer);
 
         IInteractable best = null;
         float bestSqr = float.MaxValue;
@@ -68,20 +100,19 @@ public class Interactor : MonoBehaviour
         }
     }
 
-    public bool Interact(Player player)
+    public void Interact()
     {
         if (current != null)
         {
             InteractExit();
-            return true;
+            return;
         }
 
-        if (selected == null) return false;
-        if (!selected.IsAvailable()) return false;
+        if (selected == null) return;
+        if (!selected.IsAvailable()) return;
 
         current = selected;
         current.Interact(player);
-        return true;
     }
 
     public void InteractExit()

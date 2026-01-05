@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
@@ -35,6 +36,8 @@ public class PlayerMove : MonoBehaviour
 
     [SerializeField] float airControlLerp = 8f;
 
+    public event Action JumpCommitted;
+
 
     void Awake()
     {
@@ -66,7 +69,8 @@ public class PlayerMove : MonoBehaviour
         if (TimeManager.IsPaused) return;
         if (player.HP.IsDead) return;
 
-        if (!player.CanControl)
+        // 플레이어 조작 불가 상태 or 벽점프후 0.25초 이내
+        if (!player.CanControl || Time.unscaledTime < wallJumpTime + 0.25f)
         {
             inputVec = Vector2.zero;
             return;
@@ -90,7 +94,7 @@ public class PlayerMove : MonoBehaviour
         GetGroundDistance();
 
         // 2) 점프
-        bool canNormalControl = !player.isDodging && player.CanControl && !player.isAirDownAttack && !isWallGrabbing && !isWallSliding;
+        bool canNormalControl = player.CanControl && !player.isAirDownAttack;
         if (canNormalControl)
         {
             HandleJump();
@@ -112,7 +116,8 @@ public class PlayerMove : MonoBehaviour
         if (TimeManager.IsPaused) return;
 
         anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
-        anim.SetFloat("Move", Mathf.Abs(rb.linearVelocity.x));
+        anim.SetFloat("InputX", Mathf.Abs(inputVec.x));
+        anim.SetFloat("MoveX", Mathf.Abs(rb.linearVelocity.x));
 
         anim.SetBool("IsGrounded", isGrounded);
         anim.SetBool("IsWallGrabbing", isWallGrabbing || isWallSliding);
@@ -137,12 +142,17 @@ public class PlayerMove : MonoBehaviour
         lastJumpPressedTime = Time.time;
     }
 
+    float wallJumpTime;
+
     #region 속도 적용
+    public void StopMoveOnce()
+    {
+        rb.linearVelocity = Vector2.zero;
+    }
     void ApplyVelocity()
     {
         float newX = rb.linearVelocity.x;
         float newY = rb.linearVelocity.y;
-
         // 벽 잡기
         if (isWallGrabbing)
         {
@@ -186,6 +196,22 @@ public class PlayerMove : MonoBehaviour
             newX = isGrounded
                 ? targetX
                 : Mathf.Lerp(rb.linearVelocity.x, targetX, Time.fixedDeltaTime * airControlLerp);
+            if(Time.time < wallJumpTime + 0.25f)
+            {
+                newX = rb.linearVelocityX;
+            }
+            // 발끝이 벽에 걸리면 움직이지 않기
+            if (!isGrounded && isFootTouchingWall && !isWallGrabbing && !isWallSliding)
+            {
+                bool inputTowardWall =
+                    (isRightFacing && inputVec.x > 0.1f) ||
+                    (!isRightFacing && inputVec.x < -0.1f);
+
+                if (inputTowardWall)
+                {
+                    newX = 0f;
+                }
+            }
         }
 
         // 최종 적용
@@ -233,9 +259,11 @@ public class PlayerMove : MonoBehaviour
 
         isGrounded = false;
         anim.SetTrigger("Jump");
-        sfx.Play("JumpVoice");
+        sfx.Play("Jump");
+        JumpCommitted?.Invoke();
     }
 
+    public float wallJumpForceX = 5;
     void HandleWallJump()
     {
         isWallGrabbing = false;
@@ -246,11 +274,12 @@ public class PlayerMove : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
 
-        Vector2 wallJumpVec = new Vector2(wallJumpForceX * jumpDir, wallJumpForceY);
+        Vector2 wallJumpVec = new Vector2(wallJumpForceX * jumpDir, stats.curJumpForce);
         rb.AddForce(wallJumpVec, ForceMode2D.Impulse);
         sfx.Play("JumpVoice");
 
-        currentJumpCount--;
+        currentJumpCount = 0;
+        wallJumpTime = Time.time;
     }
     #endregion
 
@@ -434,9 +463,13 @@ public class PlayerMove : MonoBehaviour
     public bool isWallSliding = false;
     public LayerMask wallMask;
     [SerializeField] float wallCheckDistance = 0.5f;
+    [SerializeField] float wallCheckYOffset = 0f;
     [SerializeField] float wallSlideSpeed = 2f;
-    [SerializeField] float wallJumpForceX = 10f;
-    [SerializeField] float wallJumpForceY = 15f;
+
+
+    public bool isFootTouchingWall = false;
+    [SerializeField] float footWallCheckDistance = 0.08f; // 0.03~0.12 사이로 취향 조절
+    [SerializeField] float footWallCheckYOffset = 0.05f;  // b.min.y에서 살짝 위(발끝)
     bool wasWallSliding;
     void HandleWallCheck()
     {
@@ -444,23 +477,25 @@ public class PlayerMove : MonoBehaviour
         {
             isWallGrabbing = false;
             isWallSliding = false;
+        isFootTouchingWall = false;
             return;
         }
 
         wasWallSliding = isWallSliding;
 
         Bounds b = col.bounds;
-        Vector2 rayOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, b.center.y);
+
+        // 벽 판정용 중앙 레이
+        float rayY = b.center.y + wallCheckYOffset;
+        Vector2 rayOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, rayY);
         Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
 
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, wallCheckDistance, wallMask);
 
+#if UNITY_EDITOR
         Color color = hit.collider != null ? Color.red : Color.green;
-        Debug.DrawLine(
-            rayOrigin,
-            rayOrigin + rayDirection * wallCheckDistance,
-            color
-        );
+        Debug.DrawLine(rayOrigin, rayOrigin + rayDirection * wallCheckDistance, color);
+#endif
 
 
         bool isTouchingWall = (hit.collider != null);
@@ -471,6 +506,7 @@ public class PlayerMove : MonoBehaviour
 
         bool allowWallState = (rb.linearVelocity.y < 0f) || isWallGrabbing || isWallSliding;
 
+        // 중앙 레이가 맞았으면 벽잡기 상태로 진입
         if (isTouchingWall && allowWallState)
         {
             if (inputTowardWall)
@@ -483,12 +519,50 @@ public class PlayerMove : MonoBehaviour
                 isWallSliding = true;
                 isWallGrabbing = false;
             }
+
+            isFootTouchingWall = false;
+            return;
         }
+
+        // 중앙 레이가 안 맞으면 벽잡기 상태 해제
         else
         {
             isWallGrabbing = false;
             isWallSliding = false;
         }
+
+        // 전방 머리나 하체쪽에 벽이 있을때 스턱 방지용 면 체크
+        Vector2 castOrigin = b.center;
+        Vector2 castSize = b.size;
+
+        hit = Physics2D.BoxCast(
+            castOrigin,
+            castSize,
+            0f,
+            rayDirection,
+            footWallCheckDistance,
+            wallMask
+        );
+
+        isFootTouchingWall = (hit.collider != null);
+
+#if UNITY_EDITOR
+        Color footColor = isFootTouchingWall ? Color.magenta : Color.cyan;
+
+        // 박스 윤곽 + 캐스트 방향 표시
+        Vector2 half = castSize * 0.5f;
+        Vector2 p1 = castOrigin + new Vector2(-half.x, -half.y);
+        Vector2 p2 = castOrigin + new Vector2(-half.x, half.y);
+        Vector2 p3 = castOrigin + new Vector2(half.x, half.y);
+        Vector2 p4 = castOrigin + new Vector2(half.x, -half.y);
+
+        Debug.DrawLine(p1, p2, footColor);
+        Debug.DrawLine(p2, p3, footColor);
+        Debug.DrawLine(p3, p4, footColor);
+        Debug.DrawLine(p4, p1, footColor);
+
+        Debug.DrawLine(castOrigin, castOrigin + rayDirection * footWallCheckDistance, footColor);
+#endif
     }
     #endregion
 
@@ -518,5 +592,11 @@ public class PlayerMove : MonoBehaviour
         anim.SetTrigger("Die");
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
+    }
+    public void ResetAfterDeath()
+    {
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.linearVelocity = Vector2.zero;
+        isGrounded = true; 
     }
 }
