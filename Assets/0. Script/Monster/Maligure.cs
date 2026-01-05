@@ -237,8 +237,7 @@ public class Malirgue : MonoBehaviour, IDamageable
             return;
         }
 
-        MoveX(moveDirX, aggroSpeed);
-        
+        MoveX(moveDirX, aggroSpeed);        
 
         if(isHit && isHeigtForAttackOk) return;
 
@@ -272,6 +271,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         isAttacking = false;
         ChangeState(malirgue_State.Idle);
         animator?.SetTrigger("Idle");
+        HideWarningVFX();
         StartCoroutine(AttackCoolDown());
         
         yield return new WaitForSeconds(standByTime);
@@ -352,6 +352,7 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         StopX();
         isDead = true;
+        HideWarningVFX();
 
         ChangeState(malirgue_State.Dead);
         animator?.SetTrigger("Dead");
@@ -386,6 +387,7 @@ public class Malirgue : MonoBehaviour, IDamageable
 
     void HideWarningVFX()
     {
+        if (!WarningVFX) return;
         WarningVFX.SetActive(false);
     }
 
