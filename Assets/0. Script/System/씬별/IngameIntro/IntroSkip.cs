@@ -8,6 +8,7 @@ public class IntroSkip : MonoBehaviour
     [SerializeField] float holdSeconds = 1.5f;
     [SerializeField] KeyCode key = KeyCode.Escape;
     [SerializeField] AudioSource audioSource;
+    [SerializeField] string GotoSceneName;
     public float autoSkipTime;
     float EnableTime;
     float holdTime;
@@ -67,6 +68,6 @@ public class IntroSkip : MonoBehaviour
     }
     void StartGame()
     {
-        SceneLoader.LoadScene("Stage1");
+        SceneLoader.LoadScene(GotoSceneName);
     }
 }

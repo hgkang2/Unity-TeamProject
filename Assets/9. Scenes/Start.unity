@@ -1748,6 +1748,8 @@ GameObject:
   m_Component:
   - component: {fileID: 253155260}
   - component: {fileID: 253155259}
+  - component: {fileID: 253155262}
+  - component: {fileID: 253155261}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1785,6 +1787,34 @@ Transform:
   - {fileID: 306121424}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &253155261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253155258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d690053e3872c14c909ce9e66fa8d29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialoguePanel: {fileID: 0}
+  tutorialTrigger: {fileID: 0}
+  visionEmitter: {fileID: 0}
+  targetMonster: {fileID: 0}
+--- !u!225 &253155262
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253155258}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &287348568
 GameObject:
   m_ObjectHideFlags: 0
@@ -11675,8 +11705,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clickVFX: {fileID: 2796253519308722077, guid: ae13613c965215b4b95c43ceccb2eed2, type: 3}
   vfxCamera: {fileID: 1473690035}
-  attackVFXLibrary: {fileID: 0}
-  attackPoolRoot: {fileID: 0}
+  attackVFXLibrary: {fileID: 11400000, guid: b8c32e3d8f80cdf48ab65f1a0fd63923, type: 2}
+  attackPoolRoot: {fileID: 4865463053665952301}
   prewarmEach: 3
 --- !u!4 &2362263048384707990
 Transform:

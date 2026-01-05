@@ -294,9 +294,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 306066744}
+  - component: {fileID: 306066747}
   - component: {fileID: 306066746}
   - component: {fileID: 306066745}
-  - component: {fileID: 306066747}
   m_Layer: 5
   m_Name: "\uC2A4\uD0B5 \uAC8C\uC774\uC9C0"
   m_TagString: Untagged
@@ -377,6 +377,7 @@ MonoBehaviour:
   holdSeconds: 2
   key: 27
   audioSource: {fileID: 21887685}
+  GotoSceneName: Stage1
   autoSkipTime: 10
 --- !u!1 &930735689
 GameObject:

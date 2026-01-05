@@ -3,11 +3,15 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(CanvasGroup))]
+[RequireComponent(typeof(TutorialRunner))]
 public class GameManager : MonoBehaviour
 {
     [SerializeField] CanvasGroup fade;
     CinemachineCamera cinemachineCamera;
     public CharacterId curcharacter = CharacterId.None;
+    TutorialRunner tutorialRunner;
+
     static GameManager instance;
     public static GameManager Instance
     {
@@ -26,7 +30,8 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        if(cinemachineCamera == null)
+        tutorialRunner = GetComponent<TutorialRunner>();
+        if (cinemachineCamera == null)
         {
             cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
         }
@@ -54,12 +59,25 @@ public class GameManager : MonoBehaviour
     {
         switch (scene.name)
         {
+            case "IngameIntro":
+                fade.alpha = 1;
+                StartCoroutine(FadeInRoutine(3));
+                break;
             case "Stage1":
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+                tutorialRunner.StartTutorial();
+                break;
+            case "Stage1_Test":
+                if (SoundManager.Instance == null) return;
+                SoundManager.Instance.PlayBGM("Stage1");
+                cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+                tutorialRunner.dialoguePanel = FindFirstObjectByType<DialoguePanel>();
+                tutorialRunner.StartTutorial();
                 break;
         }
+
     }
 
     public IEnumerator TeleportRoutine(Player p, Transform targetPosition)

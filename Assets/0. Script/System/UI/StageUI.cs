@@ -132,6 +132,6 @@ public class StageUI : MonoBehaviour
     public void GoToCharacterChoiceScene()
     {
         GameManager.Instance.curcharacter = CharacterId.None;
-        SceneManager.LoadScene("CharacterChoice");
+        SceneManager.LoadScene("Start");
     }
 }

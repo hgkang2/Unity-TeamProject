@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
@@ -35,6 +36,8 @@ public class PlayerMove : MonoBehaviour
 
     [SerializeField] float airControlLerp = 8f;
 
+    public event Action JumpCommitted;
+
 
     void Awake()
     {
@@ -67,7 +70,7 @@ public class PlayerMove : MonoBehaviour
         if (player.HP.IsDead) return;
 
         // 플레이어 조작 불가 상태 or 벽점프후 0.25초 이내
-        if (!player.CanControl || Time.time < wallJumpTime + 0.25f)
+        if (!player.CanControl || Time.unscaledTime < wallJumpTime + 0.25f)
         {
             inputVec = Vector2.zero;
             return;
@@ -257,6 +260,7 @@ public class PlayerMove : MonoBehaviour
         isGrounded = false;
         anim.SetTrigger("Jump");
         sfx.Play("Jump");
+        JumpCommitted?.Invoke();
     }
 
     public float wallJumpForceX = 5;

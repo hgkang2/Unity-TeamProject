@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Unity.Mathematics;
 using Unity.VisualScripting;
@@ -30,6 +31,7 @@ public class PlayerAttack : MonoBehaviour
     public bool isAttacking;
     AttackType currentType = AttackType.None;
 
+    public event Action<AttackType> AttackCommitted;
 
     void Awake()
     {
@@ -154,8 +156,8 @@ public class PlayerAttack : MonoBehaviour
             sfxKey = "Attack";
             vfxKey = "Attack";
         }
+
         StartAttack(type);
-        
     }
     Transform attackVFXPos;
 
@@ -178,6 +180,7 @@ public class PlayerAttack : MonoBehaviour
         sfx.Play(sfxKey);
 
         isAttacking = true;
+        AttackCommitted?.Invoke(type);
     }
 
     // 각 공격 애니메이션의 공격 시작 프레임에 연결

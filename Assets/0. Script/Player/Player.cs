@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Data.Common;
 using UnityEngine;
 
 public class Player : MonoBehaviour, IDamageable
@@ -14,7 +15,7 @@ public class Player : MonoBehaviour, IDamageable
     public PlayerStats Stats { get { return stats; } }
 
     public PlayerMove playerMove;
-    PlayerAttack playerAttack;
+    public PlayerAttack playerAttack;
 
     public SpriteRenderer playerSprite;
     public GameObject playerPartSprite;
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour, IDamageable
     SpriteFlash spriteFlash;
     LocalSFX sfx;
 
+    bool isInCinematic = false;
     public bool CanControl
     {
         get
@@ -31,6 +33,7 @@ public class Player : MonoBehaviour, IDamageable
             if (HP.IsDead) return false;
             if (isStunned) return false;
             if (isDodging) return false;
+            if (isInCinematic) return false;
             return true;
         }
     }
@@ -62,7 +65,7 @@ public class Player : MonoBehaviour, IDamageable
 
     void Update()
     {
-        if(TimeManager.IsPaused) return;
+        if (TimeManager.IsPaused) return;
     }
 
     #region 넉백
@@ -158,7 +161,7 @@ public class Player : MonoBehaviour, IDamageable
     IEnumerator AirDownRoutine()
     {
         // 준비 시간 동안 대기
-        
+
         while (Time.time < airDownPrepareEndTime)
         {
             yield return null;
@@ -176,12 +179,12 @@ public class Player : MonoBehaviour, IDamageable
 
         // 착지 후 딜레이
         VFXManager.Instance.PlayAttackSpriteVFX("ImpactWave", transform, transform.position, Quaternion.identity);
-        yield return new WaitForSeconds(0.25f);;
+        yield return new WaitForSeconds(0.25f); ;
 
         // 공격 끝
         EndAirDownAttack();
     }
-    
+
     [Header("Air Down Attack Camera Shake")]
     [SerializeField] float cameraShakeAmplitude;
     [SerializeField] float cameraShakeFrequency;
@@ -245,7 +248,7 @@ public class Player : MonoBehaviour, IDamageable
     public void BeginInvincible()
     {
         if (isInvincible) return;
-            
+
         // 혹시 이전에 돌던 제한시간 코루틴이 있으면 정리
         if (invincibleCoroutine != null)
         {
@@ -260,7 +263,7 @@ public class Player : MonoBehaviour, IDamageable
     public void EndInvincible()
     {
         if (!isInvincible && invincibleCoroutine == null) return;
-            
+
         isInvincible = false;
 
         // 수동 종료 시, 혹시 남아 있을 수 있는 코루틴도 끊기
@@ -324,7 +327,7 @@ public class Player : MonoBehaviour, IDamageable
 
         // --- 데미지 반영 ---
         hp.TakeDamage(amount);
-        if(hp.IsDead) return;
+        if (hp.IsDead) return;
 
         // --- 리액션 처리 ---
         switch (type)
@@ -341,8 +344,8 @@ public class Player : MonoBehaviour, IDamageable
         }
     }
     #endregion
-    private Vector2 lastSafePosition; 
-    private bool isTrapDeath = false; 
+    private Vector2 lastSafePosition;
+    private bool isTrapDeath = false;
 
     void Start()
     {
@@ -350,11 +353,11 @@ public class Player : MonoBehaviour, IDamageable
         lastSafePosition = transform.position;
     }
 
-    
+
     public void TakeTrapDamage()
     {
         if (isInvincible || HP.IsDead) return;
-    
+
         isTrapDeath = true;
         hp.Kill();
     }
@@ -363,7 +366,7 @@ public class Player : MonoBehaviour, IDamageable
         playerMove.HandleDieMotion();
         sfx.Play("Die");
         // + 기타 사망 연출
-       if (!isTrapDeath)
+        if (!isTrapDeath)
         {
             Destroy(gameObject, 2f);
         }
@@ -387,40 +390,45 @@ public class Player : MonoBehaviour, IDamageable
     private void Respawn()
     {
         isTrapDeath = false;
-    
+
         // 1. 위치 이동
         transform.position = lastSafePosition;
-    
+
         // 2. 물리 및 상태 복구
-        hp.ResetHP(); 
+        hp.ResetHP();
         playerMove.ResetAfterDeath();
-    
+
         // 3. 애니메이션 초기화
-        anim.Rebind(); 
+        anim.Rebind();
         anim.Update(0f);
-    
+
         // 4. 시각적 복구
-        UsePlayerSprite(); 
-    
+        UsePlayerSprite();
+
         // 5. 부활 시 짧은 무적 시간 부여
         StartInvincibleForDuration(1f);
     }
 
-public void UpdateSafePosition(Vector2 newPos)
-{
-    lastSafePosition = newPos;
-}
+    public void UpdateSafePosition(Vector2 newPos)
+    {
+        lastSafePosition = newPos;
+    }
 
     public void UsePlayerSprite()
     {
         playerSprite.enabled = true;
-        playerPartSprite.SetActive (false);
-    
+        playerPartSprite.SetActive(false);
+
     }
     public void UsePartSprite()
     {
         playerSprite.enabled = false;
-        playerPartSprite.SetActive (true);
+        playerPartSprite.SetActive(true);
     }
     
+    public void SetControlLocked(bool b)
+    {
+        Debug.Log($"Locked : {b}");
+        isInCinematic = b;
+    }
 }
