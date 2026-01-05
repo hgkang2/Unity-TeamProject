@@ -22,7 +22,7 @@ public class SkillHitBox : MonoBehaviour
             Vector2 hitPos = transform.position;
             damageable.TakeDamage(damage, damageType, hitPos);
             //OnHit?.Invoke(damageable);
-            Debug.Log("Damage");
+            //Debug.Log("Damage");
         }
     }
 }
