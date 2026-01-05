@@ -1,16 +1,14 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Trap : MonoBehaviour
 {
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnCollisionEnter2D(Collision2D other)
     {
-        if (collision.CompareTag("Player"))
+        Player player = other.gameObject.GetComponent<Player>();
+        if (player != null)
         {
-            Player player = collision.GetComponent<Player>();
-            if (player != null)
-            {
-                player.TakeTrapDamage(); // 함정 데미지 호출
-            }
+            player.TakeTrapDamage(); // 함정 데미지 호출
         }
     }
 }
