@@ -1,7 +1,4 @@
-using TMPro;
-using UnityEditor.Rendering.CustomRenderTexture.ShaderGraph;
 using UnityEngine;
-using UnityEngine.InputSystem.Composites;
 using UnityEngine.UI;
 
 public class MainCharacterConfirmPanel : UIKeyboardHandler
