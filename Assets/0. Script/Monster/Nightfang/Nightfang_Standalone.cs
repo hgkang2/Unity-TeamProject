@@ -188,8 +188,11 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         dx = toPlayer.x;
         distance = toPlayer.magnitude;
 
-        if (Mathf.Abs(dx) > freezeZoneX)
+        if(state == State.Aggro)
+        {
+            if (Mathf.Abs(dx) > freezeZoneX)
             moveDirX = dx > 0f ? 1 : -1;
+        }
     }
     
     void RunFSM()
@@ -214,19 +217,19 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if(!canMove) return;
 
+        if (enablePatrol && stateTimer >= idleTime && !isHit)
+        {
+            moveDirX *= -1;
+            ApplyFlip();
+            ChangeState(State.Patrol);
+            animator?.SetTrigger("Patrol");
+            return;
+        }
+
         if (enableAggro && distance <= aggroRange && !isHit)
         {
             ChangeState(State.Aggro);
             animator?.SetTrigger("Aggro");
-            return;
-        }
-
-        if (enablePatrol && stateTimer >= idleTime && !isHit)
-        {
-            ApplyFlip();
-            moveDirX *= -1;
-            animator?.SetTrigger("Patrol");
-            ChangeState(State.Patrol);
             return;
         }
     }
@@ -257,6 +260,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             return;
         }
 
+        
         MoveX(moveDirX, patrolSpeed);
         facingX = moveDirX;
     }
@@ -428,7 +432,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     {
         // flip
         transform.localScale = new Vector3(
-            facingX < 0 ? originScale.x : -originScale.x,
+            facingX < 0 ? -originScale.x : originScale.x,
             originScale.y,
             originScale.z
         );
