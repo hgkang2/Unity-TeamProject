@@ -22,15 +22,17 @@ public class VFXManager : MonoBehaviour
 
     void Awake()
     {
-        // 싱글톤
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
-
         vfxManager = this;
         DontDestroyOnLoad(gameObject);
+
+        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        vfxCamera = sceneContext.VFXCamera;
+        clickVFX = sceneContext.clickVFX;
 
         RefreshCameras();
     }

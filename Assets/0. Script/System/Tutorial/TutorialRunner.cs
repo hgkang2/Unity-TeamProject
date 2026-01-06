@@ -1,22 +1,29 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
 
 public class TutorialRunner : MonoBehaviour
 {
-    [Header("Refs")]
-    public DialoguePanel dialoguePanel;
+    // 참조들
+    DialoguePanel dialoguePanel;
+    Player player;
+    TargetTrackerEmitter2D targetTrackerEmitter2D; // player 아래에 있음(TurotialCollider)
 
-    // 플레이어가 닿으면 발동되는 
-    [SerializeField] TutorialTrigger2D tutorialTrigger;
+    // 플레이어가 닿으면 발동되는 트리거
+    //[SerializeField] TutorialTrigger2D tutorialTrigger;
 
     List<ITutorialStep> steps;
     ITutorialStep currentStep;
     int stepIndex;
     bool isRunning;
-    public Player player;
 
+    void Awake()
+    {
+        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        dialoguePanel = sceneContext.dialoguePanel;
+        player = sceneContext.player;
+        targetTrackerEmitter2D = sceneContext.targetTrackerEmitter2D;
+    }
 
     void OnEnable()
     {
@@ -91,8 +98,6 @@ public class TutorialRunner : MonoBehaviour
     // Step 구성
     // -----------------------
 
-    [Header("Player의 튜토리얼 collider 붙이기")]
-    public TargetTrackerEmitter2D visionEmitter;
 
     void BuildSteps()
     {
@@ -108,8 +113,8 @@ public class TutorialRunner : MonoBehaviour
         steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
         // 2) 몬스터 발견
         steps.Add(new WaitEventCountStep(
-            subscribe: cb => visionEmitter.TargetEntered += cb,
-            unsubscribe: cb => visionEmitter.TargetEntered -= cb,
+            subscribe: cb => targetTrackerEmitter2D.TargetEntered += cb,
+            unsubscribe: cb => targetTrackerEmitter2D.TargetEntered -= cb,
             targetCount: 1
         ));
 

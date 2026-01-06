@@ -14,18 +14,21 @@ public class StageUI : MonoBehaviour
     [SerializeField] GameObject settingPanel;
 
     //레벨업 이벤트 구독 용
-    [SerializeField] Exp exp;
-
+    Exp exp;
     //레벨업 시 띄우기
-    [SerializeField] LevelUpPanel levelUpPanel;
+    LevelUpPanel levelUpPanel;
 
     //보유 영성 ui
-    [SerializeField] GameObject haveSoulsUI;
+    GameObject haveSoulsUI;
 
     void Awake()
     {
+        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        levelUpPanel = sceneContext.levelUpPanel;
+        haveSoulsUI = sceneContext.haveSoulsPanel.gameObject;
+
         //이벤트 구독
-        exp.LevelChanged += HandleLevelUp;
+        sceneContext.player.Exp.LevelChanged += HandleLevelUp;
         levelUpPanel.SelectSoulCompleted += HideLevelupPanel;
 
         //기본적으로 모든 ui 한번 열었다 닫기(초기화용)
@@ -48,7 +51,8 @@ public class StageUI : MonoBehaviour
     }
     void OnDestroy()
     {
-        exp.LevelChanged -= HandleLevelUp;
+        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        sceneContext.player.Exp.LevelChanged -= HandleLevelUp;
         levelUpPanel.SelectSoulCompleted -= HideLevelupPanel;
     }
 

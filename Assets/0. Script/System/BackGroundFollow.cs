@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BackGroundFollow : MonoBehaviour
 {
-    [SerializeField] Transform cam;
+    Transform cam;
     [SerializeField, Range(0f, 1f)] float followFactor = 0.15f;
 
     Vector3 startPos;
@@ -10,11 +10,8 @@ public class BackGroundFollow : MonoBehaviour
 
     void Awake()
     {
-        if (cam == null)
-        {
-            Camera main = Camera.main;
-            if (main != null) cam = main.transform;
-        }
+        Camera main = Camera.main;
+        cam = main.transform;
 
         startPos = transform.position;
         camStartX = cam != null ? cam.position.x : 0f;

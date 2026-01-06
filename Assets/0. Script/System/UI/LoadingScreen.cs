@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class LoadingScreen : MonoBehaviour
 {
     [SerializeField] ProgressBar progressBar;
-    [SerializeField] float minDisplayTime = 1.0f; // 로딩이 너무 빨리 끝나도 최소 1초는 보여주기
+    [SerializeField] float minDisplayTime = 0.75f; // 로딩이 너무 빨리 끝나도 최소 0.75초는 보여주기
 
     void Start()
     {

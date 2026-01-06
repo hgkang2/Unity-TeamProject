@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 public class HaveSoulsPanel : MonoBehaviour
 {
     [SerializeField] HaveSoulTooltipUI soulTooltipUI;
-    [SerializeField] SoulManager SM;
     [SerializeField] HaveSoulSlot haveSoulSlotPrefab;
     List<IInteractiveView<SoulData>> uiSlots = new List<IInteractiveView<SoulData>>();
     [SerializeField] List<Transform> emptySlot = new List<Transform>();
@@ -47,10 +46,10 @@ public class HaveSoulsPanel : MonoBehaviour
         forwarder.MouseEntered += HandleMouseEnter;
 
         // 미니아이콘 슬롯 생성 및 바인딩
-        for(int i=0; i<SM.CurSouls.Count; i++)
+        for(int i=0; i<SoulManager.Instance.CurSouls.Count; i++)
         {
             HaveSoulSlot haveSoulUI = Instantiate(haveSoulSlotPrefab, transform);
-            haveSoulUI.Bind(SM.CurSouls[i].data);
+            haveSoulUI.Bind(SoulManager.Instance.CurSouls[i].data);
             uiSlots.Add(haveSoulUI);
 
             haveSoulUI.transform.position = emptySlot[i].transform.position;

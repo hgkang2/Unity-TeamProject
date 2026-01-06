@@ -18,7 +18,9 @@ public class HPBar : MonoBehaviour
     void Awake() 
     {
         progressBar = GetComponent<ProgressBar>();
-        if(targetHP != null) Bind(targetHP);
+
+        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        Bind(sceneContext.player.HP);
     }
 
 
@@ -30,18 +32,11 @@ public class HPBar : MonoBehaviour
     public void Bind(HP hp)
     {
         targetHP = hp;
-        if (targetHP == null) return;
 
         //이벤트 구독
         targetHP.OnHPChanged += HandleHPChanged;
         //초기값 반영
         progressBar.SetValue(targetHP.CurHP, targetHP.MaxHP);
-    }
-
-    public void Bind(HP hp, Transform anchor)
-    {
-        Bind(hp);
-        this.anchor = anchor;
     }
 
     public void Clear(){

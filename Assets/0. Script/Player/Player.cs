@@ -5,17 +5,17 @@ using UnityEngine;
 
 public class Player : MonoBehaviour, IDamageable
 {
-    HP hp;
+    [SerializeField] HP hp;
     public HP HP { get { return hp; } }
 
-    Exp exp;
+    [SerializeField] Exp exp;
     public Exp Exp { get { return exp; } }
 
     PlayerStats stats;
     public PlayerStats Stats { get { return stats; } }
 
-    public PlayerMove playerMove;
-    public PlayerAttack playerAttack;
+    [HideInInspector] public PlayerMove playerMove;
+    [HideInInspector] public PlayerAttack playerAttack;
 
     public SpriteRenderer playerSprite;
     public GameObject playerPartSprite;
@@ -77,14 +77,19 @@ public class Player : MonoBehaviour, IDamageable
     }
     #endregion
 
+
     #region 회피
-    [SerializeField] GameObject dodgeEffectSprite;
+    [Header("Dodge")]
+    
     public bool isDodging = false;
     public bool Dodgeflag = false;
     public float dodgeDuration = 1f;
     public float dodgeCooldown = 2f;
+    [SerializeField] GameObject dodgeEffectSprite;
+
     float nextDodgeAvailableTime = 0f;
     Coroutine dodgeRoutine;
+
     void OnDodgePressed()
     {
         //회피 가능 조건 확인
@@ -138,8 +143,8 @@ public class Player : MonoBehaviour, IDamageable
     }
     #endregion
 
-    #region 착지 공격
-    [Header("Air Down Attack")]
+    #region 아래 공격
+    [Header("Down Attack")]
     [SerializeField] float airDownPrepareDuration = 0.15f;
 
     public bool isAirDownAttack;

@@ -5,7 +5,7 @@ using System.Linq;
 
 public class SoulManager : MonoBehaviour
 {
-    [SerializeField] Player player;
+    Player player;
 
     // 데이터 원본. 
     List<SoulData> allSouls;
@@ -18,11 +18,7 @@ public class SoulManager : MonoBehaviour
 
     public static SoulManager Instance {get; private set;}
     void Awake()
-    {   // Resources/SoulDatas 폴더
-        SoulData[] loaded = Resources.LoadAll<SoulData>("SoulDatas");
-        allSouls = loaded.ToList();
-
-        // 싱글톤
+    {   
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -31,6 +27,14 @@ public class SoulManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        // 데이터 읽어오기. Resources/SoulDatas 폴더
+        SoulData[] loaded = Resources.LoadAll<SoulData>("SoulDatas");
+        allSouls = loaded.ToList();
+
+        // 참조 가져오기.
+        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        player = sceneContext.player;
     }
 
     public void EnrollSoul(SoulData data)

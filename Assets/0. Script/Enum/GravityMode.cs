@@ -1,4 +1,4 @@
-enum GravityMode
+public enum GravityMode
 {
     Normal,
     Falling,

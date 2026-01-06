@@ -6,14 +6,10 @@ using DG.Tweening;
 
 public class LevelUpPanel : UIKeyboardHandler
 {
-    public CanvasGroup cg;
-    [SerializeField] SoulManager soulManager;
+    CanvasGroup cg;
     SoulPanel[] soulPanels;
     [SerializeField] Button rerollButton;
     [SerializeField] TMP_Text rerollText;
-    [Header("리롤할 수 있는 횟수(매번 초기화됨)")]
-    [SerializeField] int RerollNum = 2;
-    int remainRerollNum;
     int panelNum = 2;
     SoulPanel selectedSoulPanel;
 
@@ -23,6 +19,7 @@ public class LevelUpPanel : UIKeyboardHandler
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
+        
         soulPanels = GetComponentsInChildren<SoulPanel>();
         for (int i = 0; i < 3; i++)
         {
@@ -38,7 +35,7 @@ public class LevelUpPanel : UIKeyboardHandler
 
         //대충 영성 선택지 2~3개 뜨게 하는 로직(임시)
         float rand = UnityEngine.Random.value;
-        if (rand < 0.7) panelNum = 2;
+        if (rand < 0.75) panelNum = 2;
         else panelNum = 3;
 
         for (int i = 0; i < 3; i++)
@@ -97,7 +94,7 @@ public class LevelUpPanel : UIKeyboardHandler
     void StartAnim()
     {
         // 전체 연출 설정 초기화
-
+        HideRerollButton();
         // 연출 중 입력 차단
         DisableInput();
 
@@ -221,6 +218,7 @@ public class LevelUpPanel : UIKeyboardHandler
         animSequence.OnComplete(() =>
         {
             isAnimating = false;
+            ShowRerollButton();
             EnableInput();
         });
     }
@@ -238,13 +236,19 @@ public class LevelUpPanel : UIKeyboardHandler
     #endregion
 
     #region 리롤
+    [Header("리롤할 수 있는 횟수(매번 초기화됨)")]
+    [SerializeField] int RerollNum = 2;
+    int remainRerollNum;
+    [SerializeField] CanvasGroup rerollButtonCG;
+    [SerializeField] Image canRerollButtonImage;
+    [SerializeField] Image cantRerollButtonImage;
     SoulData[] candidates;
     public void Reroll()
     {
-        if (remainRerollNum == 0) return;
-
-        RerollButtonAnimation();
-
+        if(remainRerollNum <= 0)
+        {
+            return;
+        }
         DisableInput();
 
         // 시퀀스 생성
@@ -256,7 +260,7 @@ public class LevelUpPanel : UIKeyboardHandler
             RectTransform rect = soulPanels[i].GetComponent<RectTransform>();
             Sequence cardSeq = DOTween.Sequence();
 
-            // 6단계 : 회전 + 내용 보이기
+            // 90도 회전
             cardSeq.Append(
                 rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
@@ -271,6 +275,7 @@ public class LevelUpPanel : UIKeyboardHandler
                 rect.localRotation = Quaternion.Euler(0f, -90f, 0f);
             });
 
+            // 다시 90도 회전
             cardSeq.Append(
                 rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
@@ -285,25 +290,17 @@ public class LevelUpPanel : UIKeyboardHandler
         //if (remainRerollNum == 0) rerollText.color = Color.red;
         //else rerollText.color = Color.white;
         rerollText.SetText("{0}", remainRerollNum);
+        RefreshRerollButton();
         //if(remainRerollNum < RerollNum) PlayRerollIconAnim();
     }
 
-    //리롤 버튼 애니메이션
-    public void RerollButtonAnimation()
-    {
-        Sequence s;
-        s = DOTween.Sequence();
-        s.Append(rerollButton.transform.DOScale(0.95f, 0.25f).SetEase(Ease.OutQuint))
-        .Append(rerollButton.transform.DOScale(1f, 0.25f).SetEase(Ease.InQuart))
-        .SetUpdate(true);
-    }
     #endregion
 
     //영성 뽑기(현재 활성화된 panel 만큼)
     void DrawSoul()
     {
         HandleDeSelectSoul();
-        candidates = soulManager.GetSouls(candidates, panelNum);
+        candidates = SoulManager.Instance.GetSouls(candidates, panelNum);
 
         if (candidates == null) Debug.Log("뽑을 수 있는 영성이 없음");
         else
@@ -328,7 +325,7 @@ public class LevelUpPanel : UIKeyboardHandler
     {
         if (selectedSoulPanel == null) return;
 
-        soulManager.EnrollSoul(selectedSoulPanel.SoulData);
+        SoulManager.Instance.EnrollSoul(selectedSoulPanel.SoulData);
         SelectSoulCompleted?.Invoke();
     }
 
@@ -422,7 +419,33 @@ public class LevelUpPanel : UIKeyboardHandler
         cg.interactable = false;
         canInput = false;
     }
-    
+    void ShowRerollButton()
+    {
+        rerollButtonCG.alpha = 1;
+        rerollButtonCG.blocksRaycasts = true;
+        rerollButtonCG.interactable = true;
+        RefreshRerollButton();
+    }
+    void HideRerollButton()
+    {
+        rerollButtonCG.alpha = 0;
+        rerollButtonCG.blocksRaycasts = false;
+        rerollButtonCG.interactable = false;
+    }
+    void RefreshRerollButton()
+    {
+        if (remainRerollNum > 0)
+        {
+            canRerollButtonImage.enabled = true;
+            cantRerollButtonImage.enabled = false;
+        }
+        else
+        {
+            canRerollButtonImage.enabled = false;
+            cantRerollButtonImage.enabled = true;
+        }
+    }
+
     #region 키보드 조작
     //키보드로 영성 선택
     int? curIndex = null;

@@ -5,7 +5,7 @@ using TMPro;
 public class ExpBar : MonoBehaviour
 {
     // Exp 수동 지정시 자동 바인드. 런타임 지정시 반드시 수동 Bind 하기
-    [SerializeField] Exp targetExp;
+    Exp targetExp;
     [SerializeField] TMP_Text curExpText;
     [SerializeField] TMP_Text maxExpText;
     [SerializeField] TMP_Text curLevelText;
@@ -15,10 +15,9 @@ public class ExpBar : MonoBehaviour
     void Awake()
     {
         progressBar = GetComponent<ProgressBar>();
-        if (targetExp != null)
-        {
-            Bind(targetExp);
-        }
+
+        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        Bind(sceneContext.player.Exp);
     }
 
     void OnDisable()
@@ -32,10 +31,6 @@ public class ExpBar : MonoBehaviour
         Clear();
 
         targetExp = exp;
-        if (targetExp == null)
-        {
-            return;
-        }
 
         // 이벤트 구독
         targetExp.ExpChanged += HandleExpChanged;
@@ -47,10 +42,7 @@ public class ExpBar : MonoBehaviour
 
     public void Clear()
     {
-        if (targetExp == null)
-        {
-            return;
-        }
+        if (targetExp == null) return;
 
         targetExp.ExpChanged -= HandleExpChanged;
         targetExp.LevelChanged -= HandleLevelChanged;
@@ -59,12 +51,6 @@ public class ExpBar : MonoBehaviour
 
     void HandleExpChanged(int cur, int max)
     {
-        if (progressBar == null)
-        {
-            Debug.Log("progressbar null. 채워넣으시오");
-            return;
-        }
-
         progressBar.SetValue(cur, max);
         curExpText.SetText("{0}", cur);
         maxExpText.SetText("{0}", max);

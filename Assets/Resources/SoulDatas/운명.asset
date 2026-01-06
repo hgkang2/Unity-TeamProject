@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   index: 1001
   soulSprite: {fileID: 21300000, guid: d11488c9e300e6540818e5e677c100ee, type: 3}
-  soulIcon: {fileID: -8513547040226403973, guid: 91930ad924b7519459132d323a109155, type: 3}
+  soulIcon: {fileID: 21300000, guid: 91930ad924b7519459132d323a109155, type: 3}
   displayName: "\uC6B4\uBA85"
   soulEffectText: Atk +
   soulEffectText2: '%'

@@ -6,12 +6,10 @@ public class HaveSoulTooltipUI : MonoBehaviour
 {
     public RectTransform rect;
     
+    
+    [SerializeField] Image soulImage; // front랑 같음
     [SerializeField] CanvasGroup front;
     [SerializeField] CanvasGroup back;
-    [SerializeField] Image soulImage;
-    [SerializeField] TMP_Text soulName;
-    [SerializeField] TMP_Text soulEffect;
-    [SerializeField] TMP_Text soulDescript;
 
 
 
@@ -31,16 +29,5 @@ public class HaveSoulTooltipUI : MonoBehaviour
     public void Set(SoulData data)
     {
         soulImage.sprite = data.soulSprite;
-        soulName.text = data.displayName;
-        int value = data.GetValue();
-        if(value != -1 && value != 0)
-        {
-            soulEffect.text = $"{data.soulEffectText}{data.GetValue()}{data.soulEffectText2}";
-        }
-        else
-        {
-            soulEffect.text = $"{data.soulEffectText}";
-        }
-        soulDescript.text = data.soulDescript;
     }
 }

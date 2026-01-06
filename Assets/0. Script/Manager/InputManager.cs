@@ -7,8 +7,7 @@ using UnityEngine.SceneManagement;
 public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
-    [SerializeField] VFXManager vfxManager;
-    [SerializeField] Camera mainCamera;
+    Camera mainCamera;
 
     GameInputActions input;
 
@@ -154,7 +153,7 @@ public class InputManager : MonoBehaviour
     #region System Input
     void OnLeftClick(InputAction.CallbackContext ctx)
     {
-        vfxManager.MouseClickVFX();
+        VFXManager.Instance.MouseClickVFX();
         //SoundManager.Instance.PlayUI("Click");
     }
     #endregion

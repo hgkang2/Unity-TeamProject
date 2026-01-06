@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   index: 1002
   soulSprite: {fileID: 21300000, guid: c939458d6bf950b41b23f90d032810e9, type: 3}
-  soulIcon: {fileID: 4522256801638119597, guid: e2713050a6fe1a240a60830ea0ff8303, type: 3}
+  soulIcon: {fileID: 21300000, guid: e2713050a6fe1a240a60830ea0ff8303, type: 3}
   displayName: "\uC131\uC7A5"
   soulEffectText: Max HP +
   soulEffectText2: 

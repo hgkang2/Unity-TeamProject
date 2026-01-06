@@ -4,7 +4,7 @@ public class LoadDataUI : UIKeyboardHandler
 {
     protected override void OnUIMove(Vector2 dir)
     {
-        throw new System.NotImplementedException();
+        
     }
     protected override void OnUICancel()
     {
