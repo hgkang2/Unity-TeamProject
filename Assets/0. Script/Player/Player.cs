@@ -93,7 +93,6 @@ public class Player : MonoBehaviour, IDamageable
     void OnDodgePressed()
     {
         //회피 가능 조건 확인
-        if (TimeManager.IsPaused) return;
         if (!CanControl) return;
         if (Time.time < nextDodgeAvailableTime) return;
         if (isDodging) return;
@@ -419,7 +418,6 @@ public class Player : MonoBehaviour, IDamageable
     
     public void SetControlLocked(bool b)
     {
-        Debug.Log($"Locked : {b}");
         isInCinematic = b;
     }
 }

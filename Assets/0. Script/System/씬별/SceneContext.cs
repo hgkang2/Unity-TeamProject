@@ -6,11 +6,11 @@ public class SceneContext : MonoBehaviour
     
     public Player player;
     [Header("Player/TutorialCollider")]
-    public TargetTrackerEmitter2D targetTrackerEmitter2D;
     
     [Header("CameraManager/Cameras/MouseVFXCamera")]
     public Camera VFXCamera;
     public CinemachineCamera cinemachineCamera;
+    public CinemachineCamera cinemachineCamera_tutorialTrap;
     
     public DialoguePanel dialoguePanel;
     public LevelUpPanel levelUpPanel;

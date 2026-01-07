@@ -465,7 +465,7 @@ MonoBehaviour:
   holdSeconds: 2
   key: 27
   audioSource: {fileID: 21887685}
-  GotoSceneName: Stage1
+  GotoSceneName: Tutorial
   autoSkipTime: 52
 --- !u!1 &930735689
 GameObject:
@@ -582,10 +582,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d690053e3872c14c909ce9e66fa8d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialoguePanel: {fileID: 0}
-  tutorialTrigger: {fileID: 0}
-  player: {fileID: 0}
-  visionEmitter: {fileID: 0}
 --- !u!114 &1457200640
 MonoBehaviour:
   m_ObjectHideFlags: 0

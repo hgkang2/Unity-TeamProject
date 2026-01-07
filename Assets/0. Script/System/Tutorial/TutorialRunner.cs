@@ -2,15 +2,19 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+//GameManager에 붙여놓음
 public class TutorialRunner : MonoBehaviour
 {
     // 참조들
+    [SerializeField] EventHub eventHub;
     DialoguePanel dialoguePanel;
     Player player;
-    TargetTrackerEmitter2D targetTrackerEmitter2D; // player 아래에 있음(TurotialCollider)
-
-    // 플레이어가 닿으면 발동되는 트리거
-    //[SerializeField] TutorialTrigger2D tutorialTrigger;
+    // 처음 몬스터 만났을 때 대사 띄우는 트리거
+    [SerializeField] TutorialTrigger2D tutorialTrigger_monsterMeet; 
+    // 몹 처치하기 전까지 다음으로 못 가게 막는 벽
+    [SerializeField] Collider2D tutorialWall;
+    // 함정 앞에서 대사 띄우는 트리거
+    [SerializeField] TutorialTrigger2D tutorialTrigger_trap;
 
     List<ITutorialStep> steps;
     ITutorialStep currentStep;
@@ -23,7 +27,6 @@ public class TutorialRunner : MonoBehaviour
         dialoguePanel = sceneContext.dialoguePanel;
         dialoguePanel.gameObject.SetActive(true);
         player = sceneContext.player;
-        targetTrackerEmitter2D = sceneContext.targetTrackerEmitter2D;
     }
 
     void OnEnable()
@@ -60,7 +63,13 @@ public class TutorialRunner : MonoBehaviour
     }
 
     void Update()
-    {
+    {   
+        // 테스트용. 나중에 꼭 삭제하기
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            eventHub.monster.RaiseMonsterDead();
+        }
+
         if (!isRunning || currentStep == null)
             return;
 
@@ -112,84 +121,94 @@ public class TutorialRunner : MonoBehaviour
             "검은.. 여명회… 그들은 대체 왜 이런짓을…"
         }));
         steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
-        // 2) 몬스터 발견
+
+        // 2) 몬스터 발견시 일반 공격 안내
         steps.Add(new WaitEventCountStep(
-            subscribe: cb => targetTrackerEmitter2D.TargetEntered += cb,
-            unsubscribe: cb => targetTrackerEmitter2D.TargetEntered -= cb,
+            subscribe: cb => tutorialTrigger_monsterMeet.Triggered += cb,
+            unsubscribe: cb => tutorialTrigger_monsterMeet.Triggered -= cb,
             targetCount: 1
         ));
-
-        // 2) 멈추고 공격 키 누르게 하기
-
+       
         steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
         steps.Add(new CallStep(() => { TimeManager.Pause(); }));
         steps.Add(new DialogueStep(dialoguePanel, new string[]
         {
-            "괴물이잖아!!  [A] 키를 입력해서 공격 하자!"
+            "괴물이잖아!!  [A] 키를 입력해서 공격하자!",
         }));
 
         steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
         steps.Add(new WaitEventCountStep(
-            SubscribeAttackCommitted,
-            UnsubscribeAttackCommitted, 1
+            cb => InputManager.Instance.AttackPressed += cb,
+            cb => InputManager.Instance.AttackPressed -= cb, 1
         ));
         steps.Add(new CallStep(() => { TimeManager.Resume(); }));
 
-        steps.Add(new WaitSecondsStep(1.5f));
-
-        // 3) 점프
+        // 3) 공격 시도 완료.
         steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
+        steps.Add(new WaitSecondsStep(0.5f));
+
+        // 4) 점프, 회피 안내
         steps.Add(new CallStep(() => { TimeManager.Pause(); }));
         steps.Add(new DialogueStep(dialoguePanel, new string[]
         {
-            "저 녀석이 무언가 하려고 한다! 점프해서 피하자."
-        }));
-        steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
-        steps.Add(new WaitEventCountStep(SubscribeJump, UnsubscribeJump, 1));
-        steps.Add(new CallStep(() => { TimeManager.Resume(); }));
-
-        steps.Add(new WaitSecondsStep(1f));
-
-        // 4) 아래공격
-        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
-        steps.Add(new CallStep(() => TimeManager.Pause()));
-        steps.Add(new DialogueStep(dialoguePanel, new string[]
-        {
-            "지금이야!! [↓] + [A] 키 입력으로 하단 공격을 하자!"
+            "저 녀석이 공격하려고 하면 점프[Space] 혹은 회피[D] 로 피하자."
         }));
         steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
         steps.Add(new WaitEventCountStep(
-            SubscribeAttackCommitted,
-            UnsubscribeAttackCommitted, 1
-            ));
-        steps.Add(new CallStep(() => TimeManager.Resume()));
+            SubscribeDodgePressed, 
+            UnsubscribeDodgePressed, 1
+        ));
+        steps.Add(new CallStep(() => { TimeManager.Resume(); }));
 
+        // 5) 몹 처치까지 대기
+        steps.Add(new WaitEventCountStep(
+            cb => eventHub.monster.monsterDead += cb, 
+            cb => eventHub.monster.monsterDead -= cb, 1
+        ));
+        
+        // 6) 몹 처치 완료 후 종료
+        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
         steps.Add(new DialogueStep(dialoguePanel, new string[]
         {
-            "완료!"
+            "후.. 앞으로 이런 괴물들을 상대해야 하는건가??",
+            "조금.. 버거울지도 모르겠어.. 일단 앞으로 가보자."
         }));
+        steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
+        steps.Add(new CallStep(() => { tutorialWall.gameObject.SetActive(false); }));
+
+        // 7) 함정 앞에서 경고
+        steps.Add(new WaitEventCountStep(
+            subscribe: cb => tutorialTrigger_trap.Triggered += cb,
+            unsubscribe: cb => tutorialTrigger_trap.Triggered -= cb,
+            targetCount: 1
+        ));
+        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
+        steps.Add(new DialogueStep(dialoguePanel, new string[]
+        {
+            "조심해!! 앞에 함정이 있어!"
+        }));
+        steps.Add(new CallStep(() => { CameraManager.Instance.ChangeCinemachineTutorialTrap(); }));
+        steps.Add(new WaitEventCountStep(
+            subscribe: cb => CameraManager.Instance.CinemachineSequenceFinished += cb,
+            unsubscribe: cb => CameraManager.Instance.CinemachineSequenceFinished -= cb,
+            targetCount: 1
+        ));
+        steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
+
         steps.Add(new CallStep(OnTutorialFinished));
     }
 
-    void SubscribeAttackCommitted(Action callback)
-    {
-        InputManager.Instance.AttackPressed += callback;
-    }
-
-    void UnsubscribeAttackCommitted(Action callback)
-    {
-        InputManager.Instance.AttackPressed -= callback;
-    }
-
-    void SubscribeJump(Action callback)
+    void SubscribeDodgePressed(Action callback)
     {
         InputManager.Instance.JumpPressed += callback;
+        InputManager.Instance.DodgePressed += callback;
     }
-
-    void UnsubscribeJump(Action callback)
+    void UnsubscribeDodgePressed(Action callback)
     {
         InputManager.Instance.JumpPressed -= callback;
+        InputManager.Instance.DodgePressed -= callback;
     }
+
 
     void OnTutorialFinished()
     {
@@ -199,20 +218,6 @@ public class TutorialRunner : MonoBehaviour
 
 
     #region Tutorial Step Interfaces / Implementations
-
-    public class TutorialTrigger2D : MonoBehaviour
-    {
-        public event Action Triggered;
-
-        void OnTriggerEnter2D(Collider2D other)
-        {
-            if (!other.CompareTag("Player"))
-                return;
-
-            Triggered?.Invoke();
-        }
-    }
-
     public interface ITutorialStep
     {
         void Enter();
