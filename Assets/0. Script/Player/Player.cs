@@ -361,37 +361,23 @@ public class Player : MonoBehaviour, IDamageable
 
     public void TakeTrapDamage()
     {
-        if (isInvincible || HP.IsDead) return;
-
-        isTrapDeath = true;
-        hp.Kill();
+        Respawn();
     }
+
     void HandleDie()
     {
         playerMove.HandleDieMotion();
         sfx.Play("Die");
         // + 기타 사망 연출
-        if (!isTrapDeath)
-        {
-            Destroy(gameObject, 2f);
-        }
     }
 
     //사망 후 처리 (애니메이션 프레임 이벤트로 호출)
     public void OnEndDieAnimation()
     {
-        if (isTrapDeath)
-        {
-            // 함정 사망이면 부활 로직 실행
-            Respawn();
-        }
-        else
-        {
-            // 일반 사망이면 기존처럼 씬 이동
-            SceneLoader.LoadScene("Start");
-            playerSprite.enabled = false;
-        }
+        SceneLoader.LoadScene("Start");
+        playerSprite.enabled = false;
     }
+
     private void Respawn()
     {
         isTrapDeath = false;

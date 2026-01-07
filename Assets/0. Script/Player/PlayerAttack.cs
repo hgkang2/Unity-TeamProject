@@ -24,10 +24,6 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] PlayerHitBox downHitbox;
     //[SerializeField] PlayerHitBox specialHitbox;
 
-    [Header("각 공격별 이펙트")]
-    [SerializeField] GameObject basicAttackVFX;
-    [SerializeField] Transform basicAttackPos;
-
     public bool isAttacking;
     AttackType currentType = AttackType.None;
 
@@ -152,14 +148,12 @@ public class PlayerAttack : MonoBehaviour
         else
         {
             type = AttackType.Normal;
-            attackVFXPos = basicAttackPos;
             sfxKey = "Attack";
             vfxKey = "Attack";
         }
 
         StartAttack(type);
     }
-    Transform attackVFXPos;
 
     void HandleSpecialAttackPressed()
     {

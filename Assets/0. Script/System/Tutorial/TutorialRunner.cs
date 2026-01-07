@@ -21,6 +21,7 @@ public class TutorialRunner : MonoBehaviour
     {
         SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
         dialoguePanel = sceneContext.dialoguePanel;
+        dialoguePanel.gameObject.SetActive(true);
         player = sceneContext.player;
         targetTrackerEmitter2D = sceneContext.targetTrackerEmitter2D;
     }

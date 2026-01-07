@@ -49,6 +49,7 @@ Transform:
   - {fileID: 7545007637514635383}
   - {fileID: 8899078199094464230}
   - {fileID: 8597062413363788697}
+  - {fileID: 4312179273288632011}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7343844498170976683
@@ -96,15 +97,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf701f8d195e4ef4c8c6387d011b3904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hp: {fileID: 6733278554063955151}
+  exp: {fileID: 3246203202638581411}
   playerMove: {fileID: 6797658465126727401}
   playerAttack: {fileID: 0}
   playerSprite: {fileID: 751621784933970427}
   playerPartSprite: {fileID: 79729050403937579}
-  dodgeEffectSprite: {fileID: 4333207113835227846}
   isDodging: 0
   Dodgeflag: 0
   dodgeDuration: 0.5
   dodgeCooldown: 1
+  dodgeEffectSprite: {fileID: 4333207113835227846}
   airDownPrepareDuration: 0.15
   isAirDownAttack: 0
   isAirDownPrepare: 0
@@ -129,8 +132,6 @@ MonoBehaviour:
   normalHitbox: {fileID: 3068524302203164029}
   upHitbox: {fileID: 4931711516456578153}
   downHitbox: {fileID: 7484912635782620706}
-  basicAttackVFX: {fileID: 6225071935297065222, guid: 1de816a5707f6de4b87623b5bce4cf86, type: 3}
-  basicAttackPos: {fileID: 4482612463717817495}
   isAttacking: 0
 --- !u!114 &6797658465126727401
 MonoBehaviour:
@@ -147,12 +148,15 @@ MonoBehaviour:
   inputVec: {x: 0, y: 0}
   isGrounded: 1
   isRightFacing: 1
+  gravityMode: 0
   coyoteTime: 0.12
   jumpBufferTime: 0.12
   airControlLerp: 6
   mygravity: 0
   maxJumpCount: 1
+  currentJumpCount: 0
   wallJumpForceX: 5
+  baseGrav: 9.81
   apexGravityMultiplier: 0.66
   apexThreshold: 0.6
   fallGravityMultiplier: 2.5
@@ -166,12 +170,12 @@ MonoBehaviour:
   minGroundDistanceForAirAttack: 0.3
   isWallGrabbing: 0
   isWallSliding: 0
+  wallSlideSpeed: 2
   wallMask:
     serializedVersion: 2
     m_Bits: 8
   wallCheckDistance: 0.03
   wallCheckYOffset: -0.22
-  wallSlideSpeed: 2
   isFootTouchingWall: 0
   footWallCheckDistance: 0.02
   footWallCheckYOffset: 0
@@ -550,6 +554,37 @@ Transform:
   - {fileID: 561609599497031824}
   - {fileID: 4709780940411707527}
   - {fileID: 5290539213164127824}
+  m_Father: {fileID: 6568192216305126023}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &117272117913441593
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4312179273288632011}
+  m_Layer: 6
+  m_Name: CameraFollowPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4312179273288632011
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117272117913441593}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 6568192216305126023}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &542362729140075842

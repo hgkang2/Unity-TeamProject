@@ -25,7 +25,7 @@ public class DialoguePanel : MonoBehaviour
 
     public bool IsPlaying => isPlaying;
 
-        void Awake()
+    void Awake()
     {
         cg = GetComponent<CanvasGroup>();
         Hide();

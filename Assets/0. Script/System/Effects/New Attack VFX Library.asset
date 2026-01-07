@@ -16,7 +16,7 @@ MonoBehaviour:
   - key: Attack
     prefab: {fileID: 6225071935297065222, guid: 1de816a5707f6de4b87623b5bce4cf86, type: 3}
     followOwner: 0
-    localOffset: {x: 0, y: 0, z: 0}
+    localOffset: {x: 0.1, y: 0.3, z: 0}
     localEuler: {x: 0, y: 0, z: 0}
   - key: UpAttack
     prefab: {fileID: 8195810819482942243, guid: 7efc3c3dc6f33c74cbf25fb223dc9c13, type: 3}
