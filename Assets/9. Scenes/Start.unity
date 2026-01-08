@@ -3204,6 +3204,7 @@ GameObject:
   - component: {fileID: 452603846}
   - component: {fileID: 452603845}
   - component: {fileID: 452603844}
+  - component: {fileID: 452603849}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -3311,14 +3312,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d958037d8b1e841999cfaa3b0fe722, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialDelay: 0.15
-  repeatInterval: 0.15
   openingImage: {fileID: 1707324184}
   mainPanel: {fileID: 1368267083}
   mainSaveDataPanel: {fileID: 977548161}
   mainCharacterChoicePanel: {fileID: 717272084}
   mainCharacterConfirmPanel: {fileID: 816629543}
   mainExitPanel: {fileID: 1207196868}
+--- !u!114 &452603849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 452603843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69b5b49ade139ea4fb6199d5764d8510, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialDelay: 0.4
+  repeatInterval: 0.08
 --- !u!1 &458594154
 GameObject:
   m_ObjectHideFlags: 0
@@ -5433,7 +5446,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &717272082
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5479,8 +5492,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e1ac0790a185994990ce227dd3a6021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialDelay: 0.4
-  repeatInterval: 0.08
   cg: {fileID: 0}
   slots:
   - {fileID: 331996520}
@@ -5696,8 +5707,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de9f5adc3a0a36446847d2625e197785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialDelay: 0.4
-  repeatInterval: 0.08
   cg: {fileID: 0}
   confirmButton: {fileID: 524627893}
   cancelButton: {fileID: 1324243564}
@@ -5867,7 +5876,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &977548156
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5924,8 +5933,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 282ca9550ec7107478d6efdf8c28821d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialDelay: 0.4
-  repeatInterval: 0.08
   cg: {fileID: 0}
   mainCharacterChoicePanel: {fileID: 717272084}
   slots:
@@ -6020,7 +6027,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 452603848}
         m_TargetAssemblyTypeName: StartUI, Assembly-CSharp
-        m_MethodName: OpenMainSaveDatePanel
+        m_MethodName: OpenMainSaveDataPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7356,8 +7363,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e6f74e7cac31d04688a1284188ad90a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialDelay: 0.4
-  repeatInterval: 0.08
   cg: {fileID: 0}
   ConfirmButton: {fileID: 458594156}
   CancelButton: {fileID: 337817127}
@@ -7940,10 +7945,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d690053e3872c14c909ce9e66fa8d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialoguePanel: {fileID: 0}
-  tutorialTrigger: {fileID: 0}
-  visionEmitter: {fileID: 0}
-  targetMonster: {fileID: 0}
+  eventHub: {fileID: 0}
+  tutorialTrigger_monsterMeet: {fileID: 0}
+  tutorialWall: {fileID: 0}
+  tutorialTrigger_trap: {fileID: 0}
 --- !u!114 &1276273405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8398,8 +8403,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24b4035e237fd7749af5cd1b6bb94e5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialDelay: 0.4
-  repeatInterval: 0.08
   cg: {fileID: 0}
   ButtonSelectImage: {fileID: 1505121409}
 --- !u!1 &1424450064
@@ -11689,8 +11692,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7199b37b6c77bac40a45f1a14a160a05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxManager: {fileID: 1825389304565578702}
-  mainCamera: {fileID: 111838933}
 --- !u!114 &1825389304565578702
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainExitPanel : UIKeyboardHandler
+public class MainExitPanel : MonoBehaviour, IUIKeyboardTarget
 {
     public CanvasGroup cg;
     [SerializeField] Button ConfirmButton;
@@ -10,17 +10,6 @@ public class MainExitPanel : UIKeyboardHandler
     private void Awake()
     {
         cg = GetComponent<CanvasGroup>();
-    }
-    protected override void OnUIMove(Vector2 dir)
-    {
-        //좌우 방향키로 예/아니오 선택
-        //if (dir.x < -0.1f) ;
-        //else if (dir.x > 0.1f) ;
-    }
-
-    protected override void OnUIConfirm()
-    {
-        // 상호작용 키 눌러서 선택된 버튼 확인
     }
     public void Open()
     {
@@ -36,5 +25,20 @@ public class MainExitPanel : UIKeyboardHandler
         cg.blocksRaycasts = false;
         cg.interactable = false;
         enabled = false;
+    }
+
+    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
+    {
+        
+    }
+
+    void IUIKeyboardTarget.OnUIConfirm()
+    {
+        
+    }
+
+    public void OnUICancel()
+    {
+        
     }
 }

@@ -4,8 +4,10 @@ using RuntimeInspectorNamespace;
 using TMPro;
 using UnityEngine.UIElements;
 
-public class HaveSoulsPanel : MonoBehaviour
+public class HaveSoulsPanel : MonoBehaviour, IOpenStackUI
 {
+    SceneContext sceneContext;
+    public bool PauseGame => false;
     [SerializeField] HaveSoulTooltipUI soulTooltipUI;
     [SerializeField] HaveSoulSlot haveSoulSlotPrefab;
     List<IInteractiveView<SoulData>> uiSlots = new List<IInteractiveView<SoulData>>();
@@ -18,11 +20,15 @@ public class HaveSoulsPanel : MonoBehaviour
 
     [SerializeField] Exp exp;
     
+    CanvasGroup cg;
     
     void Awake()
     {
+        sceneContext = FindFirstObjectByType<SceneContext>();
+        exp = sceneContext.player.Exp;
+
         forwarder = GetComponent<SoulPanelEventAggregator>();
-        exp = FindFirstObjectByType<Exp>();
+        cg = GetComponent<CanvasGroup>();
     }
 
     void OnEnable()
@@ -85,6 +91,7 @@ public class HaveSoulsPanel : MonoBehaviour
 
     [SerializeField] TMP_Text statText;
     [SerializeField] TMP_Text effectText;
+
     void UpdateSoulEffects(List<SoulInstance> curSouls)
     {
         if(curSouls == null || curSouls.Count == 0) return;
@@ -120,6 +127,19 @@ public class HaveSoulsPanel : MonoBehaviour
     {
         //클릭했을 때 고정되는 등 효ㅘ
         //HideTooltipUI();
+    }
+
+    public void Show()
+    {
+        cg.alpha = 1;
+        cg.blocksRaycasts = true;
+        cg.interactable = true;
+    }
+    public void Hide()
+    {
+        cg.alpha = 0;
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
     }
 
     void ShowTooltipUI(SoulData data)

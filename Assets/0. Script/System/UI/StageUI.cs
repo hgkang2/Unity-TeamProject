@@ -8,10 +8,10 @@ public class StageUI : MonoBehaviour
     [SerializeField] TMP_Text characterName;
 
     //esc 일시 정지 창
-    [SerializeField] GameObject escpanel;
+    [SerializeField] MonoBehaviour escpanel;
 
     //esc 하위의 설정 창
-    [SerializeField] GameObject settingPanel;
+    [SerializeField] MonoBehaviour settingPanel;
 
     //레벨업 이벤트 구독 용
     Exp exp;
@@ -19,23 +19,25 @@ public class StageUI : MonoBehaviour
     LevelUpPanel levelUpPanel;
 
     //보유 영성 ui
-    GameObject haveSoulsUI;
+    HaveSoulsPanel haveSoulsPanel;
+
+    readonly System.Collections.Generic.Stack<IOpenStackUI> uiStack = new();
 
     void Awake()
     {
         SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
         levelUpPanel = sceneContext.levelUpPanel;
-        haveSoulsUI = sceneContext.haveSoulsPanel.gameObject;
+        haveSoulsPanel = sceneContext.haveSoulsPanel;
 
         //이벤트 구독
         sceneContext.player.Exp.LevelChanged += HandleLevelUp;
         levelUpPanel.SelectSoulCompleted += HideLevelupPanel;
 
-        //기본적으로 모든 ui 한번 열었다 닫기(초기화용)
+        //기본적으로 모든 ui 활성화시켜놓기
         escpanel.gameObject.SetActive(true);
         settingPanel.gameObject.SetActive(true);
         levelUpPanel.gameObject.SetActive(true);
-        haveSoulsUI.gameObject.SetActive(true);
+        haveSoulsPanel.gameObject.SetActive(true);
         
 
         characterName.text = GameManager.Instance.curcharacter.ToString();
@@ -43,11 +45,11 @@ public class StageUI : MonoBehaviour
 
     void Start()
     {
-        //모든 ui 닫기(닫기 말고 CanvasGroup으로 되게 수정하기)
+        //모든 ui 닫기(닫기 말고 CanvasGroup으로 hide 하게 수정하기)
         escpanel.gameObject.SetActive(false);
         settingPanel.gameObject.SetActive(false);
         levelUpPanel.Hide();
-        haveSoulsUI.gameObject.SetActive(false);
+        haveSoulsPanel.Hide();
     }
     void OnDestroy()
     {
@@ -61,20 +63,20 @@ public class StageUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            haveSoulsUI.gameObject.SetActive(true);
+            haveSoulsPanel.Show();
         }
         if (Input.GetKeyUp(KeyCode.Z))
         {
-            haveSoulsUI.gameObject.SetActive(false);
+            haveSoulsPanel.Hide();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             //우선 설정창 켜져있으면 닫기
-            if (settingPanel.activeSelf)
-            {
-                HideSettingPanel();
-                return;
-            }
+            // if (settingPanel)
+            // {
+            //     HideSettingPanel();
+            //     return;
+            // }
 
             //아니면 일시정지 / 풀기
             if (!TimeManager.IsPaused)
@@ -125,7 +127,7 @@ public class StageUI : MonoBehaviour
     {
         TimeManager.Pause();
         levelUpPanel.Show();
-        levelUpPanel.Initialize();
+        levelUpPanel.StartAnim();
     }
     public void HideLevelupPanel()
     {

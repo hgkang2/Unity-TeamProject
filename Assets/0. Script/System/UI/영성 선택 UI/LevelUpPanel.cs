@@ -4,7 +4,7 @@ using TMPro;
 using System;
 using DG.Tweening;
 
-public class LevelUpPanel : UIKeyboardHandler
+public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
 {
     CanvasGroup cg;
     SoulPanel[] soulPanels;
@@ -19,7 +19,7 @@ public class LevelUpPanel : UIKeyboardHandler
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
-        
+
         soulPanels = GetComponentsInChildren<SoulPanel>();
         for (int i = 0; i < 3; i++)
         {
@@ -27,13 +27,25 @@ public class LevelUpPanel : UIKeyboardHandler
         }
     }
 
-    public void Initialize()
+    void OnEnable()
+    {
+        SubscribeChildEvent();
+        InputManager.Instance.UiRerolled += Reroll;
+    }
+
+    void OnDisable()
+    {
+        UnSubscribeChildEvent();
+        InputManager.Instance.UiRerolled -= Reroll;
+    }
+
+    void Initialize()
     {
         remainRerollNum = RerollNum + 1;
         rerollText.SetText("{0}", remainRerollNum);
         candidates = null;
 
-        //대충 영성 선택지 2~3개 뜨게 하는 로직(임시)
+        //영성 선택지 2 or 3개 뜨게 하는 로직(임시)
         float rand = UnityEngine.Random.value;
         if (rand < 0.75) panelNum = 2;
         else panelNum = 3;
@@ -44,20 +56,8 @@ public class LevelUpPanel : UIKeyboardHandler
         }
 
         DrawSoul();
-        StartAnim();
     }
 
-    protected override void OnUIEnabled()
-    {
-        SubscribeChildEvent();
-        InputManager.Instance.UiRerolled += Reroll;
-    }
-
-    protected override void OnUIDisabled()
-    {
-        UnSubscribeChildEvent();
-        InputManager.Instance.UiRerolled -= Reroll;
-    }
 
 
     #region 영성 anim
@@ -91,8 +91,10 @@ public class LevelUpPanel : UIKeyboardHandler
     Sequence animSequence;
     bool isAnimating;
 
-    void StartAnim()
+    public void StartAnim()
     {
+        Initialize();
+
         // 전체 연출 설정 초기화
         HideRerollButton();
         // 연출 중 입력 차단
@@ -104,13 +106,12 @@ public class LevelUpPanel : UIKeyboardHandler
         animSequence = DOTween.Sequence();
         animSequence.SetUpdate(true);
 
-        // 부채꼴 각도 세팅
+        // 패널 개수에 따른 부채꼴 각도 세팅 (2 or 3개)
         float startAngle = -angleRange * 0.5f;
         float step = (panelNum > 1) ? (angleRange / (panelNum - 1)) : 0f;
         float centerIndex = (panelNum - 1) * 0.5f;
 
         animSequence.SetUpdate(true);
-
 
         // 연출 시작
         for (int i = 0; i < panelNum; i++)
@@ -215,22 +216,17 @@ public class LevelUpPanel : UIKeyboardHandler
             animSequence.Join(cardSeq);
         }
 
-        animSequence.OnComplete(() =>
-        {
-            isAnimating = false;
-            ShowRerollButton();
-            EnableInput();
-        });
+        animSequence.OnComplete(() => CompleteAnim());
     }
 
-    void CancelAnim()
+    void CompleteAnim()
     {
         animSequence?.Kill();
         animSequence = null;
 
         isAnimating = false;
 
-        // 연출 강제 종료 시 상태 정리
+        ShowRerollButton();
         EnableInput();
     }
     #endregion
@@ -245,7 +241,7 @@ public class LevelUpPanel : UIKeyboardHandler
     SoulData[] candidates;
     public void Reroll()
     {
-        if(remainRerollNum <= 0)
+        if (remainRerollNum <= 0)
         {
             return;
         }
@@ -319,83 +315,22 @@ public class LevelUpPanel : UIKeyboardHandler
             }
         }
     }
-    
-    //선택한 Soul을 등록
+
+    #region 영성 등록
     public void EnrollSoul()
     {
-        if (selectedSoulPanel == null) return;
-
         SoulManager.Instance.EnrollSoul(selectedSoulPanel.SoulData);
         SelectSoulCompleted?.Invoke();
     }
-
-    #region 마우스 입력 이벤트
-    //SoulPanel에 마우스 올리면 커짐
-    void HandleMouseHoverSoul(SoulPanel panel)
-    {
-        panel.ExpandPanelScale();
-    }
-
-    //SoulPanel에서 마우스 내리면 원래대로 작아짐
-    void HandleMouseExitSoul(SoulPanel panel)
-    {
-        //단, 이미 선택한 Panel이면 안작아지고 그대로
-        if (selectedSoulPanel == panel) return;
-        panel.OriginPanelScale();
-    }
-
-    //SoulPanel을 클릭하면 해당 소울을 선택함
-    void HandleClickSoul(SoulPanel panel)
-    {
-        //단, 이미 선택한 Panel이 있었으면 해당 Panel은 선택 취소
-        if (selectedSoulPanel != null)
-        {
-            HandleDeSelectSoul();
-        }
-
-        selectedSoulPanel = panel;
-        EnrollSoul();
-    }
-
-    //선택한 Panel 선택 취소
-    public void HandleDeSelectSoul()
-    {
-        if (selectedSoulPanel == null) return;
-
-        selectedSoulPanel.OriginPanelScale();
-        selectedSoulPanel = null;
-    }
     #endregion
 
+    #region 자체 유틸 함수
     void SelectSoul(SoulPanel panel)
     {
         HandleDeSelectSoul();
         HandleMouseHoverSoul(panel);
         selectedSoulPanel = panel;
     }
-
-    #region 이벤트 구독
-    void SubscribeChildEvent()
-    {
-        UnSubscribeChildEvent();
-        foreach (SoulPanel soulPanel in soulPanels)
-        {
-            soulPanel.SoulMouseEntered += HandleMouseHoverSoul;
-            soulPanel.SoulMouseExited += HandleMouseExitSoul;
-            soulPanel.SoulMouseClicked += HandleClickSoul;
-        }
-    }
-    void UnSubscribeChildEvent()
-    {
-        foreach (SoulPanel soulPanel in soulPanels)
-        {
-            soulPanel.SoulMouseEntered -= HandleMouseHoverSoul;
-            soulPanel.SoulMouseExited -= HandleMouseExitSoul;
-            soulPanel.SoulMouseClicked -= HandleClickSoul;
-        }
-    }
-    #endregion
-
     public void Show()
     {
         cg.alpha = 1;
@@ -409,15 +344,15 @@ public class LevelUpPanel : UIKeyboardHandler
     bool canInput = false;
     void EnableInput()
     {
+        canInput = true;
         cg.blocksRaycasts = true;
         cg.interactable = true;
-        canInput = true;
     }
     void DisableInput()
     {
+        canInput = false;
         cg.blocksRaycasts = false;
         cg.interactable = false;
-        canInput = false;
     }
     void ShowRerollButton()
     {
@@ -445,30 +380,89 @@ public class LevelUpPanel : UIKeyboardHandler
             cantRerollButtonImage.enabled = true;
         }
     }
+    #endregion
+
+    #region 이벤트 구독
+    void SubscribeChildEvent()
+    {
+        UnSubscribeChildEvent();
+        foreach (SoulPanel soulPanel in soulPanels)
+        {
+            soulPanel.SoulMouseEntered += HandleMouseHoverSoul;
+            soulPanel.SoulMouseExited += HandleMouseExitSoul;
+            soulPanel.SoulMouseClicked += HandleClickSoul;
+        }
+    }
+    void UnSubscribeChildEvent()
+    {
+        foreach (SoulPanel soulPanel in soulPanels)
+        {
+            soulPanel.SoulMouseEntered -= HandleMouseHoverSoul;
+            soulPanel.SoulMouseExited -= HandleMouseExitSoul;
+            soulPanel.SoulMouseClicked -= HandleClickSoul;
+        }
+    }
+    #endregion
+
+    #region 마우스 조작
+    //SoulPanel에 마우스 올리면 커짐
+    void HandleMouseHoverSoul(SoulPanel panel)
+    {
+        panel.ExpandPanelScale();
+    }
+
+    //SoulPanel에서 마우스 내리면 원래대로 작아짐
+    void HandleMouseExitSoul(SoulPanel panel)
+    {
+        //단, 이미 선택한 Panel이면 안작아지고 그대로
+        if (selectedSoulPanel == panel) return;
+        panel.OriginPanelScale();
+    }
+
+    //SoulPanel을 클릭하면 해당 소울을 선택함
+    void HandleClickSoul(SoulPanel panel)
+    {
+        //단, 이미 선택한 Panel이 있었으면 해당 Panel은 선택 취소
+        if (selectedSoulPanel != null) HandleDeSelectSoul();
+
+        selectedSoulPanel = panel;
+        EnrollSoul();
+    }
+
+    //선택한 Panel 선택 취소
+    public void HandleDeSelectSoul()
+    {
+        if (selectedSoulPanel == null) return;
+
+        selectedSoulPanel.OriginPanelScale();
+        selectedSoulPanel = null;
+    }
+    #endregion
 
     #region 키보드 조작
     //키보드로 영성 선택
     int? curIndex = null;
-    protected override void OnUIMove(Vector2 dir)
+
+    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
     {
-        if(!canInput) return;
+        if (!canInput) return;
 
         // 현재 아무것도 선택되지 않은 상태라면
         if (curIndex == null)
         {
-            // 왼쪽/위쪽 → 0번 선택
-            if (dir.x < -0.1f || dir.y > 0.1f) curIndex = 0;
-            // 오른쪽/아래쪽 → 마지막 선택
-            else if (dir.x > 0.1f || dir.y < -0.1f) curIndex = panelNum - 1;
+            // 왼쪽 → 0번 선택
+            if (dir.x < -0.1f) curIndex = 0;
+            // 오른쪽 → 마지막 선택
+            else if (dir.x > 0.1f) curIndex = panelNum - 1;
 
             SelectSoul(soulPanels[(int)curIndex]);
             return;
         }
 
-        //왼쪽 or 위쪽 방향키시 위쪽 방향으로
-        if (dir.x < -0.1f || dir.y > 0.1) curIndex--;
-        //오른쪽 or 아래쪽 방향키시 아래쪽 방향으로
-        else if (dir.x > 0.1f || dir.y < -0.1) curIndex++;
+        //왼쪽 방향키시 위쪽 방향으로
+        if (dir.x < -0.1f) curIndex--;
+        //오른쪽 방향키시 아래쪽 방향으로
+        else if (dir.x > 0.1f) curIndex++;
 
         //min, max 처리
         if (curIndex < 0) curIndex = panelNum - 1;
@@ -478,21 +472,25 @@ public class LevelUpPanel : UIKeyboardHandler
         SelectSoul(soulPanels[(int)curIndex]);
     }
 
-    protected override void OnUIConfirm()
+    void IUIKeyboardTarget.OnUIConfirm()
     {
-        if(selectedSoulPanel == null) return;
+        //선택된 영성이 있다면 등록
+        if (selectedSoulPanel == null) return;
         EnrollSoul();
     }
 
-    protected override void OnUICancel()
+    void IUIKeyboardTarget.OnUICancel()
     {
+        // 연출 재생 중이라면 바로 종료
         if (isAnimating && animSequence != null && animSequence.IsActive())
         {
-            animSequence.Complete(true); // ★ 최종 값으로 스냅 + 콜백 실행
-            return;
+            CompleteAnim();
         }
+        // 선택된 영성이 있다면 정리
         curIndex = null;
         HandleDeSelectSoul();
+
+        // 이 패널은 ESC로 끌 수 없음(끌 수 있는 것 또한 StageUI에서 stack으로 관리)
     }
     #endregion
 }

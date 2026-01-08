@@ -14,7 +14,7 @@ public class SceneContext : MonoBehaviour
     
     public DialoguePanel dialoguePanel;
     public LevelUpPanel levelUpPanel;
-    public GameObject haveSoulsPanel;
+    public HaveSoulsPanel haveSoulsPanel;
     [Header("Project/1. Prefab/MouseClickVFX")]
     public ParticleSystem clickVFX;
 }

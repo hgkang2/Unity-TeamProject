@@ -2,7 +2,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainPanel : UIKeyboardHandler
+public class MainPanel : MonoBehaviour, IUIKeyboardTarget
 {
     public CanvasGroup cg;
     Button[] menuButtons;
@@ -29,7 +29,7 @@ public class MainPanel : UIKeyboardHandler
             .Where(b => b != null)
             .ToArray();
     }
-    
+
     void Start()
     {
         ButtonSelectImage.gameObject.SetActive(false);
@@ -73,9 +73,36 @@ public class MainPanel : UIKeyboardHandler
         ButtonSelectImage.gameObject.SetActive(false);
     }
 
-    protected override void OnUIMove(Vector2 dir)
-    {
 
+    //버튼 선택만 해제
+    public void QuitButtonSelect()
+    {
+        if (curIndex != null)
+        {
+            curIndex = null;
+            UpdateButtonHighlight();
+        }
+    }
+
+
+    public void Open()
+    {
+        cg.alpha = 1f;
+        cg.blocksRaycasts = true;
+        cg.interactable = true;
+        enabled = true;
+    }
+
+    public void Close()
+    {
+        cg.alpha = 0f;
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
+        enabled = false;
+    }
+
+    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
+    {
         // 현재 아무것도 선택되지 않은 상태라면
         if (curIndex == null)
         {
@@ -101,17 +128,7 @@ public class MainPanel : UIKeyboardHandler
         UpdateButtonHighlight();
     }
 
-    //버튼 선택만 해제
-    public void QuitButtonSelect()
-    {
-        if (curIndex != null)
-        {
-            curIndex = null;
-            UpdateButtonHighlight();
-        }
-    }
-    
-    protected override void OnUIConfirm()
+    void IUIKeyboardTarget.OnUIConfirm()
     {
         //선택 버튼이 없으면 무시
         if (curIndex == null) return;
@@ -119,7 +136,7 @@ public class MainPanel : UIKeyboardHandler
         menuButtons[curIndex.Value].onClick.Invoke();
     }
 
-    protected override void OnUICancel()
+    void IUIKeyboardTarget.OnUICancel()
     {
         // 버튼이 선택된 상태면 해제
         if (curIndex != null)
@@ -127,21 +144,5 @@ public class MainPanel : UIKeyboardHandler
             curIndex = null;
             UpdateButtonHighlight();
         }
-    }
-    
-    public void Open()
-    {
-        cg.alpha = 1f;
-        cg.blocksRaycasts = true;
-        cg.interactable = true;
-        enabled = true;
-    }
-
-    public void Close()
-    {
-        cg.alpha = 0f;
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
-        enabled = false;
     }
 }

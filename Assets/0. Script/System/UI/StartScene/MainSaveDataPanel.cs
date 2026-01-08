@@ -3,7 +3,7 @@ using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class MainSaveDataPanel : UIKeyboardHandler
+public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
 {
 
     [HideInInspector] public CanvasGroup cg;
@@ -12,11 +12,13 @@ public class MainSaveDataPanel : UIKeyboardHandler
 
     [SerializeField] MainSaveDataSlot[] slots;
     int? focusedIndex;
-    
+
+    public event Action RequestOpenCharacterSelectPanel;
+
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
-        foreach(var slot in slots)
+        foreach (var slot in slots)
         {
             slot.slotFocused += HandleSlotEnter;
             slot.slotUnFocused += HandleSlotExit;
@@ -49,8 +51,7 @@ public class MainSaveDataPanel : UIKeyboardHandler
     {
         if (slots[index].SaveData == null)
         {
-            mainCharacterChoicePanel.Open();
-            this.enabled = false;
+            RequestOpenCharacterSelectPanel?.Invoke();
         }
         else
         {
@@ -74,9 +75,28 @@ public class MainSaveDataPanel : UIKeyboardHandler
         enabled = false;
     }
 
-    protected override void OnUIMove(Vector2 dir)
+    void UpdatFocusHighlight()
     {
-                // 현재 아무것도 선택되지 않은 상태라면
+        foreach (var slot in slots)
+        {
+            slot.UnFocused();
+        }
+        if (focusedIndex != null)
+        {
+            slots[(int)focusedIndex].Focused();
+        }
+    }
+
+    //X 버튼 눌렀을 때
+    public void ButtonCancel()
+    {
+        mainCharacterChoicePanel.Close();
+        Close();
+    }
+
+    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
+    {
+        // 현재 아무것도 선택되지 않은 상태라면
         if (focusedIndex == null)
         {
             // 위쪽 → 0번 선택
@@ -100,27 +120,15 @@ public class MainSaveDataPanel : UIKeyboardHandler
         //강조된 버튼 변경
         UpdatFocusHighlight();
     }
-    protected override void OnUIConfirm()
+
+    void IUIKeyboardTarget.OnUIConfirm()
     {
-        if(focusedIndex == null) return;
+        if (focusedIndex == null) return;
         HandleSlotLeftClick((int)focusedIndex);
     }
-    void UpdatFocusHighlight()
-    {
-        foreach(var slot in slots)
-        {
-            slot.UnFocused();
-        }
-        if(focusedIndex != null)
-        {
-            slots[(int)focusedIndex].Focused();
-        }
-    }
 
-    //X 버튼 눌렀을 때
-    public void ButtonCancel()
+    public void OnUICancel()
     {
-        mainCharacterChoicePanel.Close();
-        Close();
+
     }
 }

@@ -1,23 +1,23 @@
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
 
-public class MainCharacterChoicePanel : UIKeyboardHandler
+public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
 {
     [HideInInspector] public CanvasGroup cg;
     [SerializeField] MainCharacterChoiceSlot[] slots;
-    [SerializeField] MainCharacterConfirmPanel[] confirmPanels;
-    public bool CanClose => !confirmPanels[0].cg.blocksRaycasts
-                            && !confirmPanels[1].cg.blocksRaycasts
-                            && !confirmPanels[2].cg.blocksRaycasts;
+    [SerializeField] MainCharacterConfirmPanel confirmPanel;
 
     public int? focusedIndex = -1;
     public int? selectedIndex = -1;
+
     
+    public event Action RequestOpenCharacterConfirmPanel;
+
     void Awake()
     {
         cg = GetComponent<CanvasGroup>();
 
-        foreach(var slot in slots)
+        foreach (var slot in slots)
         {
             slot.slotselected += SelectSlot;
             slot.slotFocused += FocusSlot;
@@ -27,39 +27,74 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
     }
     private void Start()
     {
-        foreach(var panel in confirmPanels)
-        {
-            panel.gameObject.SetActive(true);
-            panel.Close();
-        }
+        confirmPanel.gameObject.SetActive(true);
+        confirmPanel.Close();
     }
     void FocusSlot(CharacterId id)
     {
-        focusedIndex = (int)id-1;
-        slots[(int)id-1].Focus();
+        focusedIndex = (int)id - 1;
+        slots[(int)id - 1].Focus();
     }
 
     void UnFocusSlot(CharacterId id)
     {
         focusedIndex = null;
-        slots[(int)id-1].UnFocus();
+        slots[(int)id - 1].UnFocus();
     }
 
     void SelectSlot(CharacterId id)
     {
-        OnUIConfirm();
+        ConfirmSelection();
     }
 
+    void ConfirmSelection()
+    {
+        if (focusedIndex == null) return;
+        if (slots[(int)focusedIndex].isLocked) return;
 
+        selectedIndex = focusedIndex;
+        focusedIndex = null;
+        UpdatFocusHighlight();
+
+        RequestOpenCharacterConfirmPanel?.Invoke();
+    }
     // ConfirmPanel->ConfirmButton OnClick Event
     public void GameStart()
     {
-        Debug.Log((selectedIndex+1));
-        GameManager.Instance.curcharacter = (CharacterId)(selectedIndex+1);
+        Debug.Log((selectedIndex + 1));
+        GameManager.Instance.curcharacter = (CharacterId)(selectedIndex + 1);
         SceneLoader.NoLoadingScene("IngameIntro");
     }
 
-    protected override void OnUIMove(Vector2 dir)
+    void UpdatFocusHighlight()
+    {
+        foreach (var slot in slots) slot.UnFocus();
+        if (focusedIndex != null)
+        {
+            slots[(int)focusedIndex].Focus();
+        }
+    }
+    public void Open()
+    {
+        cg.alpha = 1f;
+        cg.blocksRaycasts = true;
+        cg.interactable = true;
+        enabled = true;
+    }
+
+    public void Close()
+    {
+        focusedIndex = null;
+        selectedIndex = null;
+        UpdatFocusHighlight();
+
+        cg.alpha = 0f;
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
+        enabled = false;
+    }
+
+    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
     {
         // 현재 아무것도 선택되지 않은 상태라면
         if (focusedIndex == null)
@@ -85,44 +120,14 @@ public class MainCharacterChoicePanel : UIKeyboardHandler
         //강조된 버튼 변경
         UpdatFocusHighlight();
     }
-    void UpdatFocusHighlight()
-    {
-        foreach(var slot in slots) slot.UnFocus();
-        if(focusedIndex != null)
-        {
-            slots[(int)focusedIndex].Focus();
-        }
-    }
-    protected override void OnUIConfirm()
-    {
-        if(focusedIndex == null) return;
-        if(slots[(int)focusedIndex].isLocked) return;
-        selectedIndex = focusedIndex;
-        focusedIndex = null;
-        UpdatFocusHighlight();
-        
-        confirmPanels[(int)selectedIndex].Open();                  
 
-        this.enabled = false;
-    }
-    
-    public void Open()
+    void IUIKeyboardTarget.OnUIConfirm()
     {
-        cg.alpha = 1f;
-        cg.blocksRaycasts = true;
-        cg.interactable = true;
-        enabled = true;
+        ConfirmSelection();
     }
 
-    public void Close()
+    public void OnUICancel()
     {
-        focusedIndex = null;
-        selectedIndex = null;
-        UpdatFocusHighlight();
-
-        cg.alpha = 0f;
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
-        enabled = false;
+        throw new System.NotImplementedException();
     }
 }
