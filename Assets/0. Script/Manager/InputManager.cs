@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -10,6 +11,17 @@ public class InputManager : MonoBehaviour
     Camera mainCamera;
 
     GameInputActions input;
+
+
+    [Header("UI Navigate Repeat")]
+    [SerializeField] float uiInitialDelay = 0.4f;
+    [SerializeField] float uiRepeatInterval = 0.08f;
+
+    Vector2 uiHeldDir;
+    bool uiIsHeld;
+    float uiNextRepeatTime;
+
+
 
     void Awake()
     {
@@ -29,7 +41,8 @@ public class InputManager : MonoBehaviour
     void OnEnable()
     {
         if (input == null) return;
-        input.Enable();
+        input.System.Enable();
+        ApplyInputMode();
         Subscribe();
         SceneManager.sceneLoaded += OnSceneLoaded;
         RefreshCameras();
@@ -49,11 +62,90 @@ public class InputManager : MonoBehaviour
         RefreshCameras();
     }
 
+    void Update()
+    {
+        if (!uiIsHeld || uiHeldDir == Vector2.zero)
+            return;
+
+        if (Time.unscaledTime >= uiNextRepeatTime)
+        {
+            TopUI?.OnUIMove(uiHeldDir);
+            uiNextRepeatTime = Time.unscaledTime + uiRepeatInterval;
+        }
+    }
+
     void RefreshCameras()
     {
         if (mainCamera == null || !mainCamera)
             mainCamera = Camera.main;
     }
+
+    #region UI 입력 제어
+    // 모든 키보드 입력을 받는 UI
+    readonly Stack<IUIKeyboardTarget> uiTargets = new();
+    // UI 중에 플레이어 입력을 막는 UI
+    int modalCount = 0; // blocksGameplay=true UI가 하나라도 열려있으면 > 0
+
+    IUIKeyboardTarget TopUI => uiTargets.Count > 0 ? uiTargets.Peek() : null;
+
+
+    void ApplyInputMode()
+    {
+        bool uiModalActive = modalCount > 0;
+        
+        uiIsHeld = false;
+        uiHeldDir = Vector2.zero;
+
+        if (uiModalActive)
+        {
+            // UI 모달이 하나라도 있으면 플레이어 입력 강제 차단
+            Move = Vector2.zero;
+
+            input.Player.Disable();
+            input.UI.Enable();
+        }
+        else
+        {
+            input.UI.Disable();
+            input.Player.Enable();
+        }
+
+
+        input.System.Enable();
+    }
+    void ResetUINavHold()
+    {
+        
+    }
+
+    public void PushUI(IUIKeyboardTarget target, bool blocksGameplay)
+    {
+        uiTargets.Push(target);
+
+        if (blocksGameplay)
+            modalCount++;
+
+        ApplyInputMode();
+    }
+
+    public void PopUI(IUIKeyboardTarget target, bool blocksGameplay)
+    {
+        // top 규칙 강제
+        if (uiTargets.Count == 0 || !ReferenceEquals(uiTargets.Peek(), target))
+            throw new System.Exception("[InputManager] PopUI called by non-top target");
+
+        uiTargets.Pop();
+
+        if (blocksGameplay)
+            modalCount--;
+
+
+        if (modalCount < 0)
+            throw new System.Exception("[InputManager] modalCount < 0 (Pop mismatch)");
+
+        ApplyInputMode();
+    }
+    #endregion
 
 
     #region Player
@@ -103,22 +195,27 @@ public class InputManager : MonoBehaviour
     #endregion
 
     #region UI Input
-    public event Action<Vector2> UINavigateStarted;
     void OnUINavigatePerformed(InputAction.CallbackContext ctx)
     {
         Vector2 value = ctx.ReadValue<Vector2>();
         Vector2 dir = NormalizeUINav(value);
 
-        if (dir == Vector2.zero)
-            return;
+        if (dir == Vector2.zero) return;
 
-        UINavigateStarted?.Invoke(dir);
+        // 방향 저장 + 홀드 시작
+        uiHeldDir = dir;
+        uiIsHeld = true;
+
+        // 첫 입력은 즉시 1회
+        TopUI?.OnUIMove(dir);
+
+        // 이후 반복 예약 (unscaled)
+        uiNextRepeatTime = Time.unscaledTime + uiInitialDelay;
     }
-
-    public event Action UINavigateCanceled;
     void OnUINavigateCanceled(InputAction.CallbackContext ctx)
     {
-        UINavigateCanceled?.Invoke();
+        uiIsHeld = false;
+        uiHeldDir = Vector2.zero;
     }
 
     Vector2 NormalizeUINav(Vector2 value)
@@ -133,15 +230,13 @@ public class InputManager : MonoBehaviour
     }
 
     // --- 확인 / 취소 ---
-    public event Action UICanceled;
     void OnUICancelPerformed(InputAction.CallbackContext ctx)
     {
-        UICanceled?.Invoke();
+        TopUI?.OnUICancel();
     }
-    public event Action UIConfirmed;
     void OnUIConfirmPerformed(InputAction.CallbackContext ctx)
     {
-        UIConfirmed?.Invoke();
+        TopUI?.OnUIConfirm();
     }
     public event Action UiRerolled;
     void OnUIRerollPerformed(InputAction.CallbackContext ctx)
@@ -200,7 +295,6 @@ public class InputManager : MonoBehaviour
 
         //UI 키보드 입력 이벤트
         input.UI.Navigate.performed += OnUINavigatePerformed;
-        input.UI.Navigate.canceled += OnUINavigateCanceled;
         input.UI.Confirm.performed += OnUIConfirmPerformed;
         input.UI.Cancel.performed += OnUICancelPerformed;
         input.UI.Reroll.performed += OnUIRerollPerformed;
@@ -221,7 +315,6 @@ public class InputManager : MonoBehaviour
         input.Player.Interact.performed -= OnInteractPerformed;
 
         input.UI.Navigate.performed -= OnUINavigatePerformed;
-        input.UI.Navigate.canceled -= OnUINavigateCanceled;
         input.UI.Confirm.performed -= OnUIConfirmPerformed;
         input.UI.Cancel.performed -= OnUICancelPerformed;
         input.UI.Reroll.performed -= OnUIRerollPerformed;

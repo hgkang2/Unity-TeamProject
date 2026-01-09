@@ -13,7 +13,7 @@ public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
     [SerializeField] MainSaveDataSlot[] slots;
     int? focusedIndex;
 
-    public event Action RequestOpenCharacterSelectPanel;
+    public event Action<MonoBehaviour> RequestOpenPanel;
 
     void Awake()
     {
@@ -34,7 +34,6 @@ public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
             slot.Bind(null);
         }
     }
-
     void HandleSlotEnter(int index)
     {
         focusedIndex = index;
@@ -51,7 +50,7 @@ public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
     {
         if (slots[index].SaveData == null)
         {
-            RequestOpenCharacterSelectPanel?.Invoke();
+            RequestOpenPanel?.Invoke(this);
         }
         else
         {
@@ -127,8 +126,7 @@ public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
         HandleSlotLeftClick((int)focusedIndex);
     }
 
-    public void OnUICancel()
+    void IUIKeyboardTarget.OnUICancel()
     {
-
     }
 }

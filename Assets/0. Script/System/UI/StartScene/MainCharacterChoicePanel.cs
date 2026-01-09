@@ -11,7 +11,7 @@ public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
     public int? selectedIndex = -1;
 
     
-    public event Action RequestOpenCharacterConfirmPanel;
+    public event Action<MonoBehaviour> RequestOpenPanel;
 
     void Awake()
     {
@@ -56,7 +56,7 @@ public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
         focusedIndex = null;
         UpdatFocusHighlight();
 
-        RequestOpenCharacterConfirmPanel?.Invoke();
+        RequestOpenPanel?.Invoke(this);
     }
     // ConfirmPanel->ConfirmButton OnClick Event
     public void GameStart()
@@ -126,8 +126,5 @@ public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
         ConfirmSelection();
     }
 
-    public void OnUICancel()
-    {
-        throw new System.NotImplementedException();
-    }
+    void IUIKeyboardTarget.OnUICancel(){}
 }

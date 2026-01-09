@@ -489,7 +489,6 @@ public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
         // 선택된 영성이 있다면 정리
         curIndex = null;
         HandleDeSelectSoul();
-
         // 이 패널은 ESC로 끌 수 없음(끌 수 있는 것 또한 StageUI에서 stack으로 관리)
     }
     #endregion

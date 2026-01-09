@@ -4,13 +4,19 @@ using UnityEngine.UI;
 
 public class MainPanel : MonoBehaviour, IUIKeyboardTarget
 {
-    public CanvasGroup cg;
+    [HideInInspector] public CanvasGroup cg;
     Button[] menuButtons;
     [SerializeField] Transform ButtonSelectImage;
+    [SerializeField] MainSaveDataPanel mainSaveDataPanel;
+    [SerializeField] MainExitPanel mainExitPanel;
 
     private void Awake()
     {
         cg = GetComponent<CanvasGroup>();
+        mainExitPanel.gameObject.SetActive(true);
+        mainSaveDataPanel.gameObject.SetActive(true);
+
+
         int i = 0;
         menuButtons = transform.Cast<Transform>()
             .Select(t =>
@@ -28,11 +34,15 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
             })
             .Where(b => b != null)
             .ToArray();
+
+        
     }
 
     void Start()
     {
         ButtonSelectImage.gameObject.SetActive(false);
+        mainExitPanel.Close();
+        mainSaveDataPanel.Close();
     }
 
     void OnDestroy()
@@ -46,6 +56,11 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
             evt.onEnter -= ButtonMouseEnter;
             evt.onExit -= ButtonMouseExit;
         }
+    }
+    
+    public void OpenMainSaveDataPanel()
+    {
+        mainSaveDataPanel.Open();
     }
 
     int? curIndex = null;
@@ -72,18 +87,6 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
     {
         ButtonSelectImage.gameObject.SetActive(false);
     }
-
-
-    //버튼 선택만 해제
-    public void QuitButtonSelect()
-    {
-        if (curIndex != null)
-        {
-            curIndex = null;
-            UpdateButtonHighlight();
-        }
-    }
-
 
     public void Open()
     {
@@ -143,6 +146,10 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
         {
             curIndex = null;
             UpdateButtonHighlight();
+        }
+        else
+        {
+            mainExitPanel.Open();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -57,8 +58,5 @@ public class MainCharacterConfirmPanel : MonoBehaviour, IUIKeyboardTarget
         if (curButton != null) curButton.onClick.Invoke();
     }
 
-    public void OnUICancel()
-    {
-
-    }
+    void IUIKeyboardTarget.OnUICancel(){}
 }

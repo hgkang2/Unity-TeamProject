@@ -29,17 +29,6 @@ public class TutorialRunner : MonoBehaviour
         player = sceneContext.player;
     }
 
-    void OnEnable()
-    {
-        if (InputManager.Instance != null)
-            InputManager.Instance.UIConfirmed += OnUIConfirm;
-    }
-
-    void OnDisable()
-    {
-        if (InputManager.Instance != null)
-            InputManager.Instance.UIConfirmed -= OnUIConfirm;
-    }
 
     public void StartTutorial()
     {

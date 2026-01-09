@@ -4,7 +4,7 @@ using RuntimeInspectorNamespace;
 using TMPro;
 using UnityEngine.UIElements;
 
-public class HaveSoulsPanel : MonoBehaviour, IOpenStackUI
+public class HaveSoulsPanel : MonoBehaviour
 {
     SceneContext sceneContext;
     public bool PauseGame => false;

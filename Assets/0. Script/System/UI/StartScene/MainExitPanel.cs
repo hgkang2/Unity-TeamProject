@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,8 @@ public class MainExitPanel : MonoBehaviour, IUIKeyboardTarget
     public CanvasGroup cg;
     [SerializeField] Button ConfirmButton;
     [SerializeField] Button CancelButton;
+    
+    
 
     private void Awake()
     {
@@ -32,13 +35,6 @@ public class MainExitPanel : MonoBehaviour, IUIKeyboardTarget
         
     }
 
-    void IUIKeyboardTarget.OnUIConfirm()
-    {
-        
-    }
-
-    public void OnUICancel()
-    {
-        
-    }
+    void IUIKeyboardTarget.OnUIConfirm(){}
+    void IUIKeyboardTarget.OnUICancel(){}
 }
