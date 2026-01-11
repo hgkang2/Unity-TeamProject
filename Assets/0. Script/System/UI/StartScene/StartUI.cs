@@ -5,13 +5,14 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class StartUI : MonoBehaviour
+public class StartUI : MonoBehaviour,IUIKeyboardTarget
 {
     [SerializeField] Image openingImage;
 
     [SerializeField] MainPanel mainPanel;
     [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
     [SerializeField] MainCharacterConfirmPanel mainCharacterConfirmPanel;
+
 
     Sequence openingSequence;
 
@@ -34,6 +35,7 @@ public class StartUI : MonoBehaviour
         // 오프닝은 보이게
         openingImage.gameObject.SetActive(true);
 
+        InputManager.Instance.PushUI(this, true);
         OpeningStart();
     }
 
@@ -52,11 +54,12 @@ public class StartUI : MonoBehaviour
         // 2) 잠깐 대기
         openingSequence.AppendInterval(0.5f);
 
-        // 3) 메뉴 fade-in
-        openingSequence.Append(
-            mainPanel.cg.DOFade(1f, 1f)
-                .OnComplete(() => { ShowMenuImmediate(); })
-        );
+        openingSequence.OnComplete(() => { ShowMenuImmediate(); });
+        // 3) 메뉴 fade-in (cg 직접 접근 못 하게 막아서 일단 패스)
+        // openingSequence.Append(
+        //     mainPanel.cg.DOFade(1f, 1f)
+        //         .OnComplete(() => { ShowMenuImmediate(); })
+        //);
     }
     #endregion
 
@@ -70,6 +73,8 @@ public class StartUI : MonoBehaviour
         isOpeningPhase = false;
         openingImage.gameObject.SetActive(false);
 
+
+        InputManager.Instance.PopUI(this, true);
         mainPanel.Open();
 
         SoundManager.Instance.PlayBGM("MainTheme");
@@ -91,4 +96,17 @@ public class StartUI : MonoBehaviour
         GameManager.Instance.QuitGame();
     }
 
+    public void OnUIInputMove(Vector2 dir)
+    {
+    }
+
+    public void OnUIInputConfirm()
+    {
+        if (isOpeningPhase) ShowMenuImmediate();
+    }
+
+    public void OnUIInputCancel()
+    {
+        if (isOpeningPhase) ShowMenuImmediate();
+    }
 }

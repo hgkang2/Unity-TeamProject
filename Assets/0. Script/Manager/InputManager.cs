@@ -12,17 +12,6 @@ public class InputManager : MonoBehaviour
 
     GameInputActions input;
 
-
-    [Header("UI Navigate Repeat")]
-    [SerializeField] float uiInitialDelay = 0.4f;
-    [SerializeField] float uiRepeatInterval = 0.08f;
-
-    Vector2 uiHeldDir;
-    bool uiIsHeld;
-    float uiNextRepeatTime;
-
-
-
     void Awake()
     {
         // 싱글톤
@@ -62,17 +51,6 @@ public class InputManager : MonoBehaviour
         RefreshCameras();
     }
 
-    void Update()
-    {
-        if (!uiIsHeld || uiHeldDir == Vector2.zero)
-            return;
-
-        if (Time.unscaledTime >= uiNextRepeatTime)
-        {
-            TopUI?.OnUIMove(uiHeldDir);
-            uiNextRepeatTime = Time.unscaledTime + uiRepeatInterval;
-        }
-    }
 
     void RefreshCameras()
     {
@@ -92,9 +70,6 @@ public class InputManager : MonoBehaviour
     void ApplyInputMode()
     {
         bool uiModalActive = modalCount > 0;
-        
-        uiIsHeld = false;
-        uiHeldDir = Vector2.zero;
 
         if (uiModalActive)
         {
@@ -115,7 +90,7 @@ public class InputManager : MonoBehaviour
     }
     void ResetUINavHold()
     {
-        
+
     }
 
     public void PushUI(IUIKeyboardTarget target, bool blocksGameplay)
@@ -146,6 +121,37 @@ public class InputManager : MonoBehaviour
         ApplyInputMode();
     }
     #endregion
+
+    public void RemoveUI(IUIKeyboardTarget target, bool blocksGameplay)
+    {
+        // 스택에서 target을 찾아 제거 (top 아니어도)
+        if (uiTargets.Count == 0) return;
+
+        var tmp = new Stack<IUIKeyboardTarget>();
+        bool removed = false;
+
+        while (uiTargets.Count > 0)
+        {
+            var cur = uiTargets.Pop();
+            if (!removed && ReferenceEquals(cur, target))
+            {
+                removed = true;
+                continue;
+            }
+            tmp.Push(cur);
+        }
+
+        while (tmp.Count > 0)
+            uiTargets.Push(tmp.Pop());
+
+        if (removed && blocksGameplay)
+            modalCount--;
+
+        if (modalCount < 0)
+            modalCount = 0; // 또는 예외
+
+        ApplyInputMode();
+    }
 
 
     #region Player
@@ -202,20 +208,8 @@ public class InputManager : MonoBehaviour
 
         if (dir == Vector2.zero) return;
 
-        // 방향 저장 + 홀드 시작
-        uiHeldDir = dir;
-        uiIsHeld = true;
+        TopUI?.OnUIInputMove(dir);
 
-        // 첫 입력은 즉시 1회
-        TopUI?.OnUIMove(dir);
-
-        // 이후 반복 예약 (unscaled)
-        uiNextRepeatTime = Time.unscaledTime + uiInitialDelay;
-    }
-    void OnUINavigateCanceled(InputAction.CallbackContext ctx)
-    {
-        uiIsHeld = false;
-        uiHeldDir = Vector2.zero;
     }
 
     Vector2 NormalizeUINav(Vector2 value)
@@ -232,11 +226,11 @@ public class InputManager : MonoBehaviour
     // --- 확인 / 취소 ---
     void OnUICancelPerformed(InputAction.CallbackContext ctx)
     {
-        TopUI?.OnUICancel();
+        TopUI?.OnUIInputCancel();
     }
     void OnUIConfirmPerformed(InputAction.CallbackContext ctx)
     {
-        TopUI?.OnUIConfirm();
+        TopUI?.OnUIInputConfirm();
     }
     public event Action UiRerolled;
     void OnUIRerollPerformed(InputAction.CallbackContext ctx)

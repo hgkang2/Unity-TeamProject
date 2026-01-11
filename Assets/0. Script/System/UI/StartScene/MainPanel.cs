@@ -2,21 +2,17 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainPanel : MonoBehaviour, IUIKeyboardTarget
+public class MainPanel : UIPanelBase
 {
-    [HideInInspector] public CanvasGroup cg;
     Button[] menuButtons;
     [SerializeField] Transform ButtonSelectImage;
     [SerializeField] MainSaveDataPanel mainSaveDataPanel;
     [SerializeField] MainExitPanel mainExitPanel;
 
-    private void Awake()
+
+    protected override void Init()
     {
-        cg = GetComponent<CanvasGroup>();
-        mainExitPanel.gameObject.SetActive(true);
-        mainSaveDataPanel.gameObject.SetActive(true);
-
-
+        // 활성화 된 메뉴 버튼만 캐싱 하기(인스펙터에서 설정)
         int i = 0;
         menuButtons = transform.Cast<Transform>()
             .Select(t =>
@@ -35,12 +31,10 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
             .Where(b => b != null)
             .ToArray();
 
-        
-    }
-
-    void Start()
-    {
+        mainExitPanel.gameObject.SetActive(true);
+        mainSaveDataPanel.gameObject.SetActive(true);
         ButtonSelectImage.gameObject.SetActive(false);
+
         mainExitPanel.Close();
         mainSaveDataPanel.Close();
     }
@@ -57,7 +51,7 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
             evt.onExit -= ButtonMouseExit;
         }
     }
-    
+
     public void OpenMainSaveDataPanel()
     {
         mainSaveDataPanel.Open();
@@ -75,6 +69,7 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
             ButtonSelectImage.gameObject.SetActive(true);
             ButtonSelectImage.transform.position = menuButtons[(int)curIndex].transform.position;
         }
+        Debug.Log($"{curIndex}, {menuButtons[(int)curIndex].name}");
     }
 
     public void ButtonMouseEnter(int index)
@@ -88,24 +83,10 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
         ButtonSelectImage.gameObject.SetActive(false);
     }
 
-    public void Open()
-    {
-        cg.alpha = 1f;
-        cg.blocksRaycasts = true;
-        cg.interactable = true;
-        enabled = true;
-    }
 
-    public void Close()
+    public override void OnUIInputMove(Vector2 dir)
     {
-        cg.alpha = 0f;
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
-        enabled = false;
-    }
-
-    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
-    {
+        base.OnUIInputMove(dir);
         // 현재 아무것도 선택되지 않은 상태라면
         if (curIndex == null)
         {
@@ -131,7 +112,7 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
         UpdateButtonHighlight();
     }
 
-    void IUIKeyboardTarget.OnUIConfirm()
+    public override void OnUIInputConfirm()
     {
         //선택 버튼이 없으면 무시
         if (curIndex == null) return;
@@ -139,7 +120,8 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
         menuButtons[curIndex.Value].onClick.Invoke();
     }
 
-    void IUIKeyboardTarget.OnUICancel()
+    // 닫혀버리면 안 돼서 OnClosing에 추가구현 대신 OnUIInputCancel 덮어쓰기
+    public override void OnUIInputCancel()
     {
         // 버튼이 선택된 상태면 해제
         if (curIndex != null)
@@ -147,9 +129,6 @@ public class MainPanel : MonoBehaviour, IUIKeyboardTarget
             curIndex = null;
             UpdateButtonHighlight();
         }
-        else
-        {
-            mainExitPanel.Open();
-        }
+        mainExitPanel.Open();
     }
 }

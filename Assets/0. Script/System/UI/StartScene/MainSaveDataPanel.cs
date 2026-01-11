@@ -3,37 +3,35 @@ using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
+public class MainSaveDataPanel : UIPanelBase
 {
 
-    [HideInInspector] public CanvasGroup cg;
 
     [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
 
     [SerializeField] MainSaveDataSlot[] slots;
     int? focusedIndex;
 
-    public event Action<MonoBehaviour> RequestOpenPanel;
 
-    void Awake()
+    protected override void Init()
     {
-        cg = GetComponent<CanvasGroup>();
+        mainCharacterChoicePanel.gameObject.SetActive(true);
+        mainCharacterChoicePanel.Close();
+
         foreach (var slot in slots)
         {
             slot.slotFocused += HandleSlotEnter;
             slot.slotUnFocused += HandleSlotExit;
             slot.slotselected += HandleSlotLeftClick;
         }
-    }
 
-    void Start()
-    {
         // 나중에 세이브 로드 구현시 제대로 하기
         foreach (var slot in slots)
         {
             slot.Bind(null);
         }
     }
+
     void HandleSlotEnter(int index)
     {
         focusedIndex = index;
@@ -50,7 +48,7 @@ public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
     {
         if (slots[index].SaveData == null)
         {
-            RequestOpenPanel?.Invoke(this);
+            mainCharacterChoicePanel.Open();
         }
         else
         {
@@ -58,21 +56,6 @@ public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
         }
     }
 
-    public void Open()
-    {
-        cg.alpha = 1f;
-        cg.blocksRaycasts = true;
-        cg.interactable = true;
-        enabled = true;
-    }
-
-    public void Close()
-    {
-        cg.alpha = 0f;
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
-        enabled = false;
-    }
 
     void UpdatFocusHighlight()
     {
@@ -92,9 +75,9 @@ public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
         mainCharacterChoicePanel.Close();
         Close();
     }
-
-    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
+    public override void OnUIInputMove(Vector2 dir)
     {
+        base.OnUIInputMove(dir);
         // 현재 아무것도 선택되지 않은 상태라면
         if (focusedIndex == null)
         {
@@ -120,13 +103,9 @@ public class MainSaveDataPanel : MonoBehaviour, IUIKeyboardTarget
         UpdatFocusHighlight();
     }
 
-    void IUIKeyboardTarget.OnUIConfirm()
+    public override void OnUIInputConfirm()
     {
         if (focusedIndex == null) return;
         HandleSlotLeftClick((int)focusedIndex);
-    }
-
-    void IUIKeyboardTarget.OnUICancel()
-    {
     }
 }

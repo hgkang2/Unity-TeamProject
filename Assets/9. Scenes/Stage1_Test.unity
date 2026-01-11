@@ -31399,86 +31399,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.45, y: 2.77}
   m_EdgeRadius: 0
---- !u!4 &116381209 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6411014577782486977, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
-  m_PrefabInstance: {fileID: 688488632}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &135355910
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 135355911}
-  - component: {fileID: 135355912}
-  m_Layer: 0
-  m_Name: CinemachineCamera_TutorialTrap
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &135355911
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135355910}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 65.78, y: -6.28, z: -45.30586}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 116381209}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &135355912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135355910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Priority:
-    Enabled: 0
-    m_Value: 0
-  OutputChannel: 2
-  StandbyUpdate: 2
-  m_StreamingVersion: 20241001
-  m_LegacyPriority: 0
-  Target:
-    TrackingTarget: {fileID: 0}
-    LookAtTarget: {fileID: 0}
-    CustomLookAtTarget: 0
-  Lens:
-    FieldOfView: 34
-    OrthographicSize: 9.94
-    NearClipPlane: 0.3
-    FarClipPlane: 1000
-    Dutch: 0
-    ModeOverride: 0
-    PhysicalProperties:
-      GateFit: 2
-      SensorSize: {x: 21.946, y: 16.002}
-      LensShift: {x: 0, y: 0}
-      FocusDistance: 10
-      Iso: 200
-      ShutterSpeed: 0.005
-      Aperture: 16
-      BladeCount: 5
-      Curvature: {x: 2, y: 11}
-      BarrelClipping: 0.25
-      Anamorphism: 0
-  BlendHint: 0
 --- !u!1 &139544538
 GameObject:
   m_ObjectHideFlags: 0
@@ -37812,10 +37732,6 @@ PrefabInstance:
       propertyPath: orthographic size
       value: 6
       objectReference: {fileID: 0}
-    - target: {fileID: 1826242618594228017, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
-      propertyPath: DefaultBlend.Time
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2124509705133070147, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.611103
@@ -37827,10 +37743,6 @@ PrefabInstance:
     - target: {fileID: 2124509705133070147, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
       propertyPath: m_LocalPosition.z
       value: -10
-      objectReference: {fileID: 0}
-    - target: {fileID: 4321993593512921897, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
-      propertyPath: OutputChannel
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4321993593512921897, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
       propertyPath: Target.TrackingTarget
@@ -37882,10 +37794,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6411014577782486977, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 135355911}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
 --- !u!114 &688488633 stripped
@@ -53297,7 +53206,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: {fileID: 412045665}
-  escpanel: {fileID: 23317678}
+  escpanel: {fileID: 23317680}
   settingPanel: {fileID: 2009866282}
 --- !u!224 &1941995589
 RectTransform:

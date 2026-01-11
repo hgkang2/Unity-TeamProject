@@ -1,22 +1,16 @@
 using System;
 using UnityEngine;
 
-public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
+public class MainCharacterChoicePanel : UIPanelBase
 {
-    [HideInInspector] public CanvasGroup cg;
     [SerializeField] MainCharacterChoiceSlot[] slots;
     [SerializeField] MainCharacterConfirmPanel confirmPanel;
 
     public int? focusedIndex = -1;
     public int? selectedIndex = -1;
 
-    
-    public event Action<MonoBehaviour> RequestOpenPanel;
-
-    void Awake()
+    protected override void Init()
     {
-        cg = GetComponent<CanvasGroup>();
-
         foreach (var slot in slots)
         {
             slot.slotselected += SelectSlot;
@@ -24,12 +18,16 @@ public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
             slot.slotUnFocused += UnFocusSlot;
             slot.UnFocus();
         }
-    }
-    private void Start()
-    {
+
         confirmPanel.gameObject.SetActive(true);
         confirmPanel.Close();
+
+        
+        focusedIndex = null;
+        selectedIndex = null;
+        UpdatFocusHighlight();
     }
+
     void FocusSlot(CharacterId id)
     {
         focusedIndex = (int)id - 1;
@@ -56,8 +54,9 @@ public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
         focusedIndex = null;
         UpdatFocusHighlight();
 
-        RequestOpenPanel?.Invoke(this);
+        confirmPanel.Open();
     }
+
     // ConfirmPanel->ConfirmButton OnClick Event
     public void GameStart()
     {
@@ -74,28 +73,10 @@ public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
             slots[(int)focusedIndex].Focus();
         }
     }
-    public void Open()
-    {
-        cg.alpha = 1f;
-        cg.blocksRaycasts = true;
-        cg.interactable = true;
-        enabled = true;
-    }
 
-    public void Close()
+    public override void OnUIInputMove(Vector2 dir)
     {
-        focusedIndex = null;
-        selectedIndex = null;
-        UpdatFocusHighlight();
-
-        cg.alpha = 0f;
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
-        enabled = false;
-    }
-
-    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
-    {
+        base.OnUIInputMove(dir);
         // 현재 아무것도 선택되지 않은 상태라면
         if (focusedIndex == null)
         {
@@ -121,10 +102,8 @@ public class MainCharacterChoicePanel : MonoBehaviour, IUIKeyboardTarget
         UpdatFocusHighlight();
     }
 
-    void IUIKeyboardTarget.OnUIConfirm()
+    public override void OnUIInputConfirm()
     {
         ConfirmSelection();
     }
-
-    void IUIKeyboardTarget.OnUICancel(){}
 }

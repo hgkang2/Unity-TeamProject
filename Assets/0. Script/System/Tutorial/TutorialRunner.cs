@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 //GameManager에 붙여놓음
 public class TutorialRunner : MonoBehaviour
@@ -23,12 +24,22 @@ public class TutorialRunner : MonoBehaviour
 
     void Awake()
     {
-        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
-        dialoguePanel = sceneContext.dialoguePanel;
-        dialoguePanel.gameObject.SetActive(true);
-        player = sceneContext.player;
-    }
 
+    }
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        switch (scene.name)
+        {
+            case "Stage1":
+            case "Stage1_Test":
+                SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+                dialoguePanel = sceneContext.dialoguePanel;
+                dialoguePanel.gameObject.SetActive(true);
+                player = sceneContext.player;
+                break;
+        }
+
+    }
 
     public void StartTutorial()
     {

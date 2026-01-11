@@ -4,9 +4,8 @@ using TMPro;
 using System;
 using DG.Tweening;
 
-public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
+public class LevelUpPanel : UIPanelBase
 {
-    CanvasGroup cg;
     SoulPanel[] soulPanels;
     [SerializeField] Button rerollButton;
     [SerializeField] TMP_Text rerollText;
@@ -16,10 +15,9 @@ public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
     public event Action SelectSoulCompleted;
 
     Vector3[] soulPanels_OriginPos = new Vector3[3];
-    void Awake()
-    {
-        cg = GetComponent<CanvasGroup>();
 
+    protected override void Init()
+    {
         soulPanels = GetComponentsInChildren<SoulPanel>();
         for (int i = 0; i < 3; i++)
         {
@@ -39,24 +37,6 @@ public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
         InputManager.Instance.UiRerolled -= Reroll;
     }
 
-    void Initialize()
-    {
-        remainRerollNum = RerollNum + 1;
-        rerollText.SetText("{0}", remainRerollNum);
-        candidates = null;
-
-        //영성 선택지 2 or 3개 뜨게 하는 로직(임시)
-        float rand = UnityEngine.Random.value;
-        if (rand < 0.75) panelNum = 2;
-        else panelNum = 3;
-
-        for (int i = 0; i < 3; i++)
-        {
-            soulPanels[i].transform.position = soulPanels_OriginPos[i];
-        }
-
-        DrawSoul();
-    }
 
 
 
@@ -93,7 +73,21 @@ public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
 
     public void StartAnim()
     {
-        Initialize();
+        remainRerollNum = RerollNum + 1;
+        rerollText.SetText("{0}", remainRerollNum);
+        candidates = null;
+
+        //영성 선택지 2 or 3개 뜨게 하는 로직(임시)
+        float rand = UnityEngine.Random.value;
+        if (rand < 0.75) panelNum = 2;
+        else panelNum = 3;
+
+        for (int i = 0; i < 3; i++)
+        {
+            soulPanels[i].transform.position = soulPanels_OriginPos[i];
+        }
+
+        DrawSoul();
 
         // 전체 연출 설정 초기화
         HideRerollButton();
@@ -443,7 +437,7 @@ public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
     //키보드로 영성 선택
     int? curIndex = null;
 
-    void IUIKeyboardTarget.OnUIMove(Vector2 dir)
+    public override void OnUIInputMove(Vector2 dir)
     {
         if (!canInput) return;
 
@@ -472,14 +466,14 @@ public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
         SelectSoul(soulPanels[(int)curIndex]);
     }
 
-    void IUIKeyboardTarget.OnUIConfirm()
+    public override void OnUIInputConfirm()
     {
         //선택된 영성이 있다면 등록
         if (selectedSoulPanel == null) return;
         EnrollSoul();
     }
 
-    void IUIKeyboardTarget.OnUICancel()
+    public override void OnUIInputCancel()
     {
         // 연출 재생 중이라면 바로 종료
         if (isAnimating && animSequence != null && animSequence.IsActive())
@@ -489,7 +483,7 @@ public class LevelUpPanel : MonoBehaviour, IUIKeyboardTarget
         // 선택된 영성이 있다면 정리
         curIndex = null;
         HandleDeSelectSoul();
-        // 이 패널은 ESC로 끌 수 없음(끌 수 있는 것 또한 StageUI에서 stack으로 관리)
+        // 이 패널은 ESC로 끌 수 없음
     }
     #endregion
 }

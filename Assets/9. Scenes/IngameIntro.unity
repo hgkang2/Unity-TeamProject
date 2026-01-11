@@ -465,7 +465,7 @@ MonoBehaviour:
   holdSeconds: 2
   key: 27
   audioSource: {fileID: 21887685}
-  GotoSceneName: Stage1
+  GotoSceneName: Stage1_Test
   autoSkipTime: 52
 --- !u!1 &930735689
 GameObject:
