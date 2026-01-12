@@ -442,7 +442,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1492542353616019464}
   m_Father: {fileID: 7924254842058052279}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
@@ -1027,7 +1028,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8151638905917209896}
   m_Father: {fileID: 7924254842058052279}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1129,7 +1131,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7924254842058052279}
+  m_Father: {fileID: 6450574553186682118}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2236,6 +2238,7 @@ GameObject:
   - component: {fileID: 5613412970042190280}
   - component: {fileID: 4350583798858266705}
   - component: {fileID: 111420424039853413}
+  - component: {fileID: 8423592989090222565}
   m_Layer: 5
   m_Name: HaveSoulsUI
   m_TagString: Untagged
@@ -2262,9 +2265,7 @@ RectTransform:
   - {fileID: 3274266937476710511}
   - {fileID: 5554415145674154878}
   - {fileID: 1939210208867898099}
-  - {fileID: 8151638905917209896}
   - {fileID: 6450574553186682118}
-  - {fileID: 1492542353616019464}
   - {fileID: 1723033599843912343}
   - {fileID: 3868307615436777288}
   - {fileID: 1842984863375447300}
@@ -2288,6 +2289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f60bb1c7bbb0af47b77e8c321cf4169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blocksGameplay: 1
   soulTooltipUI: {fileID: 3951018196033221185}
   haveSoulSlotPrefab: {fileID: 8865729324723260921, guid: a53f0905c7d400a40b67d77d59289404, type: 3}
   emptySlot:
@@ -2311,7 +2313,6 @@ MonoBehaviour:
   soulLevel: {fileID: 5662057029303008148}
   soulExp: {fileID: 1650853075037259752}
   soulEffects: []
-  exp: {fileID: 0}
   statText: {fileID: 9186053300703413172}
   effectText: {fileID: 8807429780392029079}
 --- !u!114 &5613412970042190280
@@ -2366,6 +2367,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &8423592989090222565
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6622470108076343048}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &7045080840550190855
 GameObject:
   m_ObjectHideFlags: 0
@@ -2896,7 +2909,7 @@ GameObject:
   - component: {fileID: 950733273677074502}
   - component: {fileID: 9186053300703413172}
   m_Layer: 5
-  m_Name: EffectsText
+  m_Name: StatText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2914,7 +2927,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7924254842058052279}
+  m_Father: {fileID: 1939210208867898099}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
