@@ -6,8 +6,20 @@ public class SettingPanel : UIPanelBase
     [Header("Setting Items (Top → Bottom)")]
     [SerializeField] List<MonoBehaviour> settingItemBehaviours;
 
+    [SerializeField] SaveAlertPanel saveAlertPanel_GotoTitle;
+    [SerializeField] SaveAlertPanel saveAlertPanel_QuitGame;
+
     List<ISettingItem> items = new();
-    int? currentIndex;
+    int currentIndex;
+
+    public void OpenSaveAlertPanel_GotoTitle()
+    {
+        saveAlertPanel_GotoTitle.Open();
+    }
+    public void OpenSaveAlertPanel_QuitGame()
+    {
+        saveAlertPanel_QuitGame.Open();
+    }
 
     protected override void Init()
     {
@@ -18,9 +30,17 @@ public class SettingPanel : UIPanelBase
                 items.Add(item);
         }
 
-        if(currentIndex == null) return;
-        currentIndex = Mathf.Clamp((int)currentIndex, 0, items.Count - 1);
+        currentIndex = Mathf.Clamp(currentIndex, 0, items.Count - 1);
+        
+        currentIndex = 3; // 저장 버튼 기본값.
+
         RefreshSelection();
+
+        saveAlertPanel_GotoTitle.gameObject.SetActive(true);
+        saveAlertPanel_QuitGame.gameObject.SetActive(true);
+
+        saveAlertPanel_GotoTitle.Close();
+        saveAlertPanel_QuitGame.Close();
     }
 
     public override void OnUIInputMove(Vector2 dir)
@@ -32,11 +52,10 @@ public class SettingPanel : UIPanelBase
             return;
         }
 
-        if(currentIndex == null) return;
         // 좌 / 우 : 값 변경
         if (Mathf.Abs(dir.x) > 0.1f)
         {
-            var cur = items[(int)currentIndex];
+            var cur = items[currentIndex];
             if (cur.CanAdjust)
                 cur.Adjust(dir.x > 0 ? +1 : -1);
         }
@@ -44,29 +63,35 @@ public class SettingPanel : UIPanelBase
 
     public override void OnUIInputConfirm()
     {
-        if(currentIndex == null) return;
-        var cur = items[(int)currentIndex];
+        var cur = items[currentIndex];
         if (cur.CanSubmit)
             cur.Submit();
     }
 
     void MoveIndex(int delta)
     {
-        if(currentIndex == null) return;
-        items[(int)currentIndex].SetSelected(false);
+        items[currentIndex].SetSelected(false);
+
         currentIndex = (currentIndex + delta + items.Count) % items.Count;
-        items[(int)currentIndex].SetSelected(true);
+        items[currentIndex].SetSelected(true);
     }
 
     void RefreshSelection()
     {
-        if(currentIndex == null) return;
         for (int i = 0; i < items.Count; i++)
             items[i].SetSelected(i == currentIndex);
     }
 
     protected override void OnClosing()
     {
-        currentIndex = null;
+    }
+
+    public void GotoTitle()
+    {
+        SceneLoader.NoLoadingScene("Start");
+    }
+    public void QuitGame()
+    {
+        GameManager.Instance.QuitGame();
     }
 }
