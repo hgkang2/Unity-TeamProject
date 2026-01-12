@@ -8,6 +8,6 @@ public interface IInteractable
     void OnFocus();
     void OnUnfocus();
 
-    void Interact(Player user);
+    void Interact(Player user, Interactor interactor);
     void Exit();
 }
