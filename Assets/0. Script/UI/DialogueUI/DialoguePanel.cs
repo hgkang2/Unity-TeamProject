@@ -154,5 +154,8 @@ public class DialoguePanel : UIPanelBase
 
         ShowLine(lineIndex);
     }
-
+    public override void OnUIInputCancel()
+    {
+        OnUIInputConfirm();
+    }
 }

@@ -64,7 +64,7 @@ public class InputManager : MonoBehaviour
     // UI 중에 플레이어 입력을 막는 UI
     int modalCount = 0; // blocksGameplay=true UI가 하나라도 열려있으면 > 0
 
-    IUIKeyboardTarget TopUI => uiTargets.Count > 0 ? uiTargets.Peek() : null;
+    public IUIKeyboardTarget TopUI => uiTargets.Count > 0 ? uiTargets.Peek() : null;
 
 
     void ApplyInputMode()
@@ -245,6 +245,30 @@ public class InputManager : MonoBehaviour
         VFXManager.Instance.MouseClickVFX();
         //SoundManager.Instance.PlayUI("Click");
     }
+    public event Action EscPressed;
+    void OnSystemEscPerformed(InputAction.CallbackContext ctx)
+    {
+        if (TopUI != null) return;
+
+        // TopUI가 없을 때는 “씬 기본 UI(예: StageUI)”가 처리하게 하고 싶으면
+        // 이벤트로 빼는 게 가장 안전함 (아래 이벤트 방식 참고)
+        EscPressed?.Invoke();
+    }
+
+    // Z 홀드: 누를 때
+public event Action ZPressed;
+    void OnSystemZPerformed(InputAction.CallbackContext ctx)
+    {
+        ZPressed?.Invoke();
+    }
+
+    // Z 홀드: 뗄 때
+public event Action ZReleased;
+    void OnSystemZCanceled(InputAction.CallbackContext ctx)
+    {
+        ZReleased?.Invoke();
+    }
+
     #endregion
 
     //기타
@@ -295,12 +319,13 @@ public class InputManager : MonoBehaviour
 
         //기타 시스템 이벤트
         input.System.LeftClick.performed += OnLeftClick;
+        input.System.Esc.performed += OnSystemEscPerformed;
+input.System.Z.performed += OnSystemZPerformed;
+input.System.Z.canceled += OnSystemZCanceled;
     }
     void UnSubscribe()
     {
         if (input == null) return;
-
-        input.System.LeftClick.performed -= OnLeftClick;
 
         input.Player.Move.performed -= OnMove;
         input.Player.Move.canceled -= OnMoveCancel;
@@ -308,13 +333,18 @@ public class InputManager : MonoBehaviour
         input.Player.Dodge.performed -= OnDodgePerformed;
         input.Player.Interact.performed -= OnInteractPerformed;
 
+        input.Player.Attack.performed -= OnAttackPerformed;
+        input.Player.SpecialAttack.performed -= OnSpecialPerformed;
+
         input.UI.Navigate.performed -= OnUINavigatePerformed;
         input.UI.Confirm.performed -= OnUIConfirmPerformed;
         input.UI.Cancel.performed -= OnUICancelPerformed;
         input.UI.Reroll.performed -= OnUIRerollPerformed;
 
-        input.Player.Attack.performed -= OnAttackPerformed;
-        input.Player.SpecialAttack.performed -= OnSpecialPerformed;
+        input.System.LeftClick.performed -= OnLeftClick;
+        input.System.Esc.performed -= OnSystemEscPerformed;
+        input.System.Z.performed -= OnSystemZPerformed;
+        input.System.Z.canceled -= OnSystemZCanceled;
     }
     #endregion
 }

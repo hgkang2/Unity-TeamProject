@@ -280,6 +280,24 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Esc"",
+                    ""type"": ""Button"",
+                    ""id"": ""8e1a468e-f36a-4a11-a436-258390306e08"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Z"",
+                    ""type"": ""Button"",
+                    ""id"": ""2e5ae567-9c82-40ff-94f2-e4b6f88e1103"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -302,6 +320,28 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""LeftClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6d505990-93d4-43cd-a50a-4a5f215fb761"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Esc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c539b8bb-2fcb-4007-b08f-932d384fbb14"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Z"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -454,6 +494,8 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_System = asset.FindActionMap("System", throwIfNotFound: true);
         m_System_MousePos = m_System.FindAction("MousePos", throwIfNotFound: true);
         m_System_LeftClick = m_System.FindAction("LeftClick", throwIfNotFound: true);
+        m_System_Esc = m_System.FindAction("Esc", throwIfNotFound: true);
+        m_System_Z = m_System.FindAction("Z", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -695,6 +737,8 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     private List<ISystemActions> m_SystemActionsCallbackInterfaces = new List<ISystemActions>();
     private readonly InputAction m_System_MousePos;
     private readonly InputAction m_System_LeftClick;
+    private readonly InputAction m_System_Esc;
+    private readonly InputAction m_System_Z;
     /// <summary>
     /// Provides access to input actions defined in input action map "System".
     /// </summary>
@@ -714,6 +758,14 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "System/LeftClick".
         /// </summary>
         public InputAction @LeftClick => m_Wrapper.m_System_LeftClick;
+        /// <summary>
+        /// Provides access to the underlying input action "System/Esc".
+        /// </summary>
+        public InputAction @Esc => m_Wrapper.m_System_Esc;
+        /// <summary>
+        /// Provides access to the underlying input action "System/Z".
+        /// </summary>
+        public InputAction @Z => m_Wrapper.m_System_Z;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -746,6 +798,12 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @LeftClick.started += instance.OnLeftClick;
             @LeftClick.performed += instance.OnLeftClick;
             @LeftClick.canceled += instance.OnLeftClick;
+            @Esc.started += instance.OnEsc;
+            @Esc.performed += instance.OnEsc;
+            @Esc.canceled += instance.OnEsc;
+            @Z.started += instance.OnZ;
+            @Z.performed += instance.OnZ;
+            @Z.canceled += instance.OnZ;
         }
 
         /// <summary>
@@ -763,6 +821,12 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @LeftClick.started -= instance.OnLeftClick;
             @LeftClick.performed -= instance.OnLeftClick;
             @LeftClick.canceled -= instance.OnLeftClick;
+            @Esc.started -= instance.OnEsc;
+            @Esc.performed -= instance.OnEsc;
+            @Esc.canceled -= instance.OnEsc;
+            @Z.started -= instance.OnZ;
+            @Z.performed -= instance.OnZ;
+            @Z.canceled -= instance.OnZ;
         }
 
         /// <summary>
@@ -996,6 +1060,20 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLeftClick(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Esc" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEsc(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Z" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnZ(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

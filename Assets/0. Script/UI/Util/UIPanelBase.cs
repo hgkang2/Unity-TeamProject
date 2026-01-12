@@ -48,11 +48,23 @@ public abstract class UIPanelBase : MonoBehaviour, IUIKeyboardTarget
             ShowCG(false);
             return;
         }
-
         IsOpen = false;
-
         OnClosing();
-        InputManager.Instance.PopUI(this, blocksGameplay);
+
+        if (blocksGameplay)
+        {
+            // 모달 UI : LIFO 강제
+            InputManager.Instance.PopUI(this, true);
+        }
+        else
+        {
+            // 비모달 UI : Top이면 Pop, 아니면 Remove
+            if (ReferenceEquals(InputManager.Instance.TopUI, this))
+                InputManager.Instance.PopUI(this, false);
+            else
+                InputManager.Instance.RemoveUI(this, false);
+        }
+
         ShowCG(false);
     }
 

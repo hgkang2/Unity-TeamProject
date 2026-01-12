@@ -147,6 +147,8 @@ public class TutorialRunner : MonoBehaviour
             cb => eventHub.monster.monsterDead += cb, 
             cb => eventHub.monster.monsterDead -= cb, 1
         ));
+
+        steps.Add(new WaitSecondsStep(1.5f));
         
         // 6) 몹 처치 완료 후 종료
         steps.Add(new CallStep(() => { player.SetControlLocked(true); }));

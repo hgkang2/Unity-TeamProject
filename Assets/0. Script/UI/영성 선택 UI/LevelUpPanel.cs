@@ -20,33 +20,35 @@ public class LevelUpPanel : UIPanelBase
     protected override void Init()
     {
         sceneContext = FindFirstObjectByType<SceneContext>();
-    }
-    protected override void OnOpened()
-    {
-        TimeManager.Pause();
-
         sceneContext.player.Exp.LevelChanged += HandleLevelUp;
-
-        SubscribeChildEvent();
-        InputManager.Instance.UiRerolled += Reroll;
-
+        
         soulPanels = GetComponentsInChildren<SoulPanel>();
         for (int i = 0; i < 3; i++)
         {
             soulPanels_OriginPos[i] = soulPanels[i].transform.position;
         }
+    }
+    protected override void OnOpened()
+    {
+        TimeManager.Pause();
+
+        SubscribeChildEvent();
+        InputManager.Instance.UiRerolled += Reroll;
 
         StartAnim();
     }
 
     protected override void OnClosing()
     {
-        sceneContext.player.Exp.LevelChanged -= HandleLevelUp;
-
         UnSubscribeChildEvent();
         InputManager.Instance.UiRerolled -= Reroll;
 
         TimeManager.Resume();
+    }
+
+    void OnDestroy()
+    {
+        sceneContext.player.Exp.LevelChanged -= HandleLevelUp;
     }
 
     void HandleLevelUp(int level)

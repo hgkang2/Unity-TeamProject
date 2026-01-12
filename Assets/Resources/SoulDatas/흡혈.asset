@@ -10,26 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25478d91cec221a48bf1008395afd652, type: 3}
-  m_Name: "\uD3ED\uD48D"
+  m_Name: "\uD761\uD608"
   m_EditorClassIdentifier: 
-  index: 1004
-  soulSprite: {fileID: 21300000, guid: 02a103e5d9069da42bcf74da0294298a, type: 3}
-  soulIcon: {fileID: 21300000, guid: 5c1e943fb530f33458bf2994c7141ad0, type: 3}
-  displayName: "\uD3ED\uD48D"
-  soulEffectText: AS +
+  index: 0
+  soulSprite: {fileID: 21300000, guid: a6c6c2180be41dc4db68d9e166e896e6, type: 3}
+  soulIcon: {fileID: 21300000, guid: ce328a108a607c0409b6691e1f1dc231, type: 3}
+  displayName: "\uD761\uD608"
+  soulEffectText: Atk +
   soulEffectText2: '%'
-  soulDescript: "\uD3ED\uD48D\uACFC \uAC19\uC740 \uACF5\uACA9\uC73C\uB85C \uACF5\uACA9\uC18D\uB3C4\uAC00
-    \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  soulDescript: 
   effect:
-    type: 1
-    targetStat: 3
+    type: 0
+    targetStat: 0
     flatValue: 0
-    percentValue: 10
+    percentValue: 0
     bonusValue: 0
     skillToLearn: 0
     healAmount: 0
   soulCharacterType: 0
   soulNeedType: 0
   levelConstrains: 0
-  maxStack: 5
+  maxStack: 1
   isDisposable: 0
