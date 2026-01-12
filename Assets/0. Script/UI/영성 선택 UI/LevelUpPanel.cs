@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
 using DG.Tweening;
 
 public class LevelUpPanel : UIPanelBase
@@ -12,32 +11,48 @@ public class LevelUpPanel : UIPanelBase
     int panelNum = 2;
     SoulPanel selectedSoulPanel;
 
-    public event Action SelectSoulCompleted;
+    //레벨업 이벤트 구독 용
+    Exp exp;
 
     Vector3[] soulPanels_OriginPos = new Vector3[3];
 
+    SceneContext sceneContext;
     protected override void Init()
     {
+        sceneContext = FindFirstObjectByType<SceneContext>();
+    }
+    protected override void OnOpened()
+    {
+        TimeManager.Pause();
+
+        sceneContext.player.Exp.LevelChanged += HandleLevelUp;
+
+        SubscribeChildEvent();
+        InputManager.Instance.UiRerolled += Reroll;
+
         soulPanels = GetComponentsInChildren<SoulPanel>();
         for (int i = 0; i < 3; i++)
         {
             soulPanels_OriginPos[i] = soulPanels[i].transform.position;
         }
+
+        StartAnim();
     }
 
-    void OnEnable()
+    protected override void OnClosing()
     {
-        SubscribeChildEvent();
-        InputManager.Instance.UiRerolled += Reroll;
-    }
+        sceneContext.player.Exp.LevelChanged -= HandleLevelUp;
 
-    void OnDisable()
-    {
         UnSubscribeChildEvent();
         InputManager.Instance.UiRerolled -= Reroll;
+
+        TimeManager.Resume();
     }
 
-
+    void HandleLevelUp(int level)
+    {
+        Open();
+    }
 
 
     #region 영성 anim
@@ -92,8 +107,6 @@ public class LevelUpPanel : UIPanelBase
         // 전체 연출 설정 초기화
         HideRerollButton();
         // 연출 중 입력 차단
-        DisableInput();
-
         isAnimating = true;
 
         animSequence?.Kill();          // 혹시 남아있으면 정리
@@ -125,7 +138,7 @@ public class LevelUpPanel : UIPanelBase
             cg.alpha = 0f;
             cg.blocksRaycasts = true;
 
-            Sequence cardSeq = DOTween.Sequence();
+            DG.Tweening.Sequence cardSeq = DOTween.Sequence();
 
             // 1단계: Fade In
             cardSeq.Join(
@@ -221,7 +234,6 @@ public class LevelUpPanel : UIPanelBase
         isAnimating = false;
 
         ShowRerollButton();
-        EnableInput();
     }
     #endregion
 
@@ -239,7 +251,7 @@ public class LevelUpPanel : UIPanelBase
         {
             return;
         }
-        DisableInput();
+        isAnimating = true;
 
         // 시퀀스 생성
         Sequence seq = DOTween.Sequence();
@@ -270,7 +282,7 @@ public class LevelUpPanel : UIPanelBase
                 rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
 
-            ).OnComplete(() => EnableInput());
+            ).OnComplete(() => isAnimating = false);
             seq.Join(cardSeq);
         }
 
@@ -314,7 +326,7 @@ public class LevelUpPanel : UIPanelBase
     public void EnrollSoul()
     {
         SoulManager.Instance.EnrollSoul(selectedSoulPanel.SoulData);
-        SelectSoulCompleted?.Invoke();
+        Close();
     }
     #endregion
 
@@ -324,29 +336,6 @@ public class LevelUpPanel : UIPanelBase
         HandleDeSelectSoul();
         HandleMouseHoverSoul(panel);
         selectedSoulPanel = panel;
-    }
-    public void Show()
-    {
-        cg.alpha = 1;
-        EnableInput();
-    }
-    public void Hide()
-    {
-        cg.alpha = 0;
-        DisableInput();
-    }
-    bool canInput = false;
-    void EnableInput()
-    {
-        canInput = true;
-        cg.blocksRaycasts = true;
-        cg.interactable = true;
-    }
-    void DisableInput()
-    {
-        canInput = false;
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
     }
     void ShowRerollButton()
     {
@@ -398,6 +387,9 @@ public class LevelUpPanel : UIPanelBase
     }
     #endregion
 
+
+    int? curIndex = null;
+
     #region 마우스 조작
     //SoulPanel에 마우스 올리면 커짐
     void HandleMouseHoverSoul(SoulPanel panel)
@@ -434,12 +426,9 @@ public class LevelUpPanel : UIPanelBase
     #endregion
 
     #region 키보드 조작
-    //키보드로 영성 선택
-    int? curIndex = null;
-
     public override void OnUIInputMove(Vector2 dir)
     {
-        if (!canInput) return;
+        if (isAnimating) return;
 
         // 현재 아무것도 선택되지 않은 상태라면
         if (curIndex == null)
@@ -468,6 +457,7 @@ public class LevelUpPanel : UIPanelBase
 
     public override void OnUIInputConfirm()
     {
+        if (isAnimating) return;
         //선택된 영성이 있다면 등록
         if (selectedSoulPanel == null) return;
         EnrollSoul();

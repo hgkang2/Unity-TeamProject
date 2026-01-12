@@ -4,7 +4,7 @@ using RuntimeInspectorNamespace;
 using TMPro;
 using UnityEngine.UIElements;
 
-public class HaveSoulsPanel : MonoBehaviour
+public class HaveSoulsPanel : UIPanelBase
 {
     SceneContext sceneContext;
     public bool PauseGame => false;
@@ -18,20 +18,17 @@ public class HaveSoulsPanel : MonoBehaviour
     [SerializeField] TMP_Text soulExp;
     [SerializeField] List<TMP_Text> soulEffects;
 
-    [SerializeField] Exp exp;
-    
-    CanvasGroup cg;
-    
-    void Awake()
+    Exp exp;
+
+
+    protected override void Init()
     {
         sceneContext = FindFirstObjectByType<SceneContext>();
         exp = sceneContext.player.Exp;
 
         forwarder = GetComponent<SoulPanelEventAggregator>();
-        cg = GetComponent<CanvasGroup>();
     }
-
-    void OnEnable()
+    protected override void OnOpened()
     {
         HideTooltipUI();
 
@@ -47,26 +44,25 @@ public class HaveSoulsPanel : MonoBehaviour
         // 게임 데이터 구독
         exp.ExpChanged += UpdateExp;
         exp.LevelChanged += UpdateLevel;
-        
+
         // UI 마우스 이벤트 구독
         forwarder.MouseEntered += HandleMouseEnter;
 
         // 미니아이콘 슬롯 생성 및 바인딩
-        for(int i=0; i<SoulManager.Instance.CurSouls.Count; i++)
+        for (int i = 0; i < SoulManager.Instance.CurSouls.Count; i++)
         {
             HaveSoulSlot haveSoulUI = Instantiate(haveSoulSlotPrefab, transform);
             haveSoulUI.Bind(SoulManager.Instance.CurSouls[i].data);
             uiSlots.Add(haveSoulUI);
 
             haveSoulUI.transform.position = emptySlot[i].transform.position;
-
         }
 
         // 이벤트 구독 재설정
         forwarder.RebuildViews();
     }
 
-    void OnDisable()
+    protected override void OnClosing()
     {
         if (SoulManager.Instance != null)
         {
@@ -79,6 +75,7 @@ public class HaveSoulsPanel : MonoBehaviour
         uiSlots.Clear();
         HideTooltipUI();
     }
+
     void UpdateExp(int newCurExp, int newMaxExp)
     {
         soulExp.SetText($"{newCurExp} / {newMaxExp}");
@@ -94,13 +91,13 @@ public class HaveSoulsPanel : MonoBehaviour
 
     void UpdateSoulEffects(List<SoulInstance> curSouls)
     {
-        if(curSouls == null || curSouls.Count == 0) return;
+        if (curSouls == null || curSouls.Count == 0) return;
         statText.SetText("");
         effectText.SetText("");
-        foreach(SoulInstance soul in curSouls)
+        foreach (SoulInstance soul in curSouls)
         {
             SoulEffectType type = soul.data.effect.type;
-            if(type == SoulEffectType.StatFlat || type == SoulEffectType.StatPercent)
+            if (type == SoulEffectType.StatFlat || type == SoulEffectType.StatPercent)
             {
                 statText.text += $"{soul.GetEffectText()}\n";
             }
@@ -121,25 +118,6 @@ public class HaveSoulsPanel : MonoBehaviour
     public void SlotMouseExit()
     {
         HideTooltipUI();
-    }
-
-    void HandleMouseClick(SlotEventArgs<SoulData> e)
-    {
-        //클릭했을 때 고정되는 등 효ㅘ
-        //HideTooltipUI();
-    }
-
-    public void Show()
-    {
-        cg.alpha = 1;
-        cg.blocksRaycasts = true;
-        cg.interactable = true;
-    }
-    public void Hide()
-    {
-        cg.alpha = 0;
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
     }
 
     void ShowTooltipUI(SoulData data)

@@ -2,12 +2,12 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
-public class DialoguePanel : MonoBehaviour
+public class DialoguePanel : UIPanelBase
 {
     [Header("UI")]
     [SerializeField] TMP_Text textUI;
-    CanvasGroup cg;
 
     [Header("Typewriter")]
     [SerializeField] float charInterval = 0.03f;
@@ -25,10 +25,9 @@ public class DialoguePanel : MonoBehaviour
 
     public bool IsPlaying => isPlaying;
 
-    void Awake()
+    protected override void Init()
     {
-        cg = GetComponent<CanvasGroup>();
-        Hide();
+        Close();
     }
 
     public void Play(DialogueAsset asset, Action onComplete = null)
@@ -50,7 +49,7 @@ public class DialoguePanel : MonoBehaviour
         lineIndex = 0;
         isPlaying = true;
 
-        Show();
+        Open();
         ShowLine(0);
     }
 
@@ -64,35 +63,13 @@ public class DialoguePanel : MonoBehaviour
 
         isTyping = false;
         isPlaying = false;
-        Hide();
+        Close();
 
         lines = null;
         onComplete = null;
         playingAsset = null;
     }
 
-    // 외부(튜토리얼 매니저)에서 "확인" 입력을 넣어줄 용도
-    public void Confirm()
-    {
-        if (!isPlaying)
-            return;
-
-        if (isTyping)
-        {
-            SkipTyping();
-            return;
-        }
-
-        lineIndex++;
-
-        if (lines == null || lineIndex >= lines.Length)
-        {
-            Finish();
-            return;
-        }
-
-        ShowLine(lineIndex);
-    }
 
     void ShowLine(int index)
     {
@@ -141,8 +118,6 @@ public class DialoguePanel : MonoBehaviour
     {
         isPlaying = false;
 
-        Hide();
-
         // 에셋에 박아둔 인스펙터 이벤트
         if (playingAsset != null)
             playingAsset.onFinished?.Invoke();
@@ -154,20 +129,30 @@ public class DialoguePanel : MonoBehaviour
         onComplete = null;
         playingAsset = null;
 
+        Close();
         cb?.Invoke();
     }
-    
-    void Show()
+    public override void OnUIInputConfirm()
     {
-        cg.alpha = 1f;
-        cg.interactable = true;
-        cg.blocksRaycasts = true;
+        // 대화가 진행 중이 아니면 리턴
+        if (!isPlaying)
+            return;
+
+        if (isTyping)
+        {
+            SkipTyping();
+            return;
+        }
+
+        lineIndex++;
+
+        if (lines == null || lineIndex >= lines.Length)
+        {
+            Finish();
+            return;
+        }
+
+        ShowLine(lineIndex);
     }
 
-    void Hide()
-    {
-        cg.alpha = 0f;
-        cg.interactable = false;
-        cg.blocksRaycasts = false;
-    }
 }

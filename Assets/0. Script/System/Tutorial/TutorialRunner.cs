@@ -22,9 +22,14 @@ public class TutorialRunner : MonoBehaviour
     int stepIndex;
     bool isRunning;
 
-    void Awake()
+    void OnEnable()
     {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
@@ -101,7 +106,7 @@ public class TutorialRunner : MonoBehaviour
     {
         // 대화 중이면 Confirm은 대화가 우선 소비
         if (dialoguePanel != null && dialoguePanel.IsPlaying)
-            dialoguePanel.Confirm();
+            dialoguePanel.OnUIInputConfirm();
     }
 
     // -----------------------
@@ -129,35 +134,12 @@ public class TutorialRunner : MonoBehaviour
             targetCount: 1
         ));
        
-        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
         steps.Add(new CallStep(() => { TimeManager.Pause(); }));
         steps.Add(new DialogueStep(dialoguePanel, new string[]
         {
             "괴물이잖아!!  [A] 키를 입력해서 공격하자!",
-        }));
-
-        steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
-        steps.Add(new WaitEventCountStep(
-            cb => InputManager.Instance.AttackPressed += cb,
-            cb => InputManager.Instance.AttackPressed -= cb, 1
-        ));
-        steps.Add(new CallStep(() => { TimeManager.Resume(); }));
-
-        // 3) 공격 시도 완료.
-        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
-        steps.Add(new WaitSecondsStep(0.5f));
-
-        // 4) 점프, 회피 안내
-        steps.Add(new CallStep(() => { TimeManager.Pause(); }));
-        steps.Add(new DialogueStep(dialoguePanel, new string[]
-        {
             "저 녀석이 공격하려고 하면 점프[Space] 혹은 회피[D] 로 피하자."
         }));
-        steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
-        steps.Add(new WaitEventCountStep(
-            SubscribeDodgePressed, 
-            UnsubscribeDodgePressed, 1
-        ));
         steps.Add(new CallStep(() => { TimeManager.Resume(); }));
 
         // 5) 몹 처치까지 대기
