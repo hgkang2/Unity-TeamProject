@@ -15,7 +15,6 @@ public class SceneContext : MonoBehaviour
     public DialoguePanel dialoguePanel;
     public LevelUpPanel levelUpPanel;
     public HaveSoulsPanel haveSoulsPanel;
-    public EscPanel escPanel;
     public SettingPanel settingPanel;
     
     [Header("Project/1. Prefab/MouseClickVFX")]

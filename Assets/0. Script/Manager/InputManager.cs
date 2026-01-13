@@ -203,25 +203,13 @@ public class InputManager : MonoBehaviour
     #region UI Input
     void OnUINavigatePerformed(InputAction.CallbackContext ctx)
     {
-        Vector2 value = ctx.ReadValue<Vector2>();
-        Vector2 dir = NormalizeUINav(value);
-
-        if (dir == Vector2.zero) return;
-
-        TopUI?.OnUIInputMove(dir);
-
+        TopUI?.OnUIInputMove(ctx.ReadValue<Vector2>());
     }
-
-    Vector2 NormalizeUINav(Vector2 value)
+    void OnUINavigateCanceled(InputAction.CallbackContext ctx)
     {
-        if (value.sqrMagnitude < 0.01f)
-            return Vector2.zero;
-
-        if (Mathf.Abs(value.x) > Mathf.Abs(value.y))
-            return new Vector2(Mathf.Sign(value.x), 0f);
-        else
-            return new Vector2(0f, Mathf.Sign(value.y));
+        TopUI?.OnUIInputMove(Vector2.zero);
     }
+
 
     // --- 확인 / 취소 ---
     void OnUICancelPerformed(InputAction.CallbackContext ctx)
@@ -256,14 +244,14 @@ public class InputManager : MonoBehaviour
     }
 
     // Z 홀드: 누를 때
-public event Action ZPressed;
+    public event Action ZPressed;
     void OnSystemZPerformed(InputAction.CallbackContext ctx)
     {
         ZPressed?.Invoke();
     }
 
     // Z 홀드: 뗄 때
-public event Action ZReleased;
+    public event Action ZReleased;
     void OnSystemZCanceled(InputAction.CallbackContext ctx)
     {
         ZReleased?.Invoke();
@@ -313,6 +301,7 @@ public event Action ZReleased;
 
         //UI 키보드 입력 이벤트
         input.UI.Navigate.performed += OnUINavigatePerformed;
+        input.UI.Navigate.canceled += OnUINavigateCanceled;
         input.UI.Confirm.performed += OnUIConfirmPerformed;
         input.UI.Cancel.performed += OnUICancelPerformed;
         input.UI.Reroll.performed += OnUIRerollPerformed;
@@ -320,8 +309,8 @@ public event Action ZReleased;
         //기타 시스템 이벤트
         input.System.LeftClick.performed += OnLeftClick;
         input.System.Esc.performed += OnSystemEscPerformed;
-input.System.Z.performed += OnSystemZPerformed;
-input.System.Z.canceled += OnSystemZCanceled;
+        input.System.Z.performed += OnSystemZPerformed;
+        input.System.Z.canceled += OnSystemZCanceled;
     }
     void UnSubscribe()
     {
@@ -337,6 +326,7 @@ input.System.Z.canceled += OnSystemZCanceled;
         input.Player.SpecialAttack.performed -= OnSpecialPerformed;
 
         input.UI.Navigate.performed -= OnUINavigatePerformed;
+        input.UI.Navigate.canceled -= OnUINavigateCanceled;
         input.UI.Confirm.performed -= OnUIConfirmPerformed;
         input.UI.Cancel.performed -= OnUICancelPerformed;
         input.UI.Reroll.performed -= OnUIRerollPerformed;

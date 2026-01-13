@@ -19,6 +19,16 @@ public class SettingCycleItem : MonoBehaviour, ISettingItem
     public bool CanAdjust => true;
     public bool CanSubmit => false;
 
+    // ---- Repeat 정책(고정) ----
+    public UIRepeatMode RepeatMode => UIRepeatMode.FixedInterval;
+    public float RepeatInterval => 0.25f;
+
+    // unused (가속용)
+    public float AccelStartDelay => 0f;
+    public float AccelInitialInterval => 0f;
+    public float AccelMinInterval => 0f;
+    public float AccelFactor => 0f;
+
     void Awake()
     {
         BuildResolutions();

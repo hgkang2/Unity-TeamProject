@@ -25,26 +25,25 @@ public class SettingSliderItem : MonoBehaviour, ISettingItem
     public bool CanAdjust => true;
     public bool CanSubmit => false;
 
+    public UIRepeatMode RepeatMode => UIRepeatMode.Accelerate;
+    public float RepeatInterval => 0f;        // unused
+    public float AccelStartDelay => 0.15f;
+    public float AccelInitialInterval => 0.15f;
+    public float AccelMinInterval => 0.05f;
+    public float AccelFactor => 0.8f;
+
     void Awake()
     {
-        // 슬라이더 마우스 드래그/클릭 대응
-        if (slider != null)
-            slider.onValueChanged.AddListener(OnSliderValueChanged);
-
-        // +- 버튼 대응
-        if (minusButton != null)
-            minusButton.onClick.AddListener(() => Step(-1));
-
-        if (plusButton != null)
-            plusButton.onClick.AddListener(() => Step(+1));
+        slider.onValueChanged.AddListener(OnSliderValueChanged);
+        minusButton.onClick.AddListener(() => Step(-1));
+        plusButton.onClick.AddListener(() => Step(+1));
 
         // 초기값 동기화 (현재 슬라이더 값 기준)
         SetPercent(PercentFromSlider(slider != null ? slider.value : 0f));
     }
     void OnDestroy()
     {
-        if (slider != null)
-            slider.onValueChanged.RemoveListener(OnSliderValueChanged);
+        slider.onValueChanged.RemoveListener(OnSliderValueChanged);
     }
 
     public void SetSelected(bool selected)
