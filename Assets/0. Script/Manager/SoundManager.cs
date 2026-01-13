@@ -3,20 +3,6 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
-    // 런타임 이전에 강제 생성
-    // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    // static void AutoCreate()
-    // {
-    //     if (Instance != null) return;
-    //     SoundManager existing = Object.FindAnyObjectByType<SoundManager>();
-    //     if (existing != null)
-    //     {
-    //         Instance = existing;
-    //         return;
-    //     }
-    //     GameObject go = new GameObject("[SoundManager]");
-    //     go.AddComponent<SoundManager>();
-    // }
 
     public static SoundManager Instance { get; private set; }
 
@@ -118,11 +104,25 @@ public class SoundManager : MonoBehaviour
         OnVolumeChanged?.Invoke();
     }
 
+    public void SetBgmVolume(float volume)
+    {
+        bgmVolume = Mathf.Clamp01(volume);
+        UpdateVolumes();
+        OnVolumeChanged?.Invoke();
+    }
+
+    public void SetSfxVolume(float volume)
+    {
+        sfxVolume = Mathf.Clamp01(volume);
+        OnVolumeChanged?.Invoke();
+    }
+
     void UpdateVolumes()
     {
         bgmSource.volume = masterVolume * bgmVolume;
         // SFX는 각 LocalSoundVFX가 개별적으로 적용
     }
+    
     public float GetGlobalSfxVolume()
     {
         return masterVolume * sfxVolume;

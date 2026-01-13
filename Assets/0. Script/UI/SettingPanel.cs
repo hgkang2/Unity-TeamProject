@@ -10,6 +10,7 @@ public class SettingPanel : UIPanelBase
     [SerializeField] SaveAlertPanel saveAlertPanel_QuitGame;
 
     List<ISettingItem> items = new();
+    Dictionary<ISettingItem, int> indexByItem = new();
     int currentIndex;
 
     public void OpenSaveAlertPanel_GotoTitle()
@@ -24,15 +25,19 @@ public class SettingPanel : UIPanelBase
     protected override void Init()
     {
         items.Clear();
+        indexByItem.Clear();
+
         foreach (var mb in settingItemBehaviours)
         {
             if (mb is ISettingItem item)
                 items.Add(item);
         }
+        for (int i = 0; i < items.Count; i++)
+            indexByItem[items[i]] = i;
 
         currentIndex = Mathf.Clamp(currentIndex, 0, items.Count - 1);
-        
-        currentIndex = 3; // 저장 버튼 기본값.
+
+        currentIndex = 3; // 저장 버튼을 기본값.
 
         RefreshSelection();
 
@@ -41,6 +46,22 @@ public class SettingPanel : UIPanelBase
 
         saveAlertPanel_GotoTitle.Close();
         saveAlertPanel_QuitGame.Close();
+    }
+
+    public void RequestFocus(ISettingItem item)
+    {
+        if (item == null)
+            return;
+
+        if (!indexByItem.TryGetValue(item, out int idx))
+            return;
+
+        if (idx == currentIndex)
+            return;
+
+        items[currentIndex].SetSelected(false);
+        currentIndex = idx;
+        items[currentIndex].SetSelected(true);
     }
 
     public override void OnUIInputMove(Vector2 dir)
