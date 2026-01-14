@@ -310,35 +310,43 @@ MonoBehaviour:
   stateTimer: 0
   rb: {fileID: 0}
   animator: {fileID: 0}
+  vfxAnimator: {fileID: 2892122130830252505}
   spriteRenderer: {fileID: 0}
   attackHitBox: {fileID: 6918387077792308386}
   WarningVFX: {fileID: 363974089023431405}
-  vfxAnimator: {fileID: 2892122130830252505}
   idleTime: 2
   patrolSpeed: 3
   patrolTime: 2
   aggroRange: 9
   aggroSpeed: 5
-  maxHeightDiffForAttack: 3
-  moveDirX: 1
+  freezeZoneX: 0.3
   attackRange: 3
   readyAttackWindup: 0.5
   attackCoolTime: 1
   attackDuration: 1
+  maxHeightDiffForAttack: 3
   delayTime: 0
   standByTime: 1
+  skillRange: 0
+  readySkillWindup: 0
+  skillCoolTime: 0
+  skillDuration: 0
   playerTransform: {fileID: 0}
   playerMask:
     serializedVersion: 2
     m_Bits: 64
   distanceToPlayer: 0
-  freezeZoneX: 0.3
-  isDead: 0
-  isHit: 0
-  hitStunTime: 0.5
-  hitLockDuration: 0.15
   knockBackXForce: 3
   knockBackYForce: 0
+  hitStunTime: 0.5
+  hitLockDuration: 0.15
+  rayLength: 0
+  forwardPadding: 0
+  bottomPadding: 0
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+  boxCollider: {fileID: 0}
 --- !u!114 &2012367200612034866
 MonoBehaviour:
   m_ObjectHideFlags: 0

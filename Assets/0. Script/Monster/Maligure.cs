@@ -50,6 +50,15 @@ public class Malirgue : MonoBehaviour, IDamageable
     bool isHeigtForAttackOk;
     bool isAttacking = false;
     bool isAttackReady = true;
+    bool isActionLocked = false;
+
+    [Header("Skill")]
+    [SerializeField] float skillRange;
+    [SerializeField] float readySkillWindup;
+    [SerializeField] float skillCoolTime;
+    [SerializeField] float skillDuration;
+    bool isUsingSkill = true;
+    bool isSkillReady = true;
 
     [Header("Detect Player")]
     [SerializeField] Transform playerTransform;
@@ -63,6 +72,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     
 
     Coroutine runningRoutine;
+    Coroutine lockActionRoutine;
 
     [Header("OnDamage")]
     [SerializeField] float knockBackXForce;
@@ -123,6 +133,8 @@ public class Malirgue : MonoBehaviour, IDamageable
             case malirgue_State.Idle: TickIdle(); break;
             case malirgue_State.Patrol: TickPatrol(); break;
             case malirgue_State.Aggro: TickAggro(); break;
+            case malirgue_State.Attack : break;
+            case malirgue_State.Skill: break;
             case malirgue_State.TakeDamage: TickTakeDamage(); break;   
             case malirgue_State.Dead: break;
         }
@@ -241,11 +253,21 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         if(isHit && isHeigtForAttackOk) return;
 
+        if (enableSkill && distanceToPlayer <= skillRange &&
+            distanceToPlayer >= attackRange &&
+            isSkillReady && !isUsingSkill)
+        {
+            StartSkill();
+            return;
+        }
+
         if(enableAttack && distanceToPlayer <= attackRange && isAttackReady && !isAttacking)
         {
             StartAttack();
             return;
         }
+
+        
     }
 
     void StartAttack()
@@ -272,8 +294,10 @@ public class Malirgue : MonoBehaviour, IDamageable
         ChangeState(malirgue_State.Idle);
         animator?.SetTrigger("Idle");
         HideWarningVFX();
-        StartCoroutine(AttackCoolDown());
         
+        lockActionRoutine = StartCoroutine(LockActionRoutine());
+        StartCoroutine(AttackCoolDown());
+
         yield return new WaitForSeconds(standByTime);
         canMove = true;
     }
@@ -282,6 +306,59 @@ public class Malirgue : MonoBehaviour, IDamageable
     {
         yield return new WaitForSeconds(attackCoolTime);
         isAttackReady = true;
+    }
+
+    public void StartSkill()
+    {
+        if (runningRoutine != null) StopCoroutine(runningRoutine);
+        isUsingSkill = true;
+        isSkillReady = false;
+        //isActionLocked = true;
+        canMove = false;
+        animator?.SetTrigger("ReadyAttack");
+        runningRoutine = StartCoroutine(SkillRoutine());
+    }
+
+    [SerializeField] float skillStabDuration;
+    IEnumerator SkillRoutine()
+    {
+        ChangeState(malirgue_State.Skill);
+        
+        StopX();
+
+        yield return new WaitForSeconds(readySkillWindup);
+
+        //sfx.Play("AttackSound");
+        animator?.SetTrigger("ReadySkill");
+        rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
+
+        yield return new WaitForSeconds(skillDuration);
+
+        StopX();
+        animator?.SetTrigger("Skill");
+
+        yield return new WaitForSeconds(skillStabDuration);
+
+        isUsingSkill = false;
+        ChangeState(malirgue_State.Idle);
+        animator?.SetTrigger("Idle");
+        //lockActionRoutine = StartCoroutine(LockActionRoutine());
+        StartCoroutine(SkillCooldownRoutine());
+
+        yield return new WaitForSeconds(standByTime);
+        canMove = true;
+    }
+
+    IEnumerator SkillCooldownRoutine()
+    {
+        yield return new WaitForSeconds(skillCoolTime);
+        isSkillReady = true;
+    }
+
+    IEnumerator LockActionRoutine()
+    {
+        yield return new WaitForSeconds(delayTime);
+        //isActionLocked = false;
     }
 
     void ApplyFlip()
@@ -398,5 +475,51 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         Gizmos.color = Color.blue; 
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, skillRange);
+    }
+
+    bool cliffStopped = false;
+    bool isCliffAhead;
+    [SerializeField] float rayLength;
+    [SerializeField] float forwardPadding;
+    [SerializeField] float bottomPadding;
+    [SerializeField] LayerMask groundMask;
+    [SerializeField] BoxCollider2D boxCollider;
+
+    void MonsterGroundCheck()
+    {
+        if(state == malirgue_State.Dead) return;
+
+        Bounds b = boxCollider.bounds;
+
+        float dirX;
+
+        // lastHitFrom 기반으로 밀려나는 방향 쪽으로 레이 시작점 이동
+        if (state == malirgue_State.TakeDamage)
+        {
+            float dx = ((Vector2)transform.position - lastHitFrom).x;
+            dirX = Mathf.Sign(dx);
+            if (dirX == 0f) dirX = 1f; // 안전장치
+        }
+        else
+        {
+            dirX = Mathf.Sign(facingX);
+            if (dirX == 0f) dirX = 1f;
+        }
+
+        Vector2 rayStart = new Vector2((dirX > 0f ? b.max.x : b.min.x) + dirX * forwardPadding,b.min.y + bottomPadding);
+
+        RaycastHit2D hit = Physics2D.Raycast(rayStart, Vector2.down, rayLength, groundMask);
+
+        Debug.DrawRay(rayStart, Vector2.down * rayLength, Color.red);
+
+        isCliffAhead = (hit.collider == null);
+
+        cliffStopped = isCliffAhead;
+
+        if(state == malirgue_State.TakeDamage) return;
+        animator?.SetBool("Aggro_Idle", cliffStopped);
     }
 }
