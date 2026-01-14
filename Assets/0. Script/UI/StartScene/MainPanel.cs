@@ -68,8 +68,8 @@ public class MainPanel : UIPanelBase
         {
             ButtonSelectImage.gameObject.SetActive(true);
             ButtonSelectImage.transform.position = menuButtons[(int)curIndex].transform.position;
+            //menuButtons[(int)curIndex].GetComponentsInChildren<>;
         }
-        Debug.Log($"{curIndex}, {menuButtons[(int)curIndex].name}");
     }
 
     public void ButtonMouseEnter(int index)
