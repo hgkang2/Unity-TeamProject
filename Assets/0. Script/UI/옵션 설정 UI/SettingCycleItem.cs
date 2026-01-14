@@ -6,6 +6,9 @@ public class SettingCycleItem : MonoBehaviour, ISettingItem
 {
     [SerializeField] Image highlight;
     [SerializeField] TMPro.TMP_Text valueText;
+    [Header("Optional Buttons (+ / -)")]
+    [SerializeField] HoldRepeatButton minusHold;
+    [SerializeField] HoldRepeatButton plusHold;
 
     struct ResolutionEntry
     {
@@ -21,18 +24,30 @@ public class SettingCycleItem : MonoBehaviour, ISettingItem
 
     // ---- Repeat 정책(고정) ----
     public UIRepeatMode RepeatMode => UIRepeatMode.FixedInterval;
-    public float RepeatInterval => 0.25f;
+    public float RepeatInterval => 0.2f;
 
     // unused (가속용)
-    public float AccelStartDelay => 0f;
-    public float AccelInitialInterval => 0f;
-    public float AccelMinInterval => 0f;
-    public float AccelFactor => 0f;
+    public float AccelStartDelay => 0.2f;
+    public float AccelInitialInterval => 0.2f;
+    public float AccelMinInterval => 0.2f;
+    public float AccelFactor => 1f;
 
     void Awake()
     {
         BuildResolutions();
         SyncWithCurrentResolution();
+        minusHold.OnFire = () => Adjust(-1);
+        plusHold.OnFire = () => Adjust(+1);
+        ApplyHoldParams(minusHold);
+        ApplyHoldParams(plusHold);
+    }
+
+    void ApplyHoldParams(HoldRepeatButton hb)
+    {
+        hb.startDelay = AccelStartDelay;
+        hb.initialInterval = AccelInitialInterval;
+        hb.minInterval = AccelMinInterval;
+        hb.accelFactor = AccelFactor;
     }
 
     public void SetSelected(bool selected)

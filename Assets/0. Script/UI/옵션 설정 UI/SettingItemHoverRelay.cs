@@ -19,12 +19,13 @@ public class SettingItemHoverRelay : MonoBehaviour, IPointerEnterHandler, IPoint
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        panel?.RequestFocus(item);
+        if (panel == null || item == null) return;
+        panel.RequestFocus(item);
     }
 
-    // hover가 아니라 클릭/드래그로 들어와도 마지막 이벤트 기준으로 포커스 맞추기
     public void OnPointerDown(PointerEventData eventData)
     {
-        panel?.RequestFocus(item);
+        if (panel == null || item == null) return;
+        panel.RequestFocus(item);
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 public class MainCharacterChoicePanel : UIPanelBase
 {
     [SerializeField] MainCharacterChoiceSlot[] slots;
-    [SerializeField] MainCharacterConfirmPanel confirmPanel;
+    [SerializeField] ConfirmPanel confirmPanel;
 
     public int? focusedIndex = -1;
     public int? selectedIndex = -1;
@@ -20,12 +20,14 @@ public class MainCharacterChoicePanel : UIPanelBase
         }
 
         confirmPanel.gameObject.SetActive(true);
-        confirmPanel.Close();
+    }
 
-        
+    protected override void OnOpened()
+    {
+        confirmPanel.Close();        
         focusedIndex = null;
         selectedIndex = null;
-        UpdatFocusHighlight();
+        UpdateFocusHighlight();
     }
 
     void FocusSlot(CharacterId id)
@@ -52,7 +54,7 @@ public class MainCharacterChoicePanel : UIPanelBase
 
         selectedIndex = focusedIndex;
         focusedIndex = null;
-        UpdatFocusHighlight();
+        UpdateFocusHighlight();
 
         confirmPanel.Open();
     }
@@ -65,7 +67,7 @@ public class MainCharacterChoicePanel : UIPanelBase
         SceneLoader.NoLoadingScene("IngameIntro");
     }
 
-    void UpdatFocusHighlight()
+    void UpdateFocusHighlight()
     {
         foreach (var slot in slots) slot.UnFocus();
         if (focusedIndex != null)
@@ -85,7 +87,7 @@ public class MainCharacterChoicePanel : UIPanelBase
             // 오른쪽 → 마지막 선택
             else if (dir.x > 0.1f) focusedIndex = slots.Length - 1;
 
-            UpdatFocusHighlight();
+            UpdateFocusHighlight();
             return;
         }
 
@@ -99,7 +101,7 @@ public class MainCharacterChoicePanel : UIPanelBase
         else if (focusedIndex >= slots.Length) focusedIndex = slots.Length - 1;
 
         //강조된 버튼 변경
-        UpdatFocusHighlight();
+        UpdateFocusHighlight();
     }
 
     public override void OnUIInputConfirm()

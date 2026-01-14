@@ -1,96 +1,198 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// SettingPanel (SSOT)
+/// - 키보드/마우스 동시 조작을 자연스럽게 만들기 위해,
+///   포커스(currentIndex)와 하이라이트는 이 패널에서만 관리한다.
+/// - 방향키 입력은 디지털 입력 기준 "마지막 축 우선(activeAxis)"으로 해석한다.
+///   - Y축: 포커스 이동(네비게이션 홀드 가능)
+///   - X축: (1) 좌/우 네비가 존재하면 포커스 이동
+///          (2) 아니면 CanAdjust 항목에 한해 값 조절(홀드/가속)
+/// - 슬라이더 드래그 중에는 focusLocked로 키보드 입력/포커스 변경을 막는다.
+/// </summary>
 public class SettingPanel : UIPanelBase
 {
+    #region Types
     enum NavAxis { None, X, Y }
 
+    // navMap 전용: 현재 인덱스에서 Up/Down/Left/Right로 어디로 이동할지
+    struct Nav4
+    {
+        public int up, down, left, right;
+        public Nav4(int up, int down, int left, int right)
+        {
+            this.up = up;
+            this.down = down;
+            this.left = left;
+            this.right = right;
+        }
+    }
+    #endregion
+
+    #region Inspector
     [Header("Setting Items (Top → Bottom)")]
     [SerializeField] List<MonoBehaviour> settingItemBehaviours;
 
-    [SerializeField] SaveAlertPanel saveAlertPanel_GotoTitle;
-    [SerializeField] SaveAlertPanel saveAlertPanel_QuitGame;
+    [Header("Confirm Panels")]
+    [SerializeField] ConfirmPanel saveAlertPanel_GotoTitle;
+    [SerializeField] ConfirmPanel saveAlertPanel_QuitGame;
 
-    List<ISettingItem> items = new();
-    Dictionary<ISettingItem, int> indexByItem = new();
+    [Header("Vertical Hold (Navigation)")]
+    [SerializeField] float navHoldStartDelay = 0.2f;
+    [SerializeField] float navHoldInterval = 0.2f;
+    #endregion
+
+    #region Item Cache
+    // 인스펙터 목록에서 ISettingItem만 추려서 캐시
+    readonly List<ISettingItem> items = new();
+    // 마우스 hover로 들어온 ISettingItem -> index 역매핑
+    readonly Dictionary<ISettingItem, int> indexByItem = new();
+
+    // 포커스(SSOT)
     int currentIndex;
 
-    // ---- Hold state ----
-    int holdX;                 // -1 / +1 / 0
+    // 그리드/특수 이동을 위한 네비 맵
+    readonly Dictionary<int, Nav4> navMap = new();
+    #endregion
+
+    #region Input State
+    // 드래그 중(슬라이더 조작 등)에는 키보드 입력/포커스 변경 잠금
+    bool focusLocked;
+
+    // 디지털 입력용 "마지막 축 우선" 판정용 상태
+    NavAxis activeAxis = NavAxis.None;
+    Vector2 lastRaw;
+
+    const float INPUT_TH = 0.1f;
+    #endregion
+
+    #region Hold Engine
+    // X: 값 조절(가속/고정) / Y: 네비게이션(고정)
+    int holdX; // -1 / +1 / 0
+    int holdY; // -1 / +1 / 0
+
     float holdElapsed;
     float nextFireTime;
+
+    // X 가속용
     float accelInterval;
     ISettingItem holdItem;
+    #endregion
 
+    #region Public API
     public void OpenSaveAlertPanel_GotoTitle() => saveAlertPanel_GotoTitle.Open();
     public void OpenSaveAlertPanel_QuitGame() => saveAlertPanel_QuitGame.Open();
 
+    /// <summary>
+    /// 슬라이더 드래그 중 포커스/키보드 입력 잠금.
+    /// (드래그 시작/끝에서 호출)
+    /// </summary>
+    public void SetFocusLocked(bool locked)
+    {
+        focusLocked = locked;
+
+        // 드래그 중에는 홀드/축 상태를 끊어주는 게 안전
+        if (locked)
+            ResetInputState();
+    }
+
+    /// <summary>
+    /// 마우스 hover/click → 포커스 변경 요청.
+    /// 포커스/하이라이트는 SettingPanel(SSOT)에서만 변경한다.
+    /// </summary>
+    public void RequestFocus(ISettingItem item)
+    {
+        if (focusLocked) return;
+        if (item == null) return;
+        if (!indexByItem.TryGetValue(item, out int idx)) return;
+        if (idx == currentIndex) return;
+
+        ResetInputState();
+
+        if (IsValidIndex(currentIndex))
+            items[currentIndex].SetSelected(false);
+
+        currentIndex = idx;
+        items[currentIndex].SetSelected(true);
+    }
+    #endregion
+
+    #region UIPanelBase
     protected override void Init()
     {
-        items.Clear();
-        indexByItem.Clear();
+        BuildItemCache();
 
-        foreach (var mb in settingItemBehaviours)
-        {
-            if (mb is ISettingItem item)
-                items.Add(item);
-        }
-        for (int i = 0; i < items.Count; i++)
-            indexByItem[items[i]] = i;
-
-        currentIndex = Mathf.Clamp(currentIndex, 0, items.Count - 1);
-
-        currentIndex = 4;
+        // 기본 선택(예: 게임 저장 버튼 위치로)
+        currentIndex = Mathf.Clamp(4, 0, items.Count - 1);
 
         RefreshSelection();
+        BuildNavMap();
 
+        // 모달 패널 초기화
         saveAlertPanel_GotoTitle.gameObject.SetActive(true);
         saveAlertPanel_QuitGame.gameObject.SetActive(true);
+    }
 
+    protected override void OnOpened()
+    {
         saveAlertPanel_GotoTitle.Close();
         saveAlertPanel_QuitGame.Close();
     }
 
+    protected override void OnClosing()
+    {
+        TimeManager.Resume();
+    }
+    #endregion
+
+    #region Update(Hold)
     void Update()
     {
-        if (holdX == 0) return;
+        // 홀드 중인 축이 없으면 스킵
+        if (holdX == 0 && holdY == 0) return;
 
-        // 패널이 열려있을 때 UI는 보통 timescale 0이어도 돌아가야 하니까 unscaled 사용
+        // UI는 timescale 0에서도 돌아야 하는 경우가 많아서 unscaled 사용
         holdElapsed += Time.unscaledDeltaTime;
 
         if (holdElapsed < nextFireTime)
             return;
 
-        // 다음 반복 실행
-        FireAdjustOnce();
-        ScheduleNext();
+        if (holdX != 0)
+        {
+            FireAdjustOnce();
+            ScheduleAdjustNext();
+        }
+        else if (holdY != 0)
+        {
+            FireNavOnce();
+            // 다음 네비 반복(고정 간격)
+            holdElapsed = 0f;
+            nextFireTime = navHoldInterval;
+        }
     }
+    #endregion
 
-
-
-    NavAxis activeAxis = NavAxis.None;
-    Vector2 lastRaw;
-
+    #region UI Input (kbd)
     public override void OnUIInputMove(Vector2 raw)
     {
-        // 해제 신호
+        if (focusLocked) return;
+
+        // 해제 신호: 입력 상태/홀드 정리
         if (raw == Vector2.zero)
         {
-            lastRaw = Vector2.zero;
-            activeAxis = NavAxis.None;
-            StopHold();
+            ResetInputState();
             return;
         }
 
-        const float TH = 0.1f;
+        // 입력 상태 파싱
+        bool xDown = Mathf.Abs(raw.x) > INPUT_TH;
+        bool yDown = Mathf.Abs(raw.y) > INPUT_TH;
 
-        bool xDown = Mathf.Abs(raw.x) > TH;
-        bool yDown = Mathf.Abs(raw.y) > TH;
+        bool xWasDown = Mathf.Abs(lastRaw.x) > INPUT_TH;
+        bool yWasDown = Mathf.Abs(lastRaw.y) > INPUT_TH;
 
-        bool xWasDown = Mathf.Abs(lastRaw.x) > TH;
-        bool yWasDown = Mathf.Abs(lastRaw.y) > TH;
-
-        bool xNewDown = xDown && !xWasDown; // 0 -> 눌림
+        bool xNewDown = xDown && !xWasDown;
         bool yNewDown = yDown && !yWasDown;
 
         int xSign = xDown ? (int)Mathf.Sign(raw.x) : 0;
@@ -102,43 +204,17 @@ public class SettingPanel : UIPanelBase
         bool xSignChanged = xDown && xWasDown && (xSign != lastXSign);
         bool ySignChanged = yDown && yWasDown && (ySign != lastYSign);
 
-        // ---- activeAxis 결정 규칙 (디지털 입력용 “마지막 축 우선”) ----
-        // 1) 새로 눌린 축이 있으면 그 축으로 전환
-        // 2) 같은 축에서 방향이 바뀌면(좌->우) 그 축 유지
-        if (xNewDown) activeAxis = NavAxis.X;
-        else if (yNewDown) activeAxis = NavAxis.Y;
-        else if (xSignChanged && activeAxis == NavAxis.X) { } // 유지
-        else if (ySignChanged && activeAxis == NavAxis.Y) { } // 유지
-        else if (activeAxis == NavAxis.None)
-        {
-            // 처음 들어온 경우: X가 있으면 X, 아니면 Y
-            if (xDown) activeAxis = NavAxis.X;
-            else if (yDown) activeAxis = NavAxis.Y;
-        }
+        // 디지털 입력: 마지막 축 우선
+        UpdateActiveAxis(xDown, yDown, xNewDown, yNewDown, xSignChanged, ySignChanged);
 
-        // ---- 축별 처리 ----
+        // 축별 처리
         if (activeAxis == NavAxis.Y)
         {
-            // 위/아래는 "새로 눌림/방향 전환"일 때만 1칸 이동
-            StopHold();
-
-            if (yNewDown || ySignChanged)
-            {
-                MoveIndex(ySign > 0 ? -1 : +1);
-            }
+            HandleYInput(yDown, ySign, yNewDown, ySignChanged);
         }
         else if (activeAxis == NavAxis.X)
         {
-            // 좌/우는 홀드 엔진 (아이템 repeat 정책에 따라 가속/고정)
-            if (!xDown)
-            {
-                StopHold();
-            }
-            else if (xNewDown || xSignChanged)
-            {
-                StartHold(xSign); // 누르는 순간 1회 + 이후 반복은 Update에서
-            }
-            // xDown 유지 중 반복은 Update()가 처리
+            HandleXInput(xDown, xSign, xNewDown, xSignChanged);
         }
 
         lastRaw = raw;
@@ -146,49 +222,188 @@ public class SettingPanel : UIPanelBase
 
     public override void OnUIInputConfirm()
     {
+        if (focusLocked) return;
+
         StopHold();
 
         var cur = items[currentIndex];
         if (cur.CanSubmit)
             cur.Submit();
     }
+    #endregion
 
-    void StartHold(int dirX)
+    #region Input Helpers
+    void UpdateActiveAxis(bool xDown, bool yDown, bool xNewDown, bool yNewDown, bool xSignChanged, bool ySignChanged)
+    {
+        // 1) 새로 눌린 축이 있으면 그 축으로 전환
+        if (xNewDown) activeAxis = NavAxis.X;
+        else if (yNewDown) activeAxis = NavAxis.Y;
+
+        // 2) 같은 축에서 방향이 바뀐 경우는 축 유지
+        else if (xSignChanged && activeAxis == NavAxis.X) { }
+        else if (ySignChanged && activeAxis == NavAxis.Y) { }
+
+        // 3) 아직 축이 없다면(처음 입력) X 우선, 없으면 Y
+        else if (activeAxis == NavAxis.None)
+        {
+            if (xDown) activeAxis = NavAxis.X;
+            else if (yDown) activeAxis = NavAxis.Y;
+        }
+    }
+
+    void HandleYInput(bool yDown, int ySign, bool yNewDown, bool ySignChanged)
+    {
+        // X 조절 홀드 중이면 끊고 Y 네비로 전환
+        if (holdX != 0) StopHold();
+
+        if (!yDown)
+        {
+            // Stop Nav Hold
+            holdY = 0;
+            holdElapsed = 0f;
+            nextFireTime = 0f;
+            return;
+        }
+
+        if (yNewDown || ySignChanged)
+            StartNavHold(ySign); // 즉시 1회 + 이후 일정 간격 반복
+    }
+    
+    void HandleXInput(bool xDown, int xSign, bool xNewDown, bool xSignChanged)
+    {
+        if (!xDown)
+        {
+            StopHold();
+            return;
+        }
+
+        if (!(xNewDown || xSignChanged))
+            return;
+
+        var cur = items[currentIndex];
+
+        // 좌/우 네비가 "실제로 존재"하면 그걸 우선
+        if (HasHorizontalNav(xSign))
+        {
+            StopHold();
+            TryMoveByMap(xSign: xSign, ySign: 0);
+            return;
+        }
+
+        // 좌/우 네비가 없으면 조절 가능한 항목만 값 조절
+        if (cur.CanAdjust)
+            StartAdjustHold(xSign);
+    }
+    #endregion
+
+    #region Navigation
+    void BuildNavMap()
+    {
+        navMap.Clear();
+
+        // 0(BGM)
+        navMap[0] = new Nav4(up: 5, down: 1, left: 0, right: 0);
+        // 1(SFX)
+        navMap[1] = new Nav4(up: 0, down: 2, left: 1, right: 1);
+        // 2(해상도)
+        navMap[2] = new Nav4(up: 1, down: 3, left: 2, right: 2);
+
+        // 1행 버튼: 3(적용) 4(저장)
+        navMap[3] = new Nav4(up: 2, down: 5, left: 3, right: 4);
+        navMap[4] = new Nav4(up: 2, down: 6, left: 3, right: 4);
+
+        // 2행 버튼: 5(메인) 6(종료)
+        navMap[5] = new Nav4(up: 3, down: 0, left: 5, right: 6);
+        navMap[6] = new Nav4(up: 4, down: 0, left: 5, right: 6);
+    }
+
+    bool HasHorizontalNav(int xSign)
+    {
+        if (!navMap.TryGetValue(currentIndex, out var n))
+            return false;
+
+        if (xSign < 0) return n.left != currentIndex;
+        if (xSign > 0) return n.right != currentIndex;
+        return false;
+    }
+
+    bool TryMoveByMap(int xSign, int ySign)
+    {
+        if (!navMap.TryGetValue(currentIndex, out var n))
+            return false;
+
+        int next = currentIndex;
+
+        if (ySign > 0) next = n.up;
+        else if (ySign < 0) next = n.down;
+        else if (xSign < 0) next = n.left;
+        else if (xSign > 0) next = n.right;
+
+        if (next == currentIndex)
+            return false;
+
+        if (!IsValidIndex(next))
+            return false;
+
+        items[currentIndex].SetSelected(false);
+        currentIndex = next;
+        items[currentIndex].SetSelected(true);
+        return true;
+    }
+
+    void StartNavHold(int dirY)
+    {
+        if (holdY == dirY) return;
+
+        holdY = dirY;
+
+        // 즉시 1회 이동
+        FireNavOnce();
+
+        // 이후 반복 스케줄
+        holdElapsed = 0f;
+        nextFireTime = navHoldStartDelay;
+    }
+
+    void FireNavOnce()
+    {
+        TryMoveByMap(0, holdY);
+    }
+
+    void StartAdjustHold(int dirX)
     {
         var cur = items[currentIndex];
 
-        // Adjust 불가면 홀드 자체가 의미 없음
+        // Adjust 불가면 홀드 의미 없음
         if (!cur.CanAdjust)
         {
             StopHold();
             return;
         }
 
-        // 같은 방향으로 이미 홀드 중이면 무시
+        // 같은 방향 + 같은 아이템 홀드 중이면 무시
         if (holdX == dirX && holdItem == cur)
             return;
 
         holdX = dirX;
         holdItem = cur;
 
-        // 누르는 순간 즉시 1회 적용
+        // 즉시 1회 조절
         FireAdjustOnce();
 
-        // 스케줄 초기화
         holdElapsed = 0f;
 
         if (cur.RepeatMode == UIRepeatMode.FixedInterval)
         {
-            nextFireTime = cur.RepeatInterval; // 예: 0.25
+            nextFireTime = cur.RepeatInterval;
         }
         else if (cur.RepeatMode == UIRepeatMode.Accelerate)
         {
-            nextFireTime = cur.AccelStartDelay;       // 예: 0.35
-            accelInterval = cur.AccelInitialInterval; // 예: 0.25
+            nextFireTime = cur.AccelStartDelay;
+            accelInterval = cur.AccelInitialInterval;
         }
         else
         {
-            // None이면 홀드 반복 없음 (단발로 끝)
             StopHold();
         }
     }
@@ -198,7 +413,7 @@ public class SettingPanel : UIPanelBase
         holdItem.Adjust(holdX);
     }
 
-    void ScheduleNext()
+    void ScheduleAdjustNext()
     {
         holdElapsed = 0f;
 
@@ -210,7 +425,6 @@ public class SettingPanel : UIPanelBase
 
         if (holdItem.RepeatMode == UIRepeatMode.Accelerate)
         {
-            // 가속: interval을 점점 줄여서 더 빨라지게
             accelInterval = Mathf.Max(holdItem.AccelMinInterval, accelInterval * holdItem.AccelFactor);
             nextFireTime = accelInterval;
         }
@@ -219,18 +433,28 @@ public class SettingPanel : UIPanelBase
     void StopHold()
     {
         holdX = 0;
+        holdY = 0;
         holdElapsed = 0f;
         nextFireTime = 0f;
         accelInterval = 0f;
         holdItem = null;
     }
+    #endregion
 
-    void MoveIndex(int delta)
+    #region Item Cache / Selection
+    void BuildItemCache()
     {
-        items[currentIndex].SetSelected(false);
+        items.Clear();
+        indexByItem.Clear();
 
-        currentIndex = (currentIndex + delta + items.Count) % items.Count;
-        items[currentIndex].SetSelected(true);
+        foreach (var mb in settingItemBehaviours)
+        {
+            if (mb is ISettingItem item)
+                items.Add(item);
+        }
+
+        for (int i = 0; i < items.Count; i++)
+            indexByItem[items[i]] = i;
     }
 
     void RefreshSelection()
@@ -239,39 +463,28 @@ public class SettingPanel : UIPanelBase
             items[i].SetSelected(i == currentIndex);
     }
 
-
-    public void RequestFocus(ISettingItem item)
+    bool IsValidIndex(int idx)
     {
-        if (item == null)
-            return;
+        return idx >= 0 && idx < items.Count;
+    }
 
-        if (!indexByItem.TryGetValue(item, out int idx))
-            return;
-
-        if (idx == currentIndex)
-            return;
-
-        StopHold();
-        activeAxis = NavAxis.None;
+    void ResetInputState()
+    {
         lastRaw = Vector2.zero;
-
-        if (currentIndex >= 0 && currentIndex < items.Count)
-            items[currentIndex].SetSelected(false);
-
-        currentIndex = idx;
-        items[currentIndex].SetSelected(true);
+        activeAxis = NavAxis.None;
+        StopHold();
     }
+    #endregion
 
-    protected override void OnClosing()
-    {
-    }
-
+    #region Button Actions
     public void GotoTitle()
     {
         SceneLoader.NoLoadingScene("Start");
     }
+
     public void QuitGame()
     {
         GameManager.Instance.QuitGame();
     }
+    #endregion
 }

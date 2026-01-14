@@ -14,8 +14,8 @@ public class SettingSliderItem : MonoBehaviour, ISettingItem
     [SerializeField] TMP_Text valueText;
 
     [Header("Optional Buttons (+ / -)")]
-    [SerializeField] Button minusButton;
-    [SerializeField] Button plusButton;
+    [SerializeField] HoldRepeatButton minusHold;
+    [SerializeField] HoldRepeatButton plusHold;
 
     [Header("Step")]
     [SerializeField] int stepPercent = 5; // 5단위
@@ -35,11 +35,23 @@ public class SettingSliderItem : MonoBehaviour, ISettingItem
     void Awake()
     {
         slider.onValueChanged.AddListener(OnSliderValueChanged);
-        minusButton.onClick.AddListener(() => Step(-1));
-        plusButton.onClick.AddListener(() => Step(+1));
+        minusHold.OnFire = () => Step(-1);
+        plusHold.OnFire = () => Step(+1);
+
+        // 키보드와 동일 파라미터로 맞추기
+        ApplyHoldParams(minusHold);
+        ApplyHoldParams(plusHold);
 
         // 초기값 동기화 (현재 슬라이더 값 기준)
         SetPercent(PercentFromSlider(slider != null ? slider.value : 0f));
+    }
+
+    void ApplyHoldParams(HoldRepeatButton hb)
+    {
+        hb.startDelay = AccelStartDelay;
+        hb.initialInterval = AccelInitialInterval;
+        hb.minInterval = AccelMinInterval;
+        hb.accelFactor = AccelFactor;
     }
     void OnDestroy()
     {

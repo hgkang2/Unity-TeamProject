@@ -11,7 +11,7 @@ public class StartUI : MonoBehaviour,IUIKeyboardTarget
 
     [SerializeField] MainPanel mainPanel;
     [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
-    [SerializeField] MainCharacterConfirmPanel mainCharacterConfirmPanel;
+    [SerializeField] ConfirmPanel mainCharacterConfirmPanel;
 
 
     Sequence openingSequence;
