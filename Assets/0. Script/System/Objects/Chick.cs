@@ -16,7 +16,7 @@ public class Chick : MonoBehaviour, IInteractable
     [Header("Peck")]
     [Range(0f, 1f)]
     [SerializeField] float peckChanceOnTransition = 0.5f;
-    [SerializeField] string peckStateTag = "Peck"; // Animator의 쪼기 State에 Tag를 "Peck"로 설정해줘
+    [SerializeField] string peckStateTag = "Peck"; // Animator의 쪼기 State에 Tag를 "Peck"로 설정
 
     [Header("Animator Triggers")]
     [SerializeField] string trigIdle = "Idle";
@@ -76,6 +76,7 @@ public class Chick : MonoBehaviour, IInteractable
         transform.localScale = scale;
     }
 
+    // 대기 <-> 이동 무한 반복( + 랜덤 확률로 사이사이에 쪼기 실시)
     IEnumerator IdleLoop()
     {
         // 시작은 대기(Idle)
@@ -88,7 +89,7 @@ public class Chick : MonoBehaviour, IInteractable
             yield return new WaitForSeconds(RandomRange(waitMin, waitMax));
             if (isInteracting) yield break;
 
-            // Wait -> Move 전환 직전 쪼기 체크
+            // Wait -> Move 전환 직전 쪼기
             yield return TryPeckOnce();
             if (isInteracting) yield break;
 
@@ -109,7 +110,7 @@ public class Chick : MonoBehaviour, IInteractable
             rb.linearVelocity = Vector2.zero;
             if (isInteracting) yield break;
 
-            // Move -> Wait 전환 직전 쪼기 체크
+            // Move -> Wait 전환 직전 쪼기
             yield return TryPeckOnce();
             if (isInteracting) yield break;
 
@@ -127,9 +128,7 @@ public class Chick : MonoBehaviour, IInteractable
 
         SetTrigger(trigPeck);
 
-        // "Has Exit Time"로 자연스럽게 끝나게 두되,
-        // 로직은 쪼기 State(태그) 재생이 끝날 때까지 기다렸다가 다음으로 넘어감.
-        // (쪼기 State에 Tag = peckStateTag 를 꼭 달아줘)
+        // peckStateTag인 Animation clip 재생이 끝날 때까지 기다리기
         yield return WaitForTaggedStateToFinish(peckStateTag);
     }
 
@@ -233,7 +232,7 @@ public class Chick : MonoBehaviour, IInteractable
         highlightTween = null;
         spriteRenderer.color = Color.white;
 
-        // 콜라이더 전부 끄기 (본체 + 자식 interactable 포함)
+        // 콜라이더 전부 끄기 (본체 + interactable 포함)
         for (int i = 0; i < allColliders.Length; i++)
             allColliders[i].enabled = false;
 
