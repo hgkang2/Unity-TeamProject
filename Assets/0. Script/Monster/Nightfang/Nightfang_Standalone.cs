@@ -38,11 +38,15 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [Header("Aggro")]
     [SerializeField] float aggroRange = 6.0f;     // Aggro 범위
     [SerializeField] float aggroSpeed = 3.5f;     // Aggro 상태 이동 속도
+    [SerializeField] float offGuardTimer = 0f;
+    [SerializeField] float alertedStateDuration = 10f;
+    [SerializeField] GameObject alertSprite;
     [SerializeField] float maxHeightDiffForAttack = 0.8f;
     int moveDirX = 1;
 
     [Header("Attack")]
     [SerializeField] float attackRange = 1.2f;    
+    [SerializeField] float attackDashForce;
     [Tooltip("일반 공격 선딜레이")]
     [SerializeField] float readyAttackWindup = 1f;
     [SerializeField] float attackCoolTime = 1.0f;
@@ -50,9 +54,11 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] float attackDuration = 1f;
     bool isAttacking;
     bool isAttackReady = true;
+    bool heightOk;
 
     [Header("Skill")]
     [SerializeField] float skillRange = 3.5f;
+    [SerializeField] float skillDashForce;
     [Tooltip("스킬 선딜레이")]
     [SerializeField] float readySkillWindup = 0.25f;
     [SerializeField] float skillCoolTime = 0.2f;
@@ -84,10 +90,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] LayerMask playerMask;
     [Tooltip("플레이어까지의 거리")]
     [SerializeField] float distance;
-
-    [Header("FreezeZone")]
-    [Tooltip("플레이어와 거리가 freezeZoneX보다 작을 경우 몹의 이동 제한")]
-    [SerializeField] float freezeZoneX = 0.1f;
+    float freezeZoneX = 0.1f;
     float dx;  // 좌우 방향 + 좌우 거리
     
     // facing/flip 
@@ -101,9 +104,12 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     Coroutine runningRoutine;
     Coroutine lockActionRoutine; // 공격(스킬 or 일반 공격) 후 연속 공격 방지
 
-    bool heightOk;
+    [Header("GroundCheck")]
+    bool cliffStopped = false;
+    [SerializeField] float rayLength;
+    [SerializeField] float forwardPadding;
+    [SerializeField] float bottomPadding;
     [SerializeField] LayerMask groundMask;
-    [SerializeField] Transform rayOrigin;
     [SerializeField] bool isCliffAhead;
     #endregion
 
@@ -150,11 +156,13 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         PlayerDetect();
 
         stateTimer += Time.deltaTime;
+        MonsterGroundCheck();
         RunFSM();
         
         ApplyFlip();
-        MonsterGroundCheck();
+        
         hitLockTimer -= Time.deltaTime;
+        offGuardTimer -= Time.deltaTime;
     }
 
     void PlayerDetect()
@@ -188,8 +196,11 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         dx = toPlayer.x;
         distance = toPlayer.magnitude;
 
-        if (Mathf.Abs(dx) > freezeZoneX)
+        if(state == State.Aggro)
+        {
+            if (Mathf.Abs(dx) > freezeZoneX)
             moveDirX = dx > 0f ? 1 : -1;
+        }
     }
     
     void RunFSM()
@@ -199,8 +210,8 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             case State.Idle: TickIdle();; break;
             case State.Patrol: TickPatrol(); break;
             case State.Aggro:TickAggro(); break;
-            case State.Attack: if(cliffStopped) {StopX(); animator?.SetBool("Aggro_Idle", true); } break;
-            case State.Skill: if(cliffStopped) {StopX(); animator?.SetBool("Aggro_Idle", true); } break;
+            case State.Attack: if(cliffStopped) StopX();  break;
+            case State.Skill: if(cliffStopped) StopX();  break;
             case State.TakeDamage : TickTakeDamage(); break;
             case State.Dead: break;
         }
@@ -216,15 +227,25 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (enableAggro && distance <= aggroRange && !isHit)
         {
-            ChangeState(State.Aggro);
-            animator?.SetTrigger("Aggro");
-            return;
+            if(offGuardTimer <= 0)
+            {
+                StartCoroutine(AlertRoutine());
+                return;
+            }
+            else
+            {
+                ChangeState(State.Aggro);
+                animator?.SetTrigger("Aggro");
+                return;
+            }
         }
 
         if (enablePatrol && stateTimer >= idleTime && !isHit)
         {
-            ApplyFlip();
             moveDirX *= -1;
+
+            facingX = moveDirX;
+            ApplyFlip();
             animator?.SetTrigger("Patrol");
             ChangeState(State.Patrol);
             return;
@@ -238,27 +259,49 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             StopX();
             animator?.SetTrigger("Idle");
             ChangeState(State.Idle);
-            sfx.Play("IdleSound");
+            //sfx.Play("IdleSound");
             return;
         }
 
         if (enableAggro && distance <= aggroRange)
         {
-            StopX();
-            ChangeState(State.Aggro);
-            animator?.SetTrigger("Aggro");
-            return;
+            if(offGuardTimer <= 0)
+            {
+                StartCoroutine(AlertRoutine());
+                return;
+            }
+            else
+            {
+                StopX();
+                ChangeState(State.Aggro);
+                animator?.SetTrigger("Aggro");
+                return;
+            } 
         }
 
+        facingX = moveDirX;
+        
         if(cliffStopped)
         {
             StopX();
-            animator?.SetBool("Aggro_Idle", true);
             return;
         }
 
         MoveX(moveDirX, patrolSpeed);
-        facingX = moveDirX;
+    }
+
+    IEnumerator AlertRoutine()
+    {
+        StopX();
+        if (Mathf.Abs(dx) > freezeZoneX)
+            facingX = dx > 0f ? 1 : -1;
+        alertSprite.SetActive(true);
+
+        yield return new WaitForSeconds(1f);
+
+        alertSprite.SetActive(false);
+        ChangeState(State.Aggro);
+        animator?.SetTrigger("Aggro");
     }
 
     void TickAggro()
@@ -283,15 +326,14 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         {
             ChangeState(State.Idle);
             animator?.SetTrigger("Idle");
-            sfx.Play("IdleSound");
+            offGuardTimer = alertedStateDuration;
+            //sfx.Play("IdleSound");
             return;
         }
 
         if(cliffStopped)
         {
             StopX();
-            animator?.SetBool("Aggro_Idle", true);
-
             return;
         }
 
@@ -334,9 +376,10 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         StopX();
         yield return new WaitForSeconds(readyAttackWindup);
 
-        sfx.Play("AttackSound");
+        //sfx.Play("AttackSound");
         animator?.SetTrigger("Attack");
-        rb.AddForce(7f * Vector2.right * facingX, ForceMode2D.Impulse);
+        //rb.AddForce(attackDashForce * Vector2.right * facingX, ForceMode2D.Impulse);
+        rb.linearVelocity = new Vector2(attackDashForce * facingX, rb.linearVelocity.y);
 
         yield return new WaitForSeconds(attackDuration);
 
@@ -378,9 +421,10 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(readySkillWindup);
 
-        sfx.Play("AttackSound");
+        //sfx.Play("AttackSound");
         animator?.SetTrigger("Skill");
-        rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
+        //rb.AddForce(skillDashForce * Vector2.right * facingX, ForceMode2D.Impulse);
+        rb.linearVelocity = new Vector2(skillDashForce * facingX, rb.linearVelocity.y);
 
         yield return new WaitForSeconds(skillDuration);
 
@@ -448,14 +492,14 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void OnDrawGizmosSelected()
     {
-        // Gizmos.color = Color.red;
-        // Gizmos.DrawWireSphere(transform.position, aggroRange);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, aggroRange);
 
-        // Gizmos.color = Color.green;
-        // Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
 
-        // Gizmos.color = Color.blue;
-        // Gizmos.DrawWireSphere(transform.position, skillRange);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, skillRange);
         
         
     }
@@ -476,7 +520,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         hp.TakeDamage(amount);
-        sfx.Play("HitSound");
+        //sfx.Play("HitSound");
 
         if (isAttacking || isUsingSkill || isDead) return;
 
@@ -486,7 +530,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
         hp.TakeDamage(amount);
-        sfx.Play("HitSound");
+        //sfx.Play("HitSound");
         if (isAttacking || isUsingSkill || isDead) return;
 
         lastHitFrom = (Vector2)attackerWorldPosition;
@@ -528,11 +572,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         GameObject.Destroy(this.gameObject, 3f);
     }
 
-    bool cliffStopped = false;
-    [SerializeField] float rayLength;
-    [SerializeField] float forwardPadding;
-    [SerializeField] float bottomPadding;
-
     void MonsterGroundCheck()
     {
         if(state == State.Dead) return;
@@ -567,4 +606,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if(state == State.TakeDamage) return;
         animator?.SetBool("Aggro_Idle", cliffStopped);
     }
+
+
 }

@@ -2,21 +2,21 @@ using UnityEngine;
 
 public class OnContactDamage : MonoBehaviour
 {
-    [SerializeField] private MonsterBase monster;
-    [SerializeField] private string playerTag = "Player";
+    [SerializeField] float collideDamage;
+    [SerializeField] DamageType damageType;
+    [SerializeField] Collider2D col;
 
     private void Awake()
     {
-        if (monster == null) monster = GetComponent<MonsterBase>();
+        if(!col) col = GetComponent<Collider2D>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag(playerTag)) return;
-
-        Player player = collision.GetComponent<Player>();
-        if (player == null) return;
-
-        player.TakeDamage(monster.monsterStats.colideDamage, DamageType.Normal);
+        if(collision.TryGetComponent<IDamageable>(out var damageable))
+        {
+            Vector2 hitPos = transform.position;
+            damageable.TakeDamage(collideDamage, damageType, hitPos);
+        }
     }
 }

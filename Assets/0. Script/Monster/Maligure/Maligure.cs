@@ -50,7 +50,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     bool isHeigtForAttackOk;
     bool isAttacking = false;
     bool isAttackReady = true;
-    bool isActionLocked = false;
+    //bool isActionLocked = false;
 
     [Header("Skill")]
     [SerializeField] float skillRange;

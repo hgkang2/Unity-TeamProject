@@ -3,12 +3,12 @@ using System;
 
 public class SkillHitBox : MonoBehaviour
 {
-    public float damage = 10f;
-    public DamageType damageType;
+    [SerializeField] float damage = 10f;
+    [SerializeField] DamageType damageType;
 
-    public Collider2D col;
+    [SerializeField] Collider2D col;
 
-    public event Action<IDamageable> OnHit;
+    //public event Action<IDamageable> OnHit;
     LocalSFX sfx;
 
     private void Awake()
