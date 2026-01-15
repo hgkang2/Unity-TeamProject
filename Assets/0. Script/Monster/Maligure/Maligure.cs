@@ -286,6 +286,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         {
             ChangeState(malirgue_State.Idle);
             animator?.SetTrigger("Idle");
+            offGuardTimer = alertedStateDuration;
             return;
         }
 
