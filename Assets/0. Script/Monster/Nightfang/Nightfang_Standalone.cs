@@ -259,7 +259,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             StopX();
             animator?.SetTrigger("Idle");
             ChangeState(State.Idle);
-            //sfx.Play("IdleSound");
+            sfx.Play("IdleSound");
             return;
         }
 
@@ -327,7 +327,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
             ChangeState(State.Idle);
             animator?.SetTrigger("Idle");
             offGuardTimer = alertedStateDuration;
-            //sfx.Play("IdleSound");
+            sfx.Play("IdleSound");
             return;
         }
 
@@ -376,7 +376,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         StopX();
         yield return new WaitForSeconds(readyAttackWindup);
 
-        //sfx.Play("AttackSound");
+        sfx.Play("AttackSound");
         animator?.SetTrigger("Attack");
         //rb.AddForce(attackDashForce * Vector2.right * facingX, ForceMode2D.Impulse);
         rb.linearVelocity = new Vector2(attackDashForce * facingX, rb.linearVelocity.y);
@@ -421,7 +421,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(readySkillWindup);
 
-        //sfx.Play("AttackSound");
+        sfx.Play("AttackSound");
         animator?.SetTrigger("Skill");
         //rb.AddForce(skillDashForce * Vector2.right * facingX, ForceMode2D.Impulse);
         rb.linearVelocity = new Vector2(skillDashForce * facingX, rb.linearVelocity.y);
@@ -520,7 +520,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         hp.TakeDamage(amount);
-        //sfx.Play("HitSound");
+        sfx.Play("HitSound");
 
         if (isAttacking || isUsingSkill || isDead) return;
 
@@ -530,7 +530,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
         hp.TakeDamage(amount);
-        //sfx.Play("HitSound");
+        sfx.Play("HitSound");
         if (isAttacking || isUsingSkill || isDead) return;
 
         lastHitFrom = (Vector2)attackerWorldPosition;

@@ -238,7 +238,7 @@ Transform:
   m_GameObject: {fileID: 3152607725845675935}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.1700001, y: 1.4099998, z: 0}
+  m_LocalPosition: {x: 1.57, y: 0.76, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -309,6 +309,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5887270353054191846}
   - component: {fileID: 5378892132954568225}
+  - component: {fileID: 4378480783797441742}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -377,6 +378,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3.2818236, y: 2.0542445}
   m_EdgeRadius: 0
+--- !u!114 &4378480783797441742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3578710920004201130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c2d413ffa3a831499b28425b37de73f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collideDamage: 10
+  damageType: 0
+  col: {fileID: 5378892132954568225}
 --- !u!1 &6924634786436510817
 GameObject:
   m_ObjectHideFlags: 0
@@ -801,6 +817,9 @@ MonoBehaviour:
   patrolTime: 2
   aggroRange: 8
   aggroSpeed: 3.5
+  offGuardTimer: 0
+  alertedStateDuration: 10
+  alertSprite: {fileID: 3152607725845675935}
   maxHeightDiffForAttack: 2.04
   attackRange: 2
   attackDashForce: 10
@@ -824,15 +843,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   distance: 0
-  freezeZoneX: 0.1
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 128
-  rayOrigin: {fileID: 3401993074058783418}
-  isCliffAhead: 0
   rayLength: 1
   forwardPadding: 0.2
   bottomPadding: 0.3
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 128
+  isCliffAhead: 0
 --- !u!114 &1091997839790200113
 MonoBehaviour:
   m_ObjectHideFlags: 0

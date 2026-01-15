@@ -34,9 +34,10 @@ public class Malirgue : MonoBehaviour, IDamageable
     [SerializeField] float aggroRange;
     [SerializeField] float aggroSpeed;
     [SerializeField] float freezeZoneX;
+    [SerializeField] float offGuardTimer = 0f;
+    [SerializeField] float alertedStateDuration = 10f;
+    [SerializeField] GameObject alertSprite;
 
-
-    
     int moveDirX = 1;
 
     [Header("Attack")]
@@ -50,14 +51,14 @@ public class Malirgue : MonoBehaviour, IDamageable
     bool isHeigtForAttackOk;
     bool isAttacking = false;
     bool isAttackReady = true;
-    //bool isActionLocked = false;
+    bool isActionLocked = false;
 
     [Header("Skill")]
     [SerializeField] float skillRange;
     [SerializeField] float readySkillWindup;
     [SerializeField] float skillCoolTime;
     [SerializeField] float skillDuration;
-    bool isUsingSkill = true;
+    bool isUsingSkill = false;
     bool isSkillReady = true;
 
     [Header("Detect Player")]
@@ -109,10 +110,12 @@ public class Malirgue : MonoBehaviour, IDamageable
         PlayerDetect();
 
         stateTimer += Time.deltaTime;
+        MonsterGroundCheck();
         RunFSM();
 
         ApplyFlip();   
         hitLockTimer -= Time.deltaTime;
+        offGuardTimer -= Time.deltaTime;
     }
 
     void ChangeState(malirgue_State next)
@@ -133,8 +136,8 @@ public class Malirgue : MonoBehaviour, IDamageable
             case malirgue_State.Idle: TickIdle(); break;
             case malirgue_State.Patrol: TickPatrol(); break;
             case malirgue_State.Aggro: TickAggro(); break;
-            case malirgue_State.Attack : break;
-            case malirgue_State.Skill: break;
+            case malirgue_State.Attack: if(cliffStopped) StopX(); break;
+            case malirgue_State.Skill: if(cliffStopped) StopX(); break;
             case malirgue_State.TakeDamage: TickTakeDamage(); break;   
             case malirgue_State.Dead: break;
         }
@@ -202,9 +205,17 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         if(enableAggro && distanceToPlayer <= aggroRange && !isHit)
         {
-            ChangeState(malirgue_State.Aggro);
-            animator?.SetTrigger("Aggro");
-            return;
+            if(offGuardTimer <= 0)
+            {
+                StartCoroutine(AlertRoutine());
+                return;
+            }
+            else
+            {
+                ChangeState(malirgue_State.Aggro);
+                animator?.SetTrigger("Aggro");
+                return;
+            }
         }
     }
 
@@ -220,14 +231,43 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         if(enableAggro && distanceToPlayer <= aggroRange)
         {
+            if(offGuardTimer <= 0)
+            {
+                StartCoroutine(AlertRoutine());
+                return;
+            }
+            else
+            {
+                StopX();
+                ChangeState(malirgue_State.Aggro);
+                animator?.SetTrigger("Aggro");
+                return;
+            } 
+        }
+
+        facingX = moveDirX;
+
+        if(cliffStopped)
+        {
             StopX();
-            ChangeState(malirgue_State.Aggro);
-            animator?.SetTrigger("Aggro");
             return;
         }
 
         MoveX(moveDirX, patrolSpeed);
-        facingX = moveDirX;
+    }
+
+    IEnumerator AlertRoutine()
+    {
+        StopX();
+        if (Mathf.Abs(distanceOfX) > freezeZoneX)
+            facingX = distanceOfX > 0f ? 1 : -1;
+        alertSprite.SetActive(true);
+
+        yield return new WaitForSeconds(1f);
+
+        alertSprite.SetActive(false);
+        ChangeState(malirgue_State.Aggro);
+        animator?.SetTrigger("Aggro");
     }
 
     void TickAggro()
@@ -249,6 +289,12 @@ public class Malirgue : MonoBehaviour, IDamageable
             return;
         }
 
+        if(cliffStopped)
+        {
+            StopX();
+            return;
+        }
+
         MoveX(moveDirX, aggroSpeed);        
 
         if(isHit && isHeigtForAttackOk) return;
@@ -266,8 +312,6 @@ public class Malirgue : MonoBehaviour, IDamageable
             StartAttack();
             return;
         }
-
-        
     }
 
     void StartAttack()
@@ -313,7 +357,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         if (runningRoutine != null) StopCoroutine(runningRoutine);
         isUsingSkill = true;
         isSkillReady = false;
-        //isActionLocked = true;
+        isActionLocked = true;
         canMove = false;
         animator?.SetTrigger("ReadyAttack");
         runningRoutine = StartCoroutine(SkillRoutine());
@@ -342,7 +386,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         isUsingSkill = false;
         ChangeState(malirgue_State.Idle);
         animator?.SetTrigger("Idle");
-        //lockActionRoutine = StartCoroutine(LockActionRoutine());
+        lockActionRoutine = StartCoroutine(LockActionRoutine());
         StartCoroutine(SkillCooldownRoutine());
 
         yield return new WaitForSeconds(standByTime);
@@ -358,7 +402,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     IEnumerator LockActionRoutine()
     {
         yield return new WaitForSeconds(delayTime);
-        //isActionLocked = false;
+        isActionLocked = false;
     }
 
     void ApplyFlip()
@@ -520,6 +564,6 @@ public class Malirgue : MonoBehaviour, IDamageable
         cliffStopped = isCliffAhead;
 
         if(state == malirgue_State.TakeDamage) return;
-        animator?.SetBool("Aggro_Idle", cliffStopped);
+        animator?.SetBool("Aggro(IdleAni)", cliffStopped);
     }
 }
