@@ -4,52 +4,22 @@ using UnityEngine.UI;
 
 public class MainPanel : UIPanelBase
 {
-    Button[] menuButtons;
-    [SerializeField] Transform ButtonSelectImage;
+    [SerializeField] MainPanelButton[] buttons;
+    [SerializeField] Transform buttonSelectImage;
     [SerializeField] MainSaveDataPanel mainSaveDataPanel;
     [SerializeField] MainExitPanel mainExitPanel;
 
-
+    public int? curIndex = null;
     protected override void Init()
     {
-        // 활성화 된 메뉴 버튼만 캐싱 하기(인스펙터에서 설정)
-        int i = 0;
-        menuButtons = transform.Cast<Transform>()
-            .Select(t =>
-            {
-                Button button = t.GetComponent<Button>();
-                StartButtonEvent evt = t.GetComponent<StartButtonEvent>();
-
-                if (evt == null) return null;
-                if (!evt.activate) return null;
-
-                evt.SetIndex(i++);
-                evt.onEnter += ButtonMouseEnter;
-                evt.onExit += ButtonMouseExit;
-                return button;
-            })
-            .Where(b => b != null)
-            .ToArray();
+        buttons = GetComponentsInChildren<MainPanelButton>();
 
         mainExitPanel.gameObject.SetActive(true);
         mainSaveDataPanel.gameObject.SetActive(true);
-        ButtonSelectImage.gameObject.SetActive(false);
+        buttonSelectImage.gameObject.SetActive(false);
 
         mainExitPanel.Close();
         mainSaveDataPanel.Close();
-    }
-
-    void OnDestroy()
-    {
-
-        for (int i = 0; i < menuButtons.Length; i++)
-        {
-            StartButtonEvent evt = menuButtons[i].GetComponent<StartButtonEvent>();
-            if (evt == null) continue;
-
-            evt.onEnter -= ButtonMouseEnter;
-            evt.onExit -= ButtonMouseExit;
-        }
     }
 
     public void OpenMainSaveDataPanel()
@@ -57,30 +27,43 @@ public class MainPanel : UIPanelBase
         mainSaveDataPanel.Open();
     }
 
-    int? curIndex = null;
-    void UpdateButtonHighlight()
-    {
-        if (curIndex == null)
-        {
-            ButtonSelectImage.gameObject.SetActive(false);
-        }
-        else
-        {
-            ButtonSelectImage.gameObject.SetActive(true);
-            ButtonSelectImage.transform.position = menuButtons[(int)curIndex].transform.position;
-            //menuButtons[(int)curIndex].GetComponentsInChildren<>;
-        }
-    }
 
-    public void ButtonMouseEnter(int index)
+    public void ButtonMouseEnter(MainPanelButton hoverButton)
     {
-        curIndex = index;
+        int i = 0;
+        for (; i < buttons.Length; i++)
+        {
+            if (buttons[i].Equals(hoverButton)) break;
+        }
+        curIndex = i;
         UpdateButtonHighlight();
     }
 
     public void ButtonMouseExit()
     {
-        ButtonSelectImage.gameObject.SetActive(false);
+        curIndex = null;
+        ClearFocus();
+    }
+
+
+    void UpdateButtonHighlight()
+    {
+        ClearFocus();
+
+        if (curIndex != null)
+        {
+            buttons[curIndex.Value].Focused();
+            buttonSelectImage.gameObject.SetActive(true);
+            buttonSelectImage.transform.position = buttons[curIndex.Value].transform.position;
+        }
+    }
+    void ClearFocus()
+    {
+        buttonSelectImage.gameObject.SetActive(false);
+        foreach (var button in buttons)
+        {
+            button.UnFocused();
+        }
     }
 
 
@@ -93,7 +76,7 @@ public class MainPanel : UIPanelBase
             // 위쪽 → 0번 선택
             if (dir.y > 0.1f) curIndex = 0;
             // 아래쪽 → 마지막 선택
-            else if (dir.y < -0.1f) curIndex = menuButtons.Length - 1;
+            else if (dir.y < -0.1f) curIndex = buttons.Length - 1;
 
             UpdateButtonHighlight();
             return;
@@ -106,7 +89,7 @@ public class MainPanel : UIPanelBase
 
         //min, max 처리
         if (curIndex < 0) curIndex = 0;
-        else if (curIndex >= menuButtons.Length) curIndex = menuButtons.Length - 1;
+        else if (curIndex >= buttons.Length) curIndex = buttons.Length - 1;
 
         //강조된 버튼 변경
         UpdateButtonHighlight();
@@ -117,7 +100,7 @@ public class MainPanel : UIPanelBase
         //선택 버튼이 없으면 무시
         if (curIndex == null) return;
         // 마우스로 클릭한 것과 동일하게 실행
-        menuButtons[curIndex.Value].onClick.Invoke();
+        buttons[curIndex.Value].Confirm();
     }
 
     // 닫혀버리면 안 돼서 OnClosing에 추가구현 대신 OnUIInputCancel 덮어쓰기
@@ -127,7 +110,7 @@ public class MainPanel : UIPanelBase
         if (curIndex != null)
         {
             curIndex = null;
-            UpdateButtonHighlight();
+            ClearFocus();
         }
         mainExitPanel.Open();
     }
