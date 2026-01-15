@@ -233,6 +233,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         {
             if(offGuardTimer <= 0)
             {
+                StopX();
                 StartCoroutine(AlertRoutine());
                 return;
             }
@@ -261,6 +262,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         StopX();
         if (Mathf.Abs(distanceOfX) > freezeZoneX)
             facingX = distanceOfX > 0f ? 1 : -1;
+        animator?.SetTrigger("Idle");
         alertSprite.SetActive(true);
 
         yield return new WaitForSeconds(1f);
@@ -364,26 +366,23 @@ public class Malirgue : MonoBehaviour, IDamageable
         runningRoutine = StartCoroutine(SkillRoutine());
     }
 
-    [SerializeField] float skillStabDuration;
+    [SerializeField] float skillDashForce;
     IEnumerator SkillRoutine()
     {
         ChangeState(malirgue_State.Skill);
-        
         StopX();
+        animator?.SetTrigger("ReadySkill");
 
         yield return new WaitForSeconds(readySkillWindup);
 
         //sfx.Play("AttackSound");
-        animator?.SetTrigger("ReadySkill");
-        rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
+        animator?.SetTrigger("Skill");
+        //rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
+        rb.linearVelocity = new Vector2(skillDashForce * facingX, rb.linearVelocity.y);
 
         yield return new WaitForSeconds(skillDuration);
 
         StopX();
-        animator?.SetTrigger("Skill");
-
-        yield return new WaitForSeconds(skillStabDuration);
-
         isUsingSkill = false;
         ChangeState(malirgue_State.Idle);
         animator?.SetTrigger("Idle");

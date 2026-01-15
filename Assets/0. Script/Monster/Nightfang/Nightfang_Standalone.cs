@@ -293,6 +293,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     IEnumerator AlertRoutine()
     {
         StopX();
+        animator?.SetTrigger("Idle");
         if (Mathf.Abs(dx) > freezeZoneX)
             facingX = dx > 0f ? 1 : -1;
         alertSprite.SetActive(true);

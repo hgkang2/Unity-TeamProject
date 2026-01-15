@@ -306,7 +306,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enablePatrol: 1
   enableAggro: 1
-  enableAttack: 1
+  enableAttack: 0
   enableSkill: 0
   state: 0
   stateTimer: 0
@@ -343,7 +343,7 @@ MonoBehaviour:
   distanceToPlayer: 0
   knockBackXForce: 3
   knockBackYForce: 0
-  skillStabDuration: 0
+  skillDashForce: 0
   hitStunTime: 0.5
   hitLockDuration: 0.15
   rayLength: 1.5
