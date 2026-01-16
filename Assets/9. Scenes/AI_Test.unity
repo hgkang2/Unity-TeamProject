@@ -827,6 +827,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &840927047
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15.35405
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.7753444
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401993074058783418, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7052323503559932824, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_Name
+      value: Nightfang
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
 --- !u!1 &1182513727
 GameObject:
   m_ObjectHideFlags: 0
@@ -1004,10 +1061,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Maligure
       objectReference: {fileID: 0}
+    - target: {fileID: 3338535456757533984, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5166442864003647467, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
+      propertyPath: enableSkill
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5166442864003647467, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
+      propertyPath: skillDashForce
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 5166442864003647467, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
       propertyPath: playerTransform
       value: 
       objectReference: {fileID: 399982679}
+    - target: {fileID: 5166442864003647467, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
+      propertyPath: skillDashDuration
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7889999544441793184, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
       propertyPath: m_LocalPosition.x
       value: 13.86
@@ -1065,3 +1138,4 @@ SceneRoots:
   - {fileID: 399982679}
   - {fileID: 2008190505}
   - {fileID: 1191193589920438901}
+  - {fileID: 840927047}

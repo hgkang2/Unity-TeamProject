@@ -227,7 +227,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (enableAggro && distance <= aggroRange && !isHit)
         {
-            if(offGuardTimer <= 0)
+            if(offGuardTimer <= 0 && state == State.Idle)
             {
                 StartCoroutine(AlertRoutine());
                 return;
@@ -243,7 +243,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         if (enablePatrol && stateTimer >= idleTime && !isHit)
         {
             moveDirX *= -1;
-
             facingX = moveDirX;
             ApplyFlip();
             animator?.SetTrigger("Patrol");
@@ -265,7 +264,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (enableAggro && distance <= aggroRange)
         {
-            if(offGuardTimer <= 0)
+            if(offGuardTimer <= 0 && state == State.Patrol)
             {
                 StartCoroutine(AlertRoutine());
                 return;

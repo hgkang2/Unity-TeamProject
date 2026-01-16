@@ -106,7 +106,10 @@ public class Malirgue : MonoBehaviour, IDamageable
         hp.OnDied -= OnDied;
     }
 
-    private void Update() {
+    private void Update() 
+    {
+        if(isDead) return;
+
         PlayerDetect();
 
         stateTimer += Time.deltaTime;
@@ -193,16 +196,6 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         if(!canMove) return;
 
-        if(enablePatrol && stateTimer >= idleTime && !isHit)
-        {
-            ApplyFlip();
-            
-            moveDirX *= -1;
-            ChangeState(malirgue_State.Patrol);
-            animator?.SetTrigger("Patrol");
-            return;
-        }
-
         if(enableAggro && distanceToPlayer <= aggroRange && !isHit)
         {
             if(offGuardTimer <= 0)
@@ -217,6 +210,16 @@ public class Malirgue : MonoBehaviour, IDamageable
                 return;
             }
         }
+
+        if(enablePatrol && stateTimer >= idleTime && !isHit)
+        {
+            moveDirX *= -1;
+            facingX = moveDirX;
+            ApplyFlip();
+            ChangeState(malirgue_State.Patrol);
+            animator?.SetTrigger("Patrol");
+            return;
+        }
     }
 
     void TickPatrol()
@@ -224,8 +227,8 @@ public class Malirgue : MonoBehaviour, IDamageable
         if(stateTimer >= patrolTime)
         {
             StopX();
-            ChangeState(malirgue_State.Idle);
             animator?.SetTrigger("Idle");
+            ChangeState(malirgue_State.Idle);
             return;
         }
 
@@ -257,12 +260,13 @@ public class Malirgue : MonoBehaviour, IDamageable
         MoveX(moveDirX, patrolSpeed);
     }
 
+
     IEnumerator AlertRoutine()
     {
         StopX();
+        animator?.SetTrigger("Idle");
         if (Mathf.Abs(distanceOfX) > freezeZoneX)
             facingX = distanceOfX > 0f ? 1 : -1;
-        animator?.SetTrigger("Idle");
         alertSprite.SetActive(true);
 
         yield return new WaitForSeconds(1f);
@@ -278,7 +282,7 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         isHeigtForAttackOk = dy <= maxHeightDiffForAttack;
 
-        if(!isAttacking)
+        if(!isAttacking && !isUsingSkill)
         {
             float deadZone = 0.05f;
             if (Mathf.Abs(distanceOfX) > deadZone) facingX = moveDirX;
@@ -300,17 +304,15 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         MoveX(moveDirX, aggroSpeed);        
 
-        if(isHit && isHeigtForAttackOk) return;
-
         if (enableSkill && distanceToPlayer <= skillRange &&
             distanceToPlayer >= attackRange &&
-            isSkillReady && !isUsingSkill)
+            isSkillReady && !isUsingSkill && !isActionLocked && !isHit && isHeigtForAttackOk)
         {
             StartSkill();
             return;
         }
 
-        if(enableAttack && distanceToPlayer <= attackRange && isAttackReady && !isAttacking)
+        if(enableAttack && distanceToPlayer <= attackRange && isAttackReady && !isAttacking && !isActionLocked && !isHit && isHeigtForAttackOk)
         {
             StartAttack();
             return;
@@ -322,6 +324,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         if(runningRoutine != null) StopCoroutine(runningRoutine);
         isAttacking = true;
         isAttackReady = false;
+        isActionLocked = true;
         canMove = false;
         animator?.SetTrigger("ReadyAttack");
         runningRoutine = StartCoroutine(AttackRoutine());
@@ -367,22 +370,24 @@ public class Malirgue : MonoBehaviour, IDamageable
     }
 
     [SerializeField] float skillDashForce;
+    [SerializeField] float skillDashDuration;
     IEnumerator SkillRoutine()
     {
         ChangeState(malirgue_State.Skill);
         StopX();
-        animator?.SetTrigger("ReadySkill");
 
         yield return new WaitForSeconds(readySkillWindup);
 
-        //sfx.Play("AttackSound");
-        animator?.SetTrigger("Skill");
-        //rb.AddForce(10f * Vector2.right * facingX, ForceMode2D.Impulse);
+        animator?.SetTrigger("SkillDash");
         rb.linearVelocity = new Vector2(skillDashForce * facingX, rb.linearVelocity.y);
+
+        yield return new WaitForSeconds(skillDashDuration);
+
+        StopX();
+        animator?.SetTrigger("Skill");
 
         yield return new WaitForSeconds(skillDuration);
 
-        StopX();
         isUsingSkill = false;
         ChangeState(malirgue_State.Idle);
         animator?.SetTrigger("Idle");
@@ -502,6 +507,7 @@ public class Malirgue : MonoBehaviour, IDamageable
 
     void ShowWarningVFX()
     {
+        if(state == malirgue_State.Skill) return;
         WarningVFX.SetActive(true);
         vfxAnimator.Play("MaligureWarningVFX", 0, 0f);
     }
