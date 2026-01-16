@@ -6,6 +6,8 @@ public class SoulData : ScriptableObject
 {
     [Label("영성 ID")]
     public int index;
+    [Label("영성 타입(영성 or 영단)")]
+    public SoulType soulType;
     [Label("영성 이미지(풀버전)")]
     public Sprite soulSprite;
     [Label("영성 이미지(아이콘)")]

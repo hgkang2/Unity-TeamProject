@@ -5,6 +5,7 @@ public enum SoulEffectType
     StatBonus, //구슬 전용
     LearnSkill,
     HealHP,
-    IncreaseJumpNum
+    IncreaseJumpNum,
+    WallJump
     // ... 앞으로 추가
 }

@@ -269,9 +269,12 @@ public class PlayerMove : MonoBehaviour
         JumpCommitted?.Invoke();
     }
     [Header("벽 점프시 반대쪽으로 튕기는 힘")]
+    public bool canWallJump = false;
     public float wallJumpForceX = 5;
     void HandleWallJump()
     {
+        if(!canWallJump) return;
+        
         isWallGrabbing = false;
         isWallSliding = false;
 
