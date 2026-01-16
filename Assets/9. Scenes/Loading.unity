@@ -659,7 +659,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   progressBar: {fileID: 619277990}
-  minDisplayTime: 1
+  minDisplayTime: 0.5
 --- !u!1 &739230714
 GameObject:
   m_ObjectHideFlags: 0
@@ -1086,8 +1086,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7199b37b6c77bac40a45f1a14a160a05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxManager: {fileID: 1882441474}
-  mainCamera: {fileID: 739230715}
 --- !u!4 &1586228311
 Transform:
   m_ObjectHideFlags: 0
@@ -1284,6 +1282,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clickVFX: {fileID: 2796253519308722077, guid: ae13613c965215b4b95c43ceccb2eed2, type: 3}
   vfxCamera: {fileID: 1111584481}
+  attackVFXLibrary: {fileID: 0}
+  attackPoolRoot: {fileID: 0}
+  prewarmEach: 3
 --- !u!4 &1882441475
 Transform:
   m_ObjectHideFlags: 0

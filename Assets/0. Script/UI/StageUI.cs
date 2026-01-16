@@ -9,7 +9,7 @@ public class StageUI : MonoBehaviour
     [SerializeField] TMP_Text characterName;
 
     //esc 일시 정지 창
-    SettingPanel settingPanel;
+    IngameSettingPanel settingPanel;
     //레벨업 시 띄우기
     LevelUpPanel levelUpPanel;
     //보유 영성 ui
@@ -22,7 +22,7 @@ public class StageUI : MonoBehaviour
         sceneContext = FindFirstObjectByType<SceneContext>();
         levelUpPanel = sceneContext.levelUpPanel;
         haveSoulsPanel = sceneContext.haveSoulsPanel;
-        settingPanel = sceneContext.settingPanel;
+        settingPanel = sceneContext.ingameSettingPanel;
 
         //기본적으로 모든 ui 활성화시켜놓기
         settingPanel.gameObject.SetActive(true);
@@ -59,7 +59,6 @@ public class StageUI : MonoBehaviour
     void OnEscPressed()
     {
         settingPanel.Open();
-        TimeManager.Pause();
     }
 
     void OnZPressed()

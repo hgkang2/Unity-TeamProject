@@ -7,7 +7,8 @@ public class MainPanel : UIPanelBase
     [SerializeField] MainPanelButton[] buttons;
     [SerializeField] Transform buttonSelectImage;
     [SerializeField] MainSaveDataPanel mainSaveDataPanel;
-    [SerializeField] MainExitPanel mainExitPanel;
+    [SerializeField] MainSettingPanel mainSettingPanel;
+    [SerializeField] ConfirmPanel mainExitPanel;
 
     public int? curIndex = null;
     protected override void Init()
@@ -16,15 +17,21 @@ public class MainPanel : UIPanelBase
 
         mainExitPanel.gameObject.SetActive(true);
         mainSaveDataPanel.gameObject.SetActive(true);
+        mainSettingPanel.gameObject.SetActive(true);
         buttonSelectImage.gameObject.SetActive(false);
 
         mainExitPanel.Close();
         mainSaveDataPanel.Close();
+        mainSettingPanel.Close();
     }
 
     public void OpenMainSaveDataPanel()
     {
         mainSaveDataPanel.Open();
+    }
+    public void OpenMainSettingPanel()
+    {
+        mainSettingPanel.Open();
     }
 
 

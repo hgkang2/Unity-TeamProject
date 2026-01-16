@@ -1,15 +1,15 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class LoadingScreen : MonoBehaviour
 {
     [SerializeField] ProgressBar progressBar;
-    [SerializeField] float minDisplayTime = 0.75f; // 로딩이 너무 빨리 끝나도 최소 0.75초는 보여주기
+    [SerializeField] float minDisplayTime = 0.5f; // 로딩이 너무 빨리 끝나도 최소 0.75초는 보여주기
 
     void Start()
     {
+        TimeManager.Resume();
         StartCoroutine(LoadRoutine());
     }
 
@@ -23,7 +23,7 @@ public class LoadingScreen : MonoBehaviour
             yield break;
         }
 
-        float startTime = Time.time;
+        float startTime = Time.unscaledTime;
 
         AsyncOperation op = SceneManager.LoadSceneAsync(targetScene);
         op.allowSceneActivation = false;
@@ -42,7 +42,7 @@ public class LoadingScreen : MonoBehaviour
             if (op.progress >= 0.9f)
             {
                 // 최소 노출 시간 보장
-                if (Time.time - startTime >= minDisplayTime)
+                if (Time.unscaledTime - startTime >= minDisplayTime)
                 {
                     op.allowSceneActivation = true;
                 }

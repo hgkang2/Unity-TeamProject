@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// SettingPanel (SSOT)
@@ -11,13 +13,18 @@ using UnityEngine;
 ///          (2) 아니면 CanAdjust 항목에 한해 값 조절(홀드/가속)
 /// - 슬라이더 드래그 중에는 focusLocked로 키보드 입력/포커스 변경을 막는다.
 /// </summary>
-public class SettingPanel : UIPanelBase
+public class SettingPanel : UIPanelBase, IPointerExitHandler
 {
+    public enum SettingPanelMode { Ingame, MainMenu }
+
+    [Header("Mode")]
+    [SerializeField] SettingPanelMode mode = SettingPanelMode.Ingame;
+
     #region Types
     enum NavAxis { None, X, Y }
 
     // navMap 전용: 현재 인덱스에서 Up/Down/Left/Right로 어디로 이동할지
-    struct Nav4
+    protected struct Nav4
     {
         public int up, down, left, right;
         public Nav4(int up, int down, int left, int right)
@@ -32,7 +39,7 @@ public class SettingPanel : UIPanelBase
 
     #region Inspector
     [Header("Setting Items (Top → Bottom)")]
-    [SerializeField] List<MonoBehaviour> settingItemBehaviours;
+    [SerializeField] List<GameObject> settingItemObjects;
 
     [Header("Confirm Panels")]
     [SerializeField] ConfirmPanel saveAlertPanel_GotoTitle;
@@ -53,7 +60,7 @@ public class SettingPanel : UIPanelBase
     int currentIndex;
 
     // 그리드/특수 이동을 위한 네비 맵
-    readonly Dictionary<int, Nav4> navMap = new();
+    protected readonly Dictionary<int, Nav4> navMap = new();
     #endregion
 
     #region Input State
@@ -123,26 +130,24 @@ public class SettingPanel : UIPanelBase
     {
         BuildItemCache();
 
-        // 기본 선택(예: 게임 저장 버튼 위치로)
-        currentIndex = Mathf.Clamp(4, 0, items.Count - 1);
-
         RefreshSelection();
         BuildNavMap();
 
         // 모달 패널 초기화
-        saveAlertPanel_GotoTitle.gameObject.SetActive(true);
-        saveAlertPanel_QuitGame.gameObject.SetActive(true);
+        saveAlertPanel_GotoTitle?.gameObject.SetActive(true);
+        saveAlertPanel_QuitGame?.gameObject.SetActive(true);
     }
 
     protected override void OnOpened()
     {
-        saveAlertPanel_GotoTitle.Close();
-        saveAlertPanel_QuitGame.Close();
+        //기본 선택
+        currentIndex = Mathf.Clamp(GetDefaultIndex(), 0, items.Count - 1);
+        saveAlertPanel_GotoTitle?.Close();
+        saveAlertPanel_QuitGame?.Close();
     }
 
     protected override void OnClosing()
     {
-        TimeManager.Resume();
     }
     #endregion
 
@@ -297,24 +302,10 @@ public class SettingPanel : UIPanelBase
     #endregion
 
     #region Navigation
-    void BuildNavMap()
+    protected virtual int GetDefaultIndex() => 0;
+    protected virtual void BuildNavMap()
     {
-        navMap.Clear();
 
-        // 0(BGM)
-        navMap[0] = new Nav4(up: 5, down: 1, left: 0, right: 0);
-        // 1(SFX)
-        navMap[1] = new Nav4(up: 0, down: 2, left: 1, right: 1);
-        // 2(해상도)
-        navMap[2] = new Nav4(up: 1, down: 3, left: 2, right: 2);
-
-        // 1행 버튼: 3(적용) 4(저장)
-        navMap[3] = new Nav4(up: 2, down: 5, left: 3, right: 4);
-        navMap[4] = new Nav4(up: 2, down: 6, left: 3, right: 4);
-
-        // 2행 버튼: 5(메인) 6(종료)
-        navMap[5] = new Nav4(up: 3, down: 0, left: 5, right: 6);
-        navMap[6] = new Nav4(up: 4, down: 0, left: 5, right: 6);
     }
 
     bool HasHorizontalNav(int xSign)
@@ -441,22 +432,26 @@ public class SettingPanel : UIPanelBase
     }
     #endregion
 
-    #region Item Cache / Selection
+    #region 내부 함수
     void BuildItemCache()
     {
         items.Clear();
         indexByItem.Clear();
 
-        foreach (var mb in settingItemBehaviours)
+        foreach (var go in settingItemObjects)
         {
-            if (mb is ISettingItem item)
-                items.Add(item);
+            if (go == null) continue;
+            if (!go.activeInHierarchy) continue;
+
+            if (!go.TryGetComponent<ISettingItem>(out var item))
+                continue;
+
+            items.Add(item);
         }
 
         for (int i = 0; i < items.Count; i++)
             indexByItem[items[i]] = i;
     }
-
     void RefreshSelection()
     {
         for (int i = 0; i < items.Count; i++)
@@ -479,12 +474,18 @@ public class SettingPanel : UIPanelBase
     #region Button Actions
     public void GotoTitle()
     {
-        SceneLoader.NoLoadingScene("Start");
+        if(SoundManager.Instance != null) SoundManager.Instance.StopBGM();
+        SceneLoader.LoadScene("Start");
     }
 
     public void QuitGame()
     {
         GameManager.Instance.QuitGame();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        OnOpened();
     }
     #endregion
 }

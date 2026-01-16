@@ -2,8 +2,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+public enum VolumeChannel
+{
+    BGM,
+    SFX
+}
+
 public class SettingSliderItem : MonoBehaviour, ISettingItem
 {
+    [Header("bgm용인지 sfx용인지")]
+    [SerializeField] VolumeChannel channel;
     [Header("볼륨에 따라 변경할 스피커 이미지 4개 (0,1,2,3 단계)")]
     [SerializeField] Sprite[] speakerSprites; // 4개
     [SerializeField] Image speakerImage;
@@ -106,7 +114,15 @@ public class SettingSliderItem : MonoBehaviour, ISettingItem
         ApplySpeakerSprite(curPercent);
 
         // 실제 볼륨 변경
-        SoundManager.Instance?.SetBgmVolume(curPercent / 100f);
+        switch (channel)
+        {
+            case VolumeChannel.BGM:
+                SoundManager.Instance?.SetBgmVolume(curPercent);
+                break;
+            case VolumeChannel.SFX:
+                SoundManager.Instance?.SetSfxVolume(curPercent);
+                break;
+        }
     }
 
     int QuantizePercent(int percent)

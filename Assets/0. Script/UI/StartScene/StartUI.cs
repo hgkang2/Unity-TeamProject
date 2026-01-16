@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class StartUI : MonoBehaviour,IUIKeyboardTarget
+public class StartUI : MonoBehaviour
 {
     [SerializeField] Image openingImage;
 
@@ -16,6 +16,8 @@ public class StartUI : MonoBehaviour,IUIKeyboardTarget
 
     Sequence openingSequence;
 
+    // 게임 처음 시작 시에만 오프닝을 재생하는 플래그.
+    static bool s_openingPlayedThisSession;
     bool isOpeningPhase = true;
 
     void Awake()
@@ -27,16 +29,27 @@ public class StartUI : MonoBehaviour,IUIKeyboardTarget
 
     void Start()
     {
+
         // 다른 UI들 숨긴 상태로 시작
         mainPanel.Close();
         mainCharacterChoicePanel.Close();
         mainCharacterConfirmPanel.Close();
 
-        // 오프닝은 보이게
-        openingImage.gameObject.SetActive(true);
+        if (!s_openingPlayedThisSession)
+        {
+            s_openingPlayedThisSession = true;
+            openingImage.gameObject.SetActive(true);
+            isOpeningPhase = true;
 
-        InputManager.Instance.PushUI(this, true);
-        OpeningStart();
+            InputManager.Instance.EscPressed += ShowMenuImmediate;
+            OpeningStart();
+        }
+        else
+        {
+            openingImage.gameObject.SetActive(false);
+            isOpeningPhase = false;
+            ShowMenuImmediate();
+        }
     }
 
 
@@ -67,46 +80,23 @@ public class StartUI : MonoBehaviour,IUIKeyboardTarget
     // 메뉴를 최종 상태로 만드는 공용 함수 (페이드 완료 or 스킵)
     void ShowMenuImmediate()
     {
+        if (!isOpeningPhase) return;
+
         if (openingSequence != null && openingSequence.IsActive())
             openingSequence.Kill();
+
+        InputManager.Instance.EscPressed -= ShowMenuImmediate;
 
         isOpeningPhase = false;
         openingImage.gameObject.SetActive(false);
 
-
-        InputManager.Instance.PopUI(this, true);
         mainPanel.Open();
-
         SoundManager.Instance.PlayBGM("MainTheme");
-    }
-    #endregion
-
-
-    #region UI 입력 이벤트들
-
-    public void UICancel()
-    {
-        // 오프닝 중이라면 스킵
-        if (isOpeningPhase) ShowMenuImmediate();
     }
     #endregion
 
     public void Quit()
     {
         GameManager.Instance.QuitGame();
-    }
-
-    public void OnUIInputMove(Vector2 dir)
-    {
-    }
-
-    public void OnUIInputConfirm()
-    {
-        if (isOpeningPhase) ShowMenuImmediate();
-    }
-
-    public void OnUIInputCancel()
-    {
-        if (isOpeningPhase) ShowMenuImmediate();
     }
 }

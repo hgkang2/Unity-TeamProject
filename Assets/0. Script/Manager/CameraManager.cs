@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Unity.Cinemachine;
 using System;
+using UnityEngine.SceneManagement;
 
 public class CameraManager : MonoBehaviour
 {
@@ -27,12 +28,30 @@ public class CameraManager : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
-        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
-        brain = Camera.main.GetComponent<CinemachineBrain>();
-        defaultChannelMask = brain.ChannelMask;
-        cinemachineCamera = sceneContext.cinemachineCamera;
-        cinemachineCamera_tutorialTrap = sceneContext.cinemachineCamera_tutorialTrap;
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        switch (scene.name)
+        {
+            case "Stage1":
+            case "Stage1_Test":
+                SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+                brain = Camera.main.GetComponent<CinemachineBrain>();
+                defaultChannelMask = brain.ChannelMask;
+                cinemachineCamera = sceneContext.cinemachineCamera;
+                cinemachineCamera_tutorialTrap = sceneContext.cinemachineCamera_tutorialTrap;
+                break;
+        }
     }
 
     // ------------------------------------------------------

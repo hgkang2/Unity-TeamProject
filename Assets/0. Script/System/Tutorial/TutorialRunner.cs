@@ -11,16 +11,17 @@ public class TutorialRunner : MonoBehaviour
     DialoguePanel dialoguePanel;
     Player player;
     // 처음 몬스터 만났을 때 대사 띄우는 트리거
-    [SerializeField] TutorialTrigger2D tutorialTrigger_monsterMeet; 
+    TutorialTrigger2D tutorialTrigger_monsterMeet; 
     // 몹 처치하기 전까지 다음으로 못 가게 막는 벽
-    [SerializeField] Collider2D tutorialWall;
+    Collider2D tutorialWall;
     // 함정 앞에서 대사 띄우는 트리거
-    [SerializeField] TutorialTrigger2D tutorialTrigger_trap;
+    TutorialTrigger2D tutorialTrigger_trap;
 
     List<ITutorialStep> steps;
     ITutorialStep currentStep;
     int stepIndex;
     bool isRunning;
+    
 
     void OnEnable()
     {
@@ -39,6 +40,10 @@ public class TutorialRunner : MonoBehaviour
             case "Stage1_Test":
                 SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
                 dialoguePanel = sceneContext.dialoguePanel;
+                tutorialTrigger_monsterMeet = sceneContext.tutorialTrigger_monsterMeet;
+                tutorialWall = sceneContext.tutorialWall;
+                tutorialTrigger_trap = sceneContext.tutorialTrigger_trap;
+
                 dialoguePanel.gameObject.SetActive(true);
                 player = sceneContext.player;
                 break;
