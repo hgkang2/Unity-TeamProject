@@ -29,7 +29,6 @@ public class StartUI : MonoBehaviour
 
     void Start()
     {
-
         // 다른 UI들 숨긴 상태로 시작
         mainPanel.Close();
         mainCharacterChoicePanel.Close();

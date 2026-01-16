@@ -42,8 +42,11 @@ public class SettingPanel : UIPanelBase, IPointerExitHandler
     [SerializeField] List<GameObject> settingItemObjects;
 
     [Header("Confirm Panels")]
+    bool isAskingClose;
+    [SerializeField] ConfirmPanel alertPanel_SettingSave;
     [SerializeField] ConfirmPanel saveAlertPanel_GotoTitle;
     [SerializeField] ConfirmPanel saveAlertPanel_QuitGame;
+    
 
     [Header("Vertical Hold (Navigation)")]
     [SerializeField] float navHoldStartDelay = 0.2f;
@@ -134,6 +137,7 @@ public class SettingPanel : UIPanelBase, IPointerExitHandler
         BuildNavMap();
 
         // 모달 패널 초기화
+        alertPanel_SettingSave?.gameObject.SetActive(true);
         saveAlertPanel_GotoTitle?.gameObject.SetActive(true);
         saveAlertPanel_QuitGame?.gameObject.SetActive(true);
     }
@@ -142,6 +146,7 @@ public class SettingPanel : UIPanelBase, IPointerExitHandler
     {
         //기본 선택
         currentIndex = Mathf.Clamp(GetDefaultIndex(), 0, items.Count - 1);
+        alertPanel_SettingSave?.Close();
         saveAlertPanel_GotoTitle?.Close();
         saveAlertPanel_QuitGame?.Close();
     }
@@ -234,6 +239,44 @@ public class SettingPanel : UIPanelBase, IPointerExitHandler
         var cur = items[currentIndex];
         if (cur.CanSubmit)
             cur.Submit();
+    }
+    public override void OnUIInputCancel()
+    {
+        RequestClose();
+    }
+
+    public void RequestClose()
+    {
+        if (isAskingClose) return;
+
+        if (SettingsManager.IsDirty)
+        {
+            isAskingClose = true;
+            alertPanel_SettingSave.Open();
+            return;
+        }
+
+        Close();
+    }
+
+    // setting save ConfirmPanel "예/확인" 버튼에 연결
+    public void OnSettingSaveConfirm()
+    {
+        SettingsManager.CommitAndSave();
+        alertPanel_SettingSave.Close();
+        isAskingClose = false;
+
+        Close();
+    }
+
+    // setting save ConfirmPanel "아니오/취소" 버튼에 연결
+    public void OnSettingSaveCancel()
+    {
+        SettingsManager.RevertWorkingToCommitted();
+        alertPanel_SettingSave.Close();
+        isAskingClose = false;
+
+        Close();
     }
     #endregion
 

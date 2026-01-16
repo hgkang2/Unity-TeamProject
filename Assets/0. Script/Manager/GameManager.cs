@@ -38,6 +38,8 @@ public class GameManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
 
+        SettingsManager.LoadOrDefault();
+        
         tutorialRunner = GetComponent<TutorialRunner>();
     }
     void OnEnable()

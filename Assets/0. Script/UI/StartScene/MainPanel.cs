@@ -24,7 +24,6 @@ public class MainPanel : UIPanelBase
         mainSaveDataPanel.Close();
         mainSettingPanel.Close();
     }
-
     public void OpenMainSaveDataPanel()
     {
         mainSaveDataPanel.Open();

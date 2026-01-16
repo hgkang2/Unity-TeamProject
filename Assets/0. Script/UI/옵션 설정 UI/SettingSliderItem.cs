@@ -114,13 +114,15 @@ public class SettingSliderItem : MonoBehaviour, ISettingItem
         ApplySpeakerSprite(curPercent);
 
         // 실제 볼륨 변경
+        float v01 = curPercent / 100f;
+
         switch (channel)
         {
             case VolumeChannel.BGM:
-                SoundManager.Instance?.SetBgmVolume(curPercent);
+                SettingsManager.SetWorkingBgm(v01);
                 break;
             case VolumeChannel.SFX:
-                SoundManager.Instance?.SetSfxVolume(curPercent);
+                SettingsManager.SetWorkingSfx(v01);
                 break;
         }
     }

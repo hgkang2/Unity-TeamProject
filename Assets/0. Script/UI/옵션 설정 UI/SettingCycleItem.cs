@@ -60,6 +60,8 @@ public class SettingCycleItem : MonoBehaviour, ISettingItem
         if (resolutions.Count == 0) return;
         index = (index + dir + resolutions.Count) % resolutions.Count;
         UpdateText();
+        var r = resolutions[index];
+        SettingsManager.SetWorkingResolution(r.width, r.height);
     }
 
     public void Submit() { }
