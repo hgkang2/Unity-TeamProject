@@ -16,6 +16,12 @@ public class MainSettingPanel : SettingPanel
         navMap[4] = new Nav4(up: 3, down: 0, left: 4, right: 4);
     }
 
-    protected override void OnOpened() { }
-    protected override void OnClosing() { }
+    protected override void OnOpened()
+    {
+        base.OnOpened();
+    }
+    protected override void OnClosing()
+    {
+        base.OnClosing();
+    }
 }

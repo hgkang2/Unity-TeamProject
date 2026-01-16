@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class StartUI : MonoBehaviour
+public class StartUI : MonoBehaviour, IUIKeyboardTarget
 {
     [SerializeField] Image openingImage;
 
@@ -29,20 +29,19 @@ public class StartUI : MonoBehaviour
 
     void Start()
     {
-        // 다른 UI들 숨긴 상태로 시작
-        mainPanel.Close();
-        mainCharacterChoicePanel.Close();
-        mainCharacterConfirmPanel.Close();
+        mainPanel.Open();
 
+        // 게임 시작시 1회만 오프닝 실행
         if (!s_openingPlayedThisSession)
         {
             s_openingPlayedThisSession = true;
             openingImage.gameObject.SetActive(true);
             isOpeningPhase = true;
 
-            InputManager.Instance.EscPressed += ShowMenuImmediate;
             OpeningStart();
+            InputManager.Instance.PushUI(this, true);
         }
+        // 아니면 오프닝 실행 안 함
         else
         {
             openingImage.gameObject.SetActive(false);
@@ -84,12 +83,9 @@ public class StartUI : MonoBehaviour
         if (openingSequence != null && openingSequence.IsActive())
             openingSequence.Kill();
 
-        InputManager.Instance.EscPressed -= ShowMenuImmediate;
-
         isOpeningPhase = false;
         openingImage.gameObject.SetActive(false);
 
-        mainPanel.Open();
         SoundManager.Instance.PlayBGM("MainTheme");
     }
     #endregion
@@ -97,5 +93,22 @@ public class StartUI : MonoBehaviour
     public void Quit()
     {
         GameManager.Instance.QuitGame();
+    }
+
+    public void OnUIInputMove(Vector2 dir)
+    {
+
+    }
+
+    public void OnUIInputConfirm()
+    {
+        ShowMenuImmediate();
+        InputManager.Instance.PopUI(this, true);
+    }
+
+    public void OnUIInputCancel()
+    {
+        ShowMenuImmediate();
+        InputManager.Instance.PopUI(this, true);
     }
 }

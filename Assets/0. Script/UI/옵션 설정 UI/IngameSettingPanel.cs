@@ -33,5 +33,6 @@ public class IngameSettingPanel : SettingPanel
     protected override void OnClosing()
     {
         TimeManager.Resume();
+        base.OnClosing();
     }
 }

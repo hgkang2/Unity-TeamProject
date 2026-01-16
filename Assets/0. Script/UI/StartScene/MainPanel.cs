@@ -19,11 +19,15 @@ public class MainPanel : UIPanelBase
         mainSaveDataPanel.gameObject.SetActive(true);
         mainSettingPanel.gameObject.SetActive(true);
         buttonSelectImage.gameObject.SetActive(false);
+    }
 
+    protected override void OnOpened()
+    {
         mainExitPanel.Close();
         mainSaveDataPanel.Close();
         mainSettingPanel.Close();
     }
+
     public void OpenMainSaveDataPanel()
     {
         mainSaveDataPanel.Open();

@@ -2612,11 +2612,11 @@ RectTransform:
   m_Children:
   - {fileID: 1664714898}
   - {fileID: 1368267076}
-  - {fileID: 1707324181}
   - {fileID: 977548156}
   - {fileID: 717272082}
   - {fileID: 207751154812592429}
   - {fileID: 1130043998}
+  - {fileID: 1707324181}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3011,9 +3011,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SettingPanel, Assembly-CSharp
-        m_MethodName: GotoTitle
+      - m_Target: {fileID: 717272084}
+        m_TargetAssemblyTypeName: MainCharacterChoicePanel, Assembly-CSharp
+        m_MethodName: GameStart
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3883,7 +3883,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 816629545}
         m_TargetAssemblyTypeName: UIPanelBase, Assembly-CSharp
         m_MethodName: Close
         m_Mode: 1
