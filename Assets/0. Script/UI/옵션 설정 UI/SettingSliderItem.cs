@@ -155,5 +155,21 @@ public class SettingSliderItem : MonoBehaviour, ISettingItem
         speakerImage.sprite = speakerSprites[idx];
     }
 
+    public void SyncFromSettings()
+    {
+        // 채널에 맞게 0~1 값을 가져와서
+        float v01 = channel == VolumeChannel.BGM
+            ? SettingsManager.CommittedBgm01
+            : SettingsManager.CommittedSfx01;
+
+        // UI만 갱신 (콜백/Dirty 유발 금지)
+        if (slider != null)
+            slider.SetValueWithoutNotify(v01);
+
+        int percent = Mathf.RoundToInt(v01 * 100f);
+        SetPercent(percent); // 내부에서 SetValueWithoutNotify 쓰고 있으면 OK.
+                             // 만약 SetPercent가 Working을 건드리면, "UI만 갱신" 버전으로 분리해줘야 함.
+    }
+
     public void Submit() { }
 }

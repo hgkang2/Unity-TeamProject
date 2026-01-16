@@ -16,19 +16,19 @@ MonoBehaviour:
   soulSprite: {fileID: 21300000, guid: 4dda8ef6156aff047952803be068d6cf, type: 3}
   soulIcon: {fileID: 21300000, guid: 31a0ebf6c4668d948a2ab229f9261dcb, type: 3}
   displayName: "\uC7AC\uC0DD"
-  soulEffectText: Atk +
-  soulEffectText2: '%'
-  soulDescript: 
+  soulEffectText: HP +
+  soulEffectText2: 
+  soulDescript: "\uC0C1\uCC98\uAC00 \uC7AC\uC0DD\uB418\uC5B4 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
   effect:
-    type: 0
+    type: 4
     targetStat: 0
     flatValue: 0
     percentValue: 0
     bonusValue: 0
     skillToLearn: 0
-    healAmount: 0
+    healAmount: 20
   soulCharacterType: 0
   soulNeedType: 0
   levelConstrains: 0
-  maxStack: 1
-  isDisposable: 0
+  maxStack: 9999
+  isDisposable: 1

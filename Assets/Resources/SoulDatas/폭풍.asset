@@ -24,7 +24,7 @@ MonoBehaviour:
     type: 1
     targetStat: 3
     flatValue: 0
-    percentValue: 10
+    percentValue: 5
     bonusValue: 0
     skillToLearn: 0
     healAmount: 0

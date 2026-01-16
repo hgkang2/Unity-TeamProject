@@ -104,4 +104,26 @@ public class SettingCycleItem : MonoBehaviour, ISettingItem
         var r = resolutions[index];
         valueText.text = $"{r.width} x {r.height}";
     }
+
+    public void SyncFromSettings()
+    {
+        // committed 해상도에 맞는 index 찾기
+        int w = SettingsManager.CommittedResW;
+        int h = SettingsManager.CommittedResH;
+
+        for (int i = 0; i < resolutions.Count; i++)
+        {
+            if (resolutions[i].width == w && resolutions[i].height == h)
+            {
+                index = i;
+                UpdateText();
+                return;
+            }
+        }
+
+        // 못 찾으면 0번
+        index = 0;
+        UpdateText();
+    }
+
 }

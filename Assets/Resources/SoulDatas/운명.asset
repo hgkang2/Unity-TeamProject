@@ -18,7 +18,7 @@ MonoBehaviour:
   displayName: "\uC6B4\uBA85"
   soulEffectText: Atk +
   soulEffectText2: '%'
-  soulDescript: "\uC6B4\uBA85\uC774 \uAC15\uD654\uB418\uC5B4 \uC801\uC5D0\uAC8C \uC8FC\uB294
+  soulDescript: "\uC6B4\uBA85\uC744 \uBC1B\uC544\uB4E4\uC5EC \uC801\uC5D0\uAC8C \uC8FC\uB294
     \uB370\uBBF8\uC9C0\uAC00 \uAC15\uD574\uC9D1\uB2C8\uB2E4."
   effect:
     type: 1

@@ -18,12 +18,19 @@ public static class SettingsManager
     public static event Action<bool> DirtyChanged;
 
     const string KEY_HAS   = "SETTINGS_HAS";
-    const string KEY_BGM   = "SETTINGS_BGM01";
-    const string KEY_SFX   = "SETTINGS_SFX01";
+    const string KEY_BGM = "SETTINGS_BGM01";
+    const string KEY_SFX = "SETTINGS_SFX01";
     const string KEY_RES_W = "SETTINGS_RES_W";
     const string KEY_RES_H = "SETTINGS_RES_H";
 
     public static bool CanApply => IsDirty;
+
+    public static float CommittedBgm01 => committed.bgm01;
+    public static float CommittedSfx01 => committed.sfx01;
+    public static int CommittedResW => committed.resW;
+    public static int CommittedResH => committed.resH;
+
+
 
     public static void LoadOrDefault()
     {
