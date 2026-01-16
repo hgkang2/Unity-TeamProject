@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
@@ -543,8 +544,9 @@ public class PlayerMove : MonoBehaviour
         }
 
         // 전방 머리나 하체쪽에 벽이 있을때 스턱 방지용 면 체크
-        Vector2 castOrigin = b.center;
-        Vector2 castSize = b.size;
+        //Vector2 castOrigin = b.center;
+        Vector2 castSize = new Vector2(0.05f, b.size.y * 0.9f);
+        Vector2 castOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, b.center.y);
 
         hit = Physics2D.BoxCast(
             castOrigin,
