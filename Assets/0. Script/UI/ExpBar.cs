@@ -4,7 +4,6 @@ using TMPro;
 [RequireComponent(typeof(ProgressBar))]
 public class ExpBar : MonoBehaviour
 {
-    // Exp 수동 지정시 자동 바인드. 런타임 지정시 반드시 수동 Bind 하기
     Exp targetExp;
     [SerializeField] TMP_Text curExpText;
     [SerializeField] TMP_Text maxExpText;
@@ -52,11 +51,11 @@ public class ExpBar : MonoBehaviour
     void HandleExpChanged(int cur, int max)
     {
         progressBar.SetValue(cur, max);
-        curExpText.SetText("{0}", cur);
-        maxExpText.SetText("{0}", max);
+        curExpText?.SetText("{0}", cur);
+        maxExpText?.SetText("{0}", max);
     }
     void HandleLevelChanged(int curLevel)
     {
-        curLevelText.SetText("{0}", curLevel);
+        curLevelText?.SetText($"Lv. {curLevel}");
     }
 }

@@ -14,6 +14,7 @@ public class SoulManager : MonoBehaviour
     List<SoulInstance> curSouls = new List<SoulInstance>();
     public List<SoulInstance> CurSouls => curSouls;
 
+    // 보유 영성 UI에서 받는 이벤트. 단순히 열 때마다 새로 갖고와도 되지만 실시간 업데이트를 위해
     public event Action<List<SoulInstance>> soulGot;
 
     public static SoulManager Instance {get; private set;}

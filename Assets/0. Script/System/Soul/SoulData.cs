@@ -84,18 +84,18 @@ public class SoulData : ScriptableObject
 
         return true;
     }
-    public int GetValue()
+    public float GetValue()
     {
         switch (effect.type)
         {
             case SoulEffectType.StatFlat:
-                return (int)effect.flatValue;
+                return effect.flatValue;
             case SoulEffectType.StatPercent:
                 return effect.percentValue;
+            case SoulEffectType.StatBonus:
+                return effect.bonusValue;
             case SoulEffectType.IncreaseJumpNum:
-                return 1;
             case SoulEffectType.LearnSkill:
-                return 0;
             case SoulEffectType.HealHP:
                 return -1;
         }

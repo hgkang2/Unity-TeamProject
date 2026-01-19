@@ -1,57 +1,33 @@
+using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class HaveSoulSlot : MonoBehaviour, IInteractiveView<SoulData>
+public class HaveSoulSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] Image soulIcon;
-    SoulData data;
-
-    public UIPointerHandler PointerHandler { get; private set; }
-    public UIClickHandler ClickHandler { get; private set; }
-    public UIDragHandler DragHandler => null;
-
-    public RectTransform Rect { get; private set; }
-    public GameObject GO => gameObject;
+    Image soulImage;
 
     void Awake()
     {
-        Rect = GetComponent<RectTransform>();
-        UIPointerHandler<SoulData> pointerT = GetComponent<UIPointerHandler<SoulData>>();
-        UIClickHandler<SoulData> clickT = GetComponent<UIClickHandler<SoulData>>();
+        soulImage = GetComponentInChildren<Image>();
+    }
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
 
-        PointerHandler = pointerT;
-        ClickHandler = clickT;
-
-        if (pointerT != null)
-        {
-            pointerT.GetData = () => data;
-            pointerT.GetRect = () => Rect;
-        }
-
-        if (clickT != null)
-        {
-            clickT.GetData = () => data;
-        }
-
-        Clear();
     }
 
-    public void Bind(SoulData newData)
+    // Update is called once per frame
+    void Update()
     {
-        if (newData == null)
-        {
-            Clear();
-            return;
-        }
 
-        data = newData;
-
-        soulIcon.sprite = data.soulIcon;
+    }
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        throw new System.NotImplementedException();
     }
 
-    public void Clear()
+    public void OnPointerExit(PointerEventData eventData)
     {
-        data = null;
-        soulIcon.sprite = null;
+        throw new System.NotImplementedException();
     }
 }

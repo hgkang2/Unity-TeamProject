@@ -10,7 +10,7 @@ public class SoulInstance
 
     public string GetEffectText()
     {
-        int value = data.GetValue();
+        float value = data.GetValue();
         if(value == -1) return null;
         else if(value == 0) return $"{data.soulEffectText}{data.soulEffectText2}";
         else return $"{data.soulEffectText}{value*stack}{data.soulEffectText2}";

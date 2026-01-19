@@ -7,16 +7,16 @@ using UnityEngine.UIElements;
 public class HaveSoulsPanel : UIPanelBase
 {
     SceneContext sceneContext;
-    public bool PauseGame => false;
-    [SerializeField] HaveSoulTooltipUI soulTooltipUI;
-    [SerializeField] HaveSoulSlot haveSoulSlotPrefab;
-    List<IInteractiveView<SoulData>> uiSlots = new List<IInteractiveView<SoulData>>();
-    [SerializeField] List<Transform> emptySlot = new List<Transform>();
-    SoulPanelEventAggregator forwarder;
 
-    [SerializeField] TMP_Text soulLevel;
-    [SerializeField] TMP_Text soulExp;
-    [SerializeField] List<TMP_Text> soulEffects;
+    // 좌측 패널
+    [SerializeField] Transform statSlotPanel;
+    [SerializeField] Transform beadPanel;
+
+    //중간 패널
+    [SerializeField] Transform[] soulSlots; 
+
+    //우측 패널
+    [SerializeField] HaveSoulTooltipUI soulTooltipUI;
 
     Exp exp;
 
@@ -25,66 +25,21 @@ public class HaveSoulsPanel : UIPanelBase
     {
         sceneContext = FindFirstObjectByType<SceneContext>();
         exp = sceneContext.player.Exp;
-
-        forwarder = GetComponent<SoulPanelEventAggregator>();
     }
     protected override void OnOpened()
     {
         HideTooltipUI();
 
-        UpdateExp(exp.CurExp, exp.MaxExp);
-        UpdateLevel(exp.CurLevel);
-
-        if (SoulManager.Instance != null)
-        {
-            UpdateSoulEffects(SoulManager.Instance.CurSouls);
-            SoulManager.Instance.soulGot += UpdateSoulEffects;
-        }
-
-        // 게임 데이터 구독
-        exp.ExpChanged += UpdateExp;
-        exp.LevelChanged += UpdateLevel;
-
-        // UI 마우스 이벤트 구독
-        forwarder.MouseEntered += HandleMouseEnter;
-
-        // 미니아이콘 슬롯 생성 및 바인딩
-        for (int i = 0; i < SoulManager.Instance.CurSouls.Count; i++)
-        {
-            HaveSoulSlot haveSoulUI = Instantiate(haveSoulSlotPrefab, transform);
-            haveSoulUI.Bind(SoulManager.Instance.CurSouls[i].data);
-            uiSlots.Add(haveSoulUI);
-
-            haveSoulUI.transform.position = emptySlot[i].transform.position;
-        }
-
-        // 이벤트 구독 재설정
-        forwarder.RebuildViews();
+        UpdateSoulEffects(SoulManager.Instance.CurSouls);
+        SoulManager.Instance.soulGot += UpdateSoulEffects;
     }
 
     protected override void OnClosing()
     {
-        if (SoulManager.Instance != null)
-        {
-            SoulManager.Instance.soulGot -= UpdateSoulEffects;
-        }
-        forwarder.MouseEntered -= HandleMouseEnter;
-        foreach (var slot in uiSlots)
-            Destroy(slot.GO);
-
-        uiSlots.Clear();
+        SoulManager.Instance.soulGot -= UpdateSoulEffects;
         HideTooltipUI();
     }
 
-    void UpdateExp(int newCurExp, int newMaxExp)
-    {
-        soulExp.SetText($"{newCurExp} / {newMaxExp}");
-    }
-
-    void UpdateLevel(int newCurLevel)
-    {
-        soulLevel.SetText($"LV. {newCurLevel}");
-    }
 
     [SerializeField] TMP_Text statText;
     [SerializeField] TMP_Text effectText;
@@ -107,25 +62,12 @@ public class HaveSoulsPanel : UIPanelBase
             }
         }
     }
-
-
-    void HandleMouseEnter(SlotEventArgs<SoulData> e)
-    {
-        ShowTooltipUI(e.Data);
-    }
-
-    // 슬롯이 아닌 슬롯 패널(MouseEventSupporter) 밖으로 나가야 선택 취소되고 뒷면 보여짐
-    public void SlotMouseExit()
-    {
-        HideTooltipUI();
-    }
-
-    void ShowTooltipUI(SoulData data)
+    public void ShowTooltipUI(SoulData data)
     {
         soulTooltipUI.Show(data);
     }
 
-    void HideTooltipUI()
+    public void HideTooltipUI()
     {
         soulTooltipUI.Hide();
     }
