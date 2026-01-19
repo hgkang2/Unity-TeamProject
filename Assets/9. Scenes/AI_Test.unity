@@ -403,7 +403,7 @@ Transform:
   m_GameObject: {fileID: 399982674}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.29, y: 1.74, z: 0}
+  m_LocalPosition: {x: 2.23, y: 1.86, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1061,26 +1061,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Maligure
       objectReference: {fileID: 0}
-    - target: {fileID: 3338535456757533984, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5166442864003647467, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
-      propertyPath: enableSkill
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5166442864003647467, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
-      propertyPath: skillDashForce
-      value: 12
-      objectReference: {fileID: 0}
     - target: {fileID: 5166442864003647467, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
       propertyPath: playerTransform
       value: 
       objectReference: {fileID: 399982679}
-    - target: {fileID: 5166442864003647467, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
-      propertyPath: skillDashDuration
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7889999544441793184, guid: c48a840c133372b4d8b1f96ad91cbeae, type: 3}
       propertyPath: m_LocalPosition.x
       value: 13.86

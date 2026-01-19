@@ -10,7 +10,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     public bool enableAttack = false;
     public bool enableSkill = false;
 
-    public enum malirgue_State { Idle, Patrol, Aggro, Attack, Skill, TakeDamage, Dead }
+    public enum malirgue_State { Idle, Patrol, Alerted, Aggro, Attack, Skill, TakeDamage, Dead }
     public malirgue_State state = malirgue_State.Idle;
     public float stateTimer;
 
@@ -118,7 +118,7 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         ApplyFlip();   
         hitLockTimer -= Time.deltaTime;
-        offGuardTimer -= Time.deltaTime;
+        
     }
 
     void ChangeState(malirgue_State next)
@@ -136,8 +136,9 @@ public class Malirgue : MonoBehaviour, IDamageable
     {
         switch(state)
         {
-            case malirgue_State.Idle: TickIdle(); break;
-            case malirgue_State.Patrol: TickPatrol(); break;
+            case malirgue_State.Idle: TickIdle(); offGuardTimer -= Time.deltaTime; break;
+            case malirgue_State.Patrol: TickPatrol(); offGuardTimer -= Time.deltaTime; break;
+            case malirgue_State.Alerted: break;
             case malirgue_State.Aggro: TickAggro(); break;
             case malirgue_State.Attack: if(cliffStopped) StopX(); break;
             case malirgue_State.Skill: if(cliffStopped) StopX(); break;
@@ -198,8 +199,9 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         if(enableAggro && distanceToPlayer <= aggroRange && !isHit)
         {
-            if(offGuardTimer <= 0)
+            if(offGuardTimer <= 0 && state == malirgue_State.Idle)
             {
+                ChangeState(malirgue_State.Alerted);
                 StartCoroutine(AlertRoutine());
                 return;
             }
@@ -224,29 +226,28 @@ public class Malirgue : MonoBehaviour, IDamageable
 
     void TickPatrol()
     {
+        if(enableAggro && distanceToPlayer <= aggroRange)
+        {
+            if(offGuardTimer <= 0 && state == malirgue_State.Patrol)
+            {
+                ChangeState(malirgue_State.Alerted);
+                StartCoroutine(AlertRoutine());
+                return;
+            }
+            else
+            {
+                ChangeState(malirgue_State.Aggro);
+                animator?.SetTrigger("Aggro");
+                return;
+            } 
+        }
+
         if(stateTimer >= patrolTime)
         {
             StopX();
             animator?.SetTrigger("Idle");
             ChangeState(malirgue_State.Idle);
             return;
-        }
-
-        if(enableAggro && distanceToPlayer <= aggroRange)
-        {
-            if(offGuardTimer <= 0)
-            {
-                StopX();
-                StartCoroutine(AlertRoutine());
-                return;
-            }
-            else
-            {
-                StopX();
-                ChangeState(malirgue_State.Aggro);
-                animator?.SetTrigger("Aggro");
-                return;
-            } 
         }
 
         facingX = moveDirX;
@@ -260,7 +261,6 @@ public class Malirgue : MonoBehaviour, IDamageable
         MoveX(moveDirX, patrolSpeed);
     }
 
-
     IEnumerator AlertRoutine()
     {
         StopX();
@@ -271,6 +271,7 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(1f);
 
+        offGuardTimer = alertedStateDuration;
         alertSprite.SetActive(false);
         ChangeState(malirgue_State.Aggro);
         animator?.SetTrigger("Aggro");

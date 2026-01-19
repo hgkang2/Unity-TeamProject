@@ -307,7 +307,7 @@ MonoBehaviour:
   enablePatrol: 1
   enableAggro: 1
   enableAttack: 0
-  enableSkill: 0
+  enableSkill: 1
   state: 0
   stateTimer: 0
   rb: {fileID: 0}
@@ -323,7 +323,7 @@ MonoBehaviour:
   aggroSpeed: 5
   freezeZoneX: 0.3
   offGuardTimer: 0
-  alertedStateDuration: 10
+  alertedStateDuration: 15
   alertSprite: {fileID: 8560376589369344395}
   attackRange: 3
   readyAttackWindup: 0.5
@@ -335,7 +335,7 @@ MonoBehaviour:
   skillRange: 5
   readySkillWindup: 1
   skillCoolTime: 5
-  skillDuration: 1
+  skillDuration: 0.5
   playerTransform: {fileID: 0}
   playerMask:
     serializedVersion: 2
@@ -343,7 +343,8 @@ MonoBehaviour:
   distanceToPlayer: 0
   knockBackXForce: 3
   knockBackYForce: 0
-  skillDashForce: 0
+  skillDashForce: 12
+  skillDashDuration: 0.5
   hitStunTime: 0.5
   hitLockDuration: 0.15
   rayLength: 1.5

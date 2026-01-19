@@ -663,7 +663,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Maligure_Skill
-  m_Speed: 1
+  m_Speed: 1.75
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 6855765400058458067}
@@ -705,7 +705,7 @@ AnimatorStateMachine:
     m_Position: {x: 350, y: -30, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 6657777127478185669}
-    m_Position: {x: 490, y: 170, z: 0}
+    m_Position: {x: 490, y: 180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5521162615632672776}
     m_Position: {x: 700, y: 120, z: 0}
@@ -802,7 +802,7 @@ AnimatorStateMachine:
     m_Position: {x: 355.59442, y: 107.7331, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -6849523428311814168}
-    m_Position: {x: 350, y: 240, z: 0}
+    m_Position: {x: 360, y: 240, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []

@@ -628,7 +628,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3401993074058783418
 Transform:
   m_ObjectHideFlags: 0
@@ -818,9 +818,10 @@ MonoBehaviour:
   aggroRange: 8
   aggroSpeed: 3.5
   offGuardTimer: 0
-  alertedStateDuration: 10
+  alertedStateDuration: 15
   alertSprite: {fileID: 3152607725845675935}
   maxHeightDiffForAttack: 2.04
+  isAlerted: 0
   attackRange: 2
   attackDashForce: 10
   readyAttackWindup: 1

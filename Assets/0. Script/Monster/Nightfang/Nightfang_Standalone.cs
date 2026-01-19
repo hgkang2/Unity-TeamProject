@@ -10,7 +10,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     public bool enableAttack = false;
     public bool enableSkill = false;
 
-    public enum State { Idle, Patrol, Aggro, Attack, Skill, TakeDamage, Dead }
+    public enum State { Idle, Patrol, Alerted, Aggro, Attack, Skill, TakeDamage, Dead }
     [Header("State")]
     public State state = State.Idle;
     public float stateTimer;
@@ -43,6 +43,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] GameObject alertSprite;
     [SerializeField] float maxHeightDiffForAttack = 0.8f;
     int moveDirX = 1;
+    [SerializeField] bool isAlerted = false;
 
     [Header("Attack")]
     [SerializeField] float attackRange = 1.2f;    
@@ -162,7 +163,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         ApplyFlip();
         
         hitLockTimer -= Time.deltaTime;
-        offGuardTimer -= Time.deltaTime;
+        
     }
 
     void PlayerDetect()
@@ -207,9 +208,10 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     {
         switch (state)
         {
-            case State.Idle: TickIdle();; break;
-            case State.Patrol: TickPatrol(); break;
-            case State.Aggro:TickAggro(); break;
+            case State.Idle: TickIdle(); offGuardTimer -= Time.deltaTime; break;
+            case State.Patrol: TickPatrol(); offGuardTimer -= Time.deltaTime; break;
+            case State.Alerted: break;
+            case State.Aggro:TickAggro(); offGuardTimer = alertedStateDuration; break;
             case State.Attack: if(cliffStopped) StopX();  break;
             case State.Skill: if(cliffStopped) StopX();  break;
             case State.TakeDamage : TickTakeDamage(); break;
@@ -229,6 +231,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         {
             if(offGuardTimer <= 0 && state == State.Idle)
             {
+                ChangeState(State.Alerted);
                 StartCoroutine(AlertRoutine());
                 return;
             }
@@ -253,19 +256,11 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     void TickPatrol()
     {
-        if (stateTimer >= patrolTime)
-        {
-            StopX();
-            animator?.SetTrigger("Idle");
-            ChangeState(State.Idle);
-            sfx.Play("IdleSound");
-            return;
-        }
-
         if (enableAggro && distance <= aggroRange)
         {
             if(offGuardTimer <= 0 && state == State.Patrol)
             {
+                ChangeState(State.Alerted);
                 StartCoroutine(AlertRoutine());
                 return;
             }
@@ -276,6 +271,15 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
                 animator?.SetTrigger("Aggro");
                 return;
             } 
+        }
+
+        if (stateTimer >= patrolTime)
+        {
+            StopX();
+            animator?.SetTrigger("Idle");
+            ChangeState(State.Idle);
+            sfx.Play("IdleSound");
+            return;
         }
 
         facingX = moveDirX;
@@ -291,6 +295,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
     IEnumerator AlertRoutine()
     {
+        //Debug.Log("Alerted");
         StopX();
         animator?.SetTrigger("Idle");
         if (Mathf.Abs(dx) > freezeZoneX)
@@ -299,6 +304,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(1f);
 
+        offGuardTimer = alertedStateDuration;
         alertSprite.SetActive(false);
         ChangeState(State.Aggro);
         animator?.SetTrigger("Aggro");
