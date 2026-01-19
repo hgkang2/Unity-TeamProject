@@ -14,7 +14,7 @@ public class SceneContext : MonoBehaviour
 
     public DialoguePanel dialoguePanel;
     public LevelUpPanel levelUpPanel;
-    public HaveSoulsPanel haveSoulsPanel;
+    public HaveSoulPanel haveSoulsPanel;
     public IngameSettingPanel ingameSettingPanel;
 
     [Header("Stage1 Tutorial")]

@@ -13,7 +13,7 @@ public class StageUI : MonoBehaviour
     //레벨업 시 띄우기
     LevelUpPanel levelUpPanel;
     //보유 영성 ui
-    HaveSoulsPanel haveSoulsPanel;
+    HaveSoulPanel haveSoulsPanel;
 
 
     SceneContext sceneContext;

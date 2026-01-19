@@ -1,33 +1,35 @@
-using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class HaveSoulSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    Image soulImage;
+    HaveSoulPanel haveSoulPanel;
+    [SerializeField] Image soulImage;
+    SoulInstance instance;
 
     void Awake()
     {
-        soulImage = GetComponentInChildren<Image>();
+        haveSoulPanel = GetComponentInParent<HaveSoulPanel>();
+        soulImage.gameObject.SetActive(false);
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    public void Set(SoulInstance item)
     {
-
+        instance = item;
+        soulImage.sprite = instance.data.soulIcon;
+        soulImage.gameObject.SetActive(true);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        if(instance == null || instance.data == null) return;
+        haveSoulPanel.ShowTooltipUI(instance.data);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        if(instance == null || instance.data == null) return;
+        haveSoulPanel.HideTooltipUI();
     }
 }

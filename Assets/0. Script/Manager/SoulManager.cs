@@ -90,6 +90,7 @@ public class SoulManager : MonoBehaviour
 
         // 0. 먼저 조건(캐릭터/레벨/기타) 만족하는 애들만 필터링
         List<SoulData> candidates = allSouls
+            .Where(soul => soul.soulType == SoulType.Soul)
             .Where(soul => soul != null && soul.CanOffer(player))
             .Where(soul =>
             {

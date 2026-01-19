@@ -19,10 +19,6 @@ public class ExpBar : MonoBehaviour
         Bind(sceneContext.player.Exp);
     }
 
-    void OnDisable()
-    {
-        Clear();
-    }
 
     public void Bind(Exp exp)
     {
