@@ -89025,7 +89025,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcf4ea9ef50846547b5abfe3283738a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterName: {fileID: 412045665}
 --- !u!224 &1941995589
 RectTransform:
   m_ObjectHideFlags: 0
@@ -93913,11 +93912,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: maxJumpCount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6797658465126727401, guid: 79768cb937e739a498986e2e886d2e92, type: 3}
       propertyPath: currentJumpCount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
