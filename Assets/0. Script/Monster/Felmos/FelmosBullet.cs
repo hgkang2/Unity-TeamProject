@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class FelmosBullet : MonoBehaviour
 {
@@ -6,8 +7,7 @@ public class FelmosBullet : MonoBehaviour
     Rigidbody2D rb;
     Player player;
 
-    MonsterBase monster;
-
+    [SerializeField] DamageType damageType;
     float damage;
 
     private void Awake()
@@ -26,15 +26,13 @@ public class FelmosBullet : MonoBehaviour
         Destroy(this.gameObject, 5f);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player"))
+        if(collision.TryGetComponent<IDamageable>(out var damageable))
         {
-            var player = collision.gameObject.GetComponent<Player>();
-
-            player.TakeDamage(damage, DamageType.Normal);
+            Vector2 hitPos = transform.position;
+            damageable.TakeDamage(damage, damageType, hitPos);
         }
-
         if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground"))
         {
             Destroy(this.gameObject);

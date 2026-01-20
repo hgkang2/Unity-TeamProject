@@ -5,24 +5,28 @@ using UnityEngine.Rendering;
 
 public class Malirgue : MonoBehaviour, IDamageable
 {
+    [Header("Debug Test")]
     public bool enablePatrol = false;
     public bool enableAggro = false;
     public bool enableAttack = false;
     public bool enableSkill = false;
 
     public enum malirgue_State { Idle, Patrol, Alerted, Aggro, Attack, Skill, TakeDamage, Dead }
+    [Header("State")]
     public malirgue_State state = malirgue_State.Idle;
     public float stateTimer;
 
+    #region Variables
     [Header("Refs")]
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Animator animator;
     [SerializeField] Animator vfxAnimator;
     [SerializeField] SpriteRenderer spriteRenderer;
     HP hp;
+
+    [Header("hitbox")]
     [SerializeField] GameObject attackHitBox;
     [SerializeField] GameObject skillHitbox;
-    [SerializeField] GameObject WarningVFX;
     
     [Header("Idle")]
     [SerializeField] float idleTime;
@@ -31,36 +35,40 @@ public class Malirgue : MonoBehaviour, IDamageable
     [SerializeField] float patrolSpeed;
     [SerializeField] float patrolTime;
 
+    [Header("Alert")]
+    [SerializeField] GameObject alertSprite;
+    [SerializeField] float alertedStateDuration = 10f;
+    float offGuardTimer = 0f;
+     
     [Header("Aggro")]
     [SerializeField] float aggroRange;
     [SerializeField] float aggroSpeed;
     [SerializeField] float freezeZoneX;
-    [SerializeField] float offGuardTimer = 0f;
-    [SerializeField] float alertedStateDuration = 10f;
-    [SerializeField] GameObject alertSprite;
-
-    int moveDirX = 1;
 
     [Header("Attack")]
+    [SerializeField] GameObject WarningVFX;
     [SerializeField] float attackRange;
     [SerializeField] float readyAttackWindup;
     [SerializeField] float attackCoolTime;
     [SerializeField] float attackDuration;
     [SerializeField] float maxHeightDiffForAttack;
-    [SerializeField] float delayTime;
-    [SerializeField] float standByTime;
     bool isHeigtForAttackOk;
     bool isAttacking = false;
     bool isAttackReady = true;
-    bool isActionLocked = false;
 
     [Header("Skill")]
     [SerializeField] float skillRange;
     [SerializeField] float readySkillWindup;
     [SerializeField] float skillCoolTime;
     [SerializeField] float skillDuration;
+    [SerializeField] float skillDashForce;
+    [SerializeField] float skillDashDuration;
     bool isUsingSkill = false;
     bool isSkillReady = true;
+
+    [Header("딜레이 시간")]
+    [SerializeField] float delayTime;
+    [SerializeField] float standByTime;
 
     [Header("Detect Player")]
     [SerializeField] Transform playerTransform;
@@ -68,21 +76,36 @@ public class Malirgue : MonoBehaviour, IDamageable
     [SerializeField] float distanceToPlayer;
     float distanceOfX;
 
+    // 움직임 방향
+    int moveDirX = 1;
     int facingX = 1;
     Vector3 originScale;
     bool canMove = true;
     
-
+    // 코루틴 고정
     Coroutine runningRoutine;
     Coroutine lockActionRoutine;
+    bool isActionLocked = false;
 
     [Header("OnDamage")]
     [SerializeField] float knockBackXForce;
     [SerializeField] float knockBackYForce;
+    [SerializeField] float hitStunTime;
+    [SerializeField] float hitLockDuration;
+    float hitLockTimer = 0f;
     Vector2 lastHitFrom;
     bool isHit = false;
-
     bool isDead = false;
+
+    [Header("Ground Check")]
+    [SerializeField] BoxCollider2D boxCollider;
+    [SerializeField] LayerMask groundMask;
+    [SerializeField] float rayLength;
+    [SerializeField] float forwardPadding;
+    [SerializeField] float bottomPadding;
+    bool cliffStopped = false;
+    bool isCliffAhead;
+    #endregion
 
     private void Awake() {
         if(!rb) rb = GetComponent<Rigidbody2D>();
@@ -108,7 +131,6 @@ public class Malirgue : MonoBehaviour, IDamageable
         hp.OnDied -= OnDied;
     }
 
-    float lastNormalized;
     private void Update() 
     {
         if(isDead) return;
@@ -123,17 +145,11 @@ public class Malirgue : MonoBehaviour, IDamageable
         hitLockTimer -= Time.deltaTime;
     }
 
+    #region State Machine
     void ChangeState(malirgue_State next)
     {
-// Debug.Log(
-//         $"[FSM] {state} → {next} | Time:{Time.time:F2} | Frame:{Time.frameCount}",
-//         this
-//     );
-
         state = next;
         stateTimer = 0f;
-
-        
 
         if(state != malirgue_State.TakeDamage && isHit)
         {
@@ -155,6 +171,7 @@ public class Malirgue : MonoBehaviour, IDamageable
             case malirgue_State.Dead: break;
         }
     }
+    #endregion
 
     void PlayerDetect()
     {
@@ -330,6 +347,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         }
     }
 
+    #region Attack / Skill
     void StartAttack()
     {
         if(runningRoutine != null) StopCoroutine(runningRoutine);
@@ -380,8 +398,6 @@ public class Malirgue : MonoBehaviour, IDamageable
         runningRoutine = StartCoroutine(SkillRoutine());
     }
 
-    [SerializeField] float skillDashForce;
-    [SerializeField] float skillDashDuration;
     IEnumerator SkillRoutine()
     {
         ChangeState(malirgue_State.Skill);
@@ -420,6 +436,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         yield return new WaitForSeconds(delayTime);
         isActionLocked = false;
     }
+    #endregion
 
     void ApplyFlip()
     {
@@ -436,9 +453,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
 
-    [SerializeField] float hitStunTime;
-    [SerializeField] float hitLockDuration;
-    float hitLockTimer = 0f;
+    #region Damage Conrtol
     void TickTakeDamage()
     {
         if(isAttacking) return;
@@ -456,7 +471,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     {
         hp.TakeDamage(amount);
 
-        if(isAttacking || isDead) return;
+        if(isAttacking || isUsingSkill || isDead) return;
 
         OnHit(transform.position - Vector3.right);
     }
@@ -465,7 +480,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     {
         hp.TakeDamage(amount);
 
-        if (isAttacking || isDead) return;
+        if (isAttacking || isUsingSkill || isDead) return;
 
         lastHitFrom = (Vector2)attackerWorldPosition;
         OnHit((Vector2)attackerWorldPosition);
@@ -505,6 +520,7 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         GameObject.Destroy(this.gameObject, 3f);
     }
+    #endregion
 
     void MonsterHitboxOn(malirgue_State currentState)
     {   
@@ -544,14 +560,6 @@ public class Malirgue : MonoBehaviour, IDamageable
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, skillRange);
     }
-
-    bool cliffStopped = false;
-    [SerializeField] bool isCliffAhead;
-    [SerializeField] float rayLength;
-    [SerializeField] float forwardPadding;
-    [SerializeField] float bottomPadding;
-    [SerializeField] LayerMask groundMask;
-    [SerializeField] BoxCollider2D boxCollider;
 
     void MonsterGroundCheck()
     {

@@ -1,10 +1,9 @@
 using System.Collections;
+using System.Security.Cryptography;
 using UnityEngine;
 
-public class Felmos_Test : MonoBehaviour
+public class Felmos_Test : MonoBehaviour, IDamageable
 {
-    public enum State { Idle, Patrol, Aggro, Dead }
-
     [Header("Test")]
     public bool enablePatrol = true;
     public bool enableAggro = true;
@@ -12,197 +11,286 @@ public class Felmos_Test : MonoBehaviour
     public bool enableKeepDistance = true;
     public bool enableMinHeightLimit = true;
 
+    public enum Felmos_State { Idle, Patrol, Alerted, Aggro, Attack, TakeDamage,Dead }
+    [Header("States")]
+    public Felmos_State state = Felmos_State.Idle;
+    public float stateTimer;
+
+    #region Variables
     [Header("Refs")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator animator;          
-    [SerializeField] private Transform firePos;          
+    [SerializeField] private Transform firePos;
+    HP hp;
 
-    [Header("Player Detect")]
-    [SerializeField] private Transform player;           // ∫ÒøÏ∏È ≈¬±◊∑Œ √£¿Ω
-    public string playerTag = "Player";
-    public float aggroRange = 8f;
-    public float shootRange = 6f;
+    [Header("Idle")]
+    [SerializeField] float idleTime;
 
-    [Header("Movement")]
-    public float idleTime = 0.3f;
-
-    public float patrolSpeed = 2f;
-    public float patrolTime = 1.0f;
-
-    public float aggroSpeed = 3.5f;
-
-    [Header("Min Height Limit")]
-    public float minHeight = 3f;         // y∞° ¿Ã ∞™∫∏¥Ÿ ≥ª∑¡∞°∏È ¿ß∑Œ∏∏ ¿ÃµøΩ√≈∞∞≈≥™ ∫∏¡§
-    public float heightPushUpSpeed = 2f;
-
-    [Header("Keep Distance")]
-    public float keepDistance = 4f;      // ¿Ã ∞≈∏Æ∫∏¥Ÿ ∞°±ÓøÏ∏È ∏÷æÓ¡ˆ∑¡ «‘(»ƒ≈)
-    public float keepDistanceForce = 1.0f; // »ƒ≈ ∞≠µµ
-
-    [Header("Shoot")]
-    public GameObject bulletPrefab;      // FelmosBullet «¡∏Æ∆’
-    public float bulletDamage = 10f;
-    public float shootCooldown = 1.5f;
-
-    [Header("Runtime")]
-    public State state = State.Idle;
-    public float stateTimer;
-    public float distanceToPlayer;
-    public Vector2 dirToPlayer;
-
-    private int patrolDirIndex = 0;
+    [Header("Patrol")]
+    [SerializeField] float patrolSpeed;
+    [SerializeField] float patrolTime;
+    int patrolDirIndex = 0;
     private readonly Vector2[] patrolDirs = new Vector2[]
     {
         Vector2.left, Vector2.right, Vector2.up, Vector2.down
     };
 
-    private bool shootReady = true;
-    private bool isDead;
+    [Header("Alert")]
+    [SerializeField] GameObject alertSprite;
+    [SerializeField] float alertedStateDuration;
+    float offGuardTimer = 0f;
 
-    void Reset()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponentInChildren<Animator>();
-    }
+    [Header("Aggro")]
+    [SerializeField] float aggroRange;
+    [SerializeField] float aggroSpeed;
+
+    [Header("Attack")]
+    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] float bulletDamage = 10f;
+    [SerializeField] float attackDuration;
+    [SerializeField] float readyAttackWindup;
+    [SerializeField] float attackCoolTime;
+    [SerializeField] float attackRange = 6f;
+    bool isAttackReady = true;
+    bool isAttacking = false;
+
+    [Header("ÎîúÎ†àÏù¥ ÏãúÍ∞Ñ")]
+    [SerializeField] float delayTime;
+    [SerializeField] float standByTime;
+
+    [Header("Detect Player")]
+    [SerializeField] Transform playerTransform;
+    [SerializeField] LayerMask playerMask;
+    [SerializeField] float distanceToPlayer;
+    float distanceOfX;
+    float distanceOfY;    
+
+    [Header("Min Height Limit")]
+    [SerializeField] float minHeight = 3f;       
+    [SerializeField] float heightPushUpSpeed = 2f;
+
+    [Header("Keep Distance")]
+    [SerializeField] float keepDistance = 4f;      
+    [SerializeField] float keepDistanceForce = 1.0f; 
+    public Vector2 dirToPlayer;
+
+    bool isDead;
+    bool isHit = false;
+
+    [SerializeField] float freezeZoneX;
+    int facingX = 1;
+    Vector3 originScale;
+
+    Coroutine runningRoutine;
+    bool canMove = true;
+    #endregion
 
     void Awake()
     {
         if (!rb) rb = GetComponent<Rigidbody2D>();
         if (!animator) animator = GetComponentInChildren<Animator>();
+        if (!hp) hp = GetComponent<HP>();
 
-        // ∞¯¡ﬂ∏˜ ±‚∫ª ºº∆√ (¡ﬂ∑¬ øµ«‚ √÷º“»≠)
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
 
-        ChangeState(State.Idle);
+        hp.OnDied += OnDied;
+
+        originScale = transform.localScale;
+        facingX = -1;
+
+        ChangeState(Felmos_State.Idle);
+    }
+
+    public void Oestroy()
+    {
+        hp.OnDied -= OnDied;        
     }
 
     void Update()
     {
         if (isDead) return;
 
-        if (!player)
-        {
-            var go = GameObject.FindGameObjectWithTag(playerTag);
-            if (go) player = go.transform;
-        }
-
         UpdateDetect();
 
         stateTimer += Time.deltaTime;
         RunFSM();
+
+        ApplyFlip();
+
+        if(Input.GetKeyDown(KeyCode.F1))
+        {
+            TakeDamage(10f);
+        }
+        hitLockTimer -= Time.deltaTime;
     }
 
     void UpdateDetect()
     {
-        if (!player)
+        if (!playerTransform)
         {
+            Collider2D hit = Physics2D.OverlapCircle(transform.position, aggroRange, playerMask);
+
+            if(hit) playerTransform = hit.transform;
+            else
+            {
+                distanceToPlayer = float.PositiveInfinity;
+                dirToPlayer = Vector2.zero;
+                return;
+            }
+        }
+
+        if(!playerTransform.gameObject.activeInHierarchy)
+        {
+            playerTransform = null;
             distanceToPlayer = float.PositiveInfinity;
             dirToPlayer = Vector2.zero;
-            return;
         }
 
         Vector2 myPos = transform.position;
-        Vector2 pPos = player.position;
+        Vector2 playerPos = playerTransform.position;
 
-        Vector2 toP = pPos - myPos;
-        distanceToPlayer = toP.magnitude;
-        dirToPlayer = (distanceToPlayer > 0.0001f) ? toP / distanceToPlayer : Vector2.zero;
+        Vector2 toPlayer = playerPos - myPos;
+        distanceOfX = toPlayer.x;
+        distanceToPlayer = toPlayer.magnitude;
+        dirToPlayer = (distanceToPlayer > 0.0001f) ? toPlayer / distanceToPlayer : Vector2.zero;
+
+        if(state == Felmos_State.Aggro || state == Felmos_State.Attack)
+        {
+            if(Mathf.Abs(distanceOfX) > freezeZoneX)
+            {
+                facingX = distanceOfX > 0f ? -1 : 1;
+            }
+        }
     }
 
     void RunFSM()
     {
         switch (state)
         {
-            case State.Idle: TickIdle(); break;
-            case State.Patrol: TickPatrol(); break;
-            case State.Aggro: TickAggro(); break;
-            case State.Dead: break;
+            case Felmos_State.Idle: TickIdle(); offGuardTimer -= Time.deltaTime; break;
+            case Felmos_State.Patrol: TickPatrol(); offGuardTimer -= Time.deltaTime; break;
+            case Felmos_State.Alerted: break;
+            case Felmos_State.Aggro: TickAggro(); offGuardTimer = alertedStateDuration; break;
+            case Felmos_State.TakeDamage : TickTakeDamage(); break;
+            case Felmos_State.Dead: break;
         }
     }
 
     void TickIdle()
     {
-        rb.linearVelocity = Vector2.zero;
+        StopXY();
 
         if (!enablePatrol && !enableAggro) return;
 
-        if (enableAggro && distanceToPlayer <= aggroRange)
+        if(!canMove) return;
+
+        if (enableAggro && distanceToPlayer <= aggroRange && !isHit)
         {
-            animator?.SetTrigger("Aggro");
-            ChangeState(State.Aggro);
-            return;
+            if(offGuardTimer <= 0 && state == Felmos_State.Idle)
+            {
+                ChangeState(Felmos_State.Alerted);
+                StartCoroutine(AlertRoutine());
+                return;
+            }
+            else
+            {
+                ChangeState(Felmos_State.Aggro);
+                animator?.SetTrigger("Aggro");
+                return;
+            }
         }
 
-        if (enablePatrol && stateTimer >= idleTime)
+        if (enablePatrol && stateTimer >= idleTime && !isHit) 
         {
+            
+            ApplyFlip();
+            facingX *= -1;
             animator?.SetTrigger("Patrol");
-            ChangeState(State.Patrol);
+            ChangeState(Felmos_State.Patrol);
+            return;
         }
     }
 
     void TickPatrol()
     {
-        // Patrol: left/right/up/down π›∫π (±‚¡∏ FelmosøÕ µø¿œ«— πÊ«‚ πËø≠ πÊΩƒ)
-        Vector2 dir = patrolDirs[patrolDirIndex];
-
-        // √÷º“ ≥Ù¿Ã ¡¶«—(æ∆∑°∑Œ ≥ª∑¡∞°∑¡ «“ ∂ß ¡¶æÓ)
-        dir = ApplyMinHeightLimit(dir);
-
-        rb.linearVelocity = dir * patrolSpeed;
-
-        // Aggro ¿¸»Ø
         if (enableAggro && distanceToPlayer <= aggroRange)
         {
-            rb.linearVelocity = Vector2.zero;
-            animator?.SetTrigger("Aggro");
-            ChangeState(State.Aggro);
-            return;
+            if(offGuardTimer <= 0 && state == Felmos_State.Patrol)
+            {
+                ChangeState(Felmos_State.Alerted);
+                animator?.SetTrigger("Idle");
+                StartCoroutine(AlertRoutine());
+                return;
+            }
+            else
+            {
+                ChangeState(Felmos_State.Aggro);
+                animator?.SetTrigger("Aggro");
+                return;               
+            }
         }
 
         if (stateTimer >= patrolTime)
         {
             patrolDirIndex = (patrolDirIndex + 1) % patrolDirs.Length;
+
             animator?.SetTrigger("Idle");
-            ChangeState(State.Idle);
+            ChangeState(Felmos_State.Idle);
         }
+        
+        Vector2 dir = patrolDirs[patrolDirIndex];
+        dir = ApplyMinHeightLimit(dir);
+
+        MoveXY(dir, patrolSpeed);       
+    }
+
+    IEnumerator AlertRoutine()
+    {
+        StopXY();
+        alertSprite.SetActive(true);
+        if(Mathf.Abs(distanceOfX) > freezeZoneX)
+        {
+            facingX = distanceOfX > 0f ? -1 : 1;
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        offGuardTimer = alertedStateDuration;
+        alertSprite.SetActive(false);
+        ChangeState(Felmos_State.Aggro);
+        animator?.SetTrigger("Aggro");
     }
 
     void TickAggro()
     {
-        if (!player)
-        {
-            ChangeState(State.Idle);
+        if(Mathf.Abs(distanceOfX) > freezeZoneX) ApplyFlip();
+
+       if (distanceToPlayer >= aggroRange)
+        { 
+            ChangeState(Felmos_State.Idle);
+            animator?.SetTrigger("Idle"); 
+            offGuardTimer = alertedStateDuration;
             return;
         }
 
-        // 1) ±‚∫ª¿∫ «√∑π¿ÃæÓ ¬ ¿∏∑Œ ¡¢±Ÿ
         Vector2 desired = dirToPlayer;
 
-        // 2) ¿œ¡§ ∞≈∏Æ ¿Ø¡ˆ(≥ π´ ∞°±ÓøÏ∏È π›¥Î∑Œ π–±‚)
         if (enableKeepDistance && distanceToPlayer < keepDistance)
         {
-            // ∞°±ÓøÔºˆ∑œ ¥ı ∞≠«œ∞‘ π›¥Î∑Œ
             float t = Mathf.InverseLerp(keepDistance, 0f, distanceToPlayer);
             Vector2 retreat = -dirToPlayer * (1f + t * keepDistanceForce);
             desired = (desired + retreat).normalized;
         }
+        
+        //desired = ApplyMinHeightLimit(desired);
 
-        // 3) √÷º“ ≥Ù¿Ã ¡¶«—
-        desired = ApplyMinHeightLimit(desired);
+        MoveXY(desired, aggroSpeed);
 
-        rb.linearVelocity = desired * aggroSpeed;
-
-        // 4) ªÁ∞› (Ω∫≈≥ æ¯¿Ω, 1πﬂ πﬂªÁ + ƒ≈∏¿”)
-        if (enableShoot && shootReady && distanceToPlayer <= shootRange)
+        if (enableShoot && isAttackReady && distanceToPlayer <= attackRange && !isAttacking && !isHit)
         {
-            StartCoroutine(ShootRoutine());
-        }
-
-        if (distanceToPlayer > aggroRange * 1.2f)
-        { 
-            animator?.SetTrigger("Idle"); 
-            ChangeState(State.Idle); 
+            StartAttack();
+            return;
         }
     }
 
@@ -210,41 +298,169 @@ public class Felmos_Test : MonoBehaviour
     {
         if (!enableMinHeightLimit) return dir;
 
-        // «ˆ¿Á y∞° minHeight∫∏¥Ÿ ≥∑¿∏∏È, æ∆∑°∑Œ ∞°∑¡¥¬ ¿‘∑¬¿ª ªÛº‚«œ∞Ì ¿ß∑Œ ªÏ¬¶ π–æÓ¡‹
         if (transform.position.y < minHeight)
         {
             if (dir.y < 0f) dir.y = 0f;
-            // øœ¿¸»˜ ∏ÿ√ﬂ±‚∫∏¥‹ ¿ß∑Œ ∫∏¡§
+
             dir += Vector2.up * (heightPushUpSpeed / Mathf.Max(0.01f, aggroSpeed));
             dir.Normalize();
         }
         return dir;
     }
 
-    IEnumerator ShootRoutine()
+    void StartAttack()
     {
-        shootReady = false;
+        if(runningRoutine != null) StopCoroutine(runningRoutine);
+        isAttacking = true;
+        isAttackReady = false;
+        canMove = false;
+        animator?.SetTrigger("ReadyAttack");
+        runningRoutine = StartCoroutine(AttackRoutine());
+    }
+
+    IEnumerator AttackRoutine()
+    {
+        ChangeState(Felmos_State.Attack);
+
+        StopXY();
+
+        yield return new WaitForSeconds(readyAttackWindup);
 
         animator?.SetTrigger("Attack");
 
-        if (bulletPrefab && firePos && player)
+        yield return new WaitForSeconds(attackDuration);
+
+        isAttacking = false;
+        ChangeState(Felmos_State.Idle);
+        animator?.SetTrigger("Idle");
+
+        StartCoroutine(AttackCoolDown());
+
+        yield return new WaitForSeconds(standByTime);
+
+        canMove = true;
+    }
+
+    IEnumerator AttackCoolDown()
+    {
+        yield return new WaitForSeconds(attackCoolTime);
+        isAttackReady = true;
+    }
+
+    void ShootProjectile()
+    {
+        if (bulletPrefab && firePos && playerTransform)
         {
             var go = Instantiate(bulletPrefab, firePos.position, Quaternion.identity);
-            Vector2 dir = (Vector2)(player.position - firePos.position);
+            Vector2 dir = (Vector2)(playerTransform.position - firePos.position);
 
-            // ±‚¡∏ FelmosBullet¿« Initialize(dir, damage)
             var bullet = go.GetComponent<FelmosBullet>();
             if (bullet) bullet.Initialize(dir, bulletDamage);
         }
-
-        yield return new WaitForSeconds(shootCooldown);
-        shootReady = true;
     }
 
-    void ChangeState(State next)
+    void ChangeState(Felmos_State next)
     {
         state = next;
         stateTimer = 0f;
+
+        if(state != Felmos_State.TakeDamage && isHit)
+        {
+            isHit = false;
+        }
+    }
+
+    void MoveXY(Vector2 moveDir, float speed)
+    {
+        rb.linearVelocity = moveDir * speed;
+    }
+
+    void StopXY()
+    {
+        rb.linearVelocity = Vector2.zero;
+    }
+
+    void ApplyFlip()
+    {
+        transform.localScale = new Vector3(facingX >0 ? -originScale.x : originScale.x, originScale.y, originScale.z);
+    }
+
+    [SerializeField] float hitStunTime;
+    [SerializeField] float hitLockTimer;
+    [SerializeField] float hitLockDuration;
+    Vector2 lastHitFrom;
+    void TickTakeDamage()
+    {
+        if(isAttacking) return;
+
+        if(stateTimer >= hitStunTime)
+        {
+            isHit = false;
+            hitLockTimer = hitLockDuration;
+            ChangeState(Felmos_State.Idle);
+            animator?.SetTrigger("Idle");
+        }
+    }
+
+    public void TakeDamage(float amount)
+    {
+        hp.TakeDamage(amount);
+
+        if(isAttacking || isDead) return;
+
+        OnHit(transform.position - Vector3.right);
+    }
+
+    void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
+    {
+        hp.TakeDamage(amount);
+
+        if(isAttacking || isDead) return;
+
+        lastHitFrom = (Vector2)attackerWorldPosition;
+        OnHit((Vector2)attackerWorldPosition);
+    }
+
+    [SerializeField] float knockBackXForce;
+    [SerializeField] float knockBackYForce;
+    public virtual void OnHit(Vector2 attackWorldPosition)
+    {
+        ChangeState(Felmos_State.TakeDamage);
+        animator?.SetTrigger("Hit");
+        isHit = true;
+
+        Vector2 dir = ((Vector2)transform.position - attackWorldPosition).normalized;
+        dir = new Vector2(dir.x * knockBackXForce, knockBackYForce);
+        rb.linearVelocity = dir;
+    }
+
+    public virtual void OnDied()
+    {
+        if(isDead) return;
+
+        isDead = true;
+        rb.gravityScale = 9.81f;
+
+        ChangeState(Felmos_State.Dead);
+        animator?.SetTrigger("Dead");
+
+        StopAllCoroutines();
+        isAttacking = false;
+
+        GetComponent<Collider2D>().enabled = false;
+        //rb.linearVelocity = Vector2.zero;
+        //rb.bodyType = RigidbodyType2D.Kinematic;
+
+        GameObject.Destroy(this.gameObject, 3f);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, aggroRange);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
 

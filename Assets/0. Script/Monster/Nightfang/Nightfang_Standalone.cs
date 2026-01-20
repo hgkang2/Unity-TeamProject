@@ -26,7 +26,6 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [Header("Hitbox")]
     [SerializeField] public GameObject skillHitBoxObj;   // 스킬 공격시 사용하는 히트박스
     [SerializeField] public GameObject attackHitboxObj;
-    [SerializeField] BoxCollider2D boxCollider;
 
     [Header("Idle")]
     [SerializeField] float idleTime = 1.0f;       // Idle(대기)상태 지속 시간
@@ -35,15 +34,15 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] float patrolSpeed = 2.0f;    // Patrol(순찰) 이동 속도
     [SerializeField] float patrolTime = 2.0f;     // Patrol(순찰) 시간 시간
 
+    [Header("Alert")]
+    [SerializeField] GameObject alertSprite;
+    [SerializeField] float alertedStateDuration = 10f;
+    float offGuardTimer = 0f;
+
     [Header("Aggro")]
     [SerializeField] float aggroRange = 6.0f;     // Aggro 범위
     [SerializeField] float aggroSpeed = 3.5f;     // Aggro 상태 이동 속도
-    [SerializeField] float offGuardTimer = 0f;
-    [SerializeField] float alertedStateDuration = 10f;
-    [SerializeField] GameObject alertSprite;
-    [SerializeField] float maxHeightDiffForAttack = 0.8f;
-    int moveDirX = 1;
-    [SerializeField] bool isAlerted = false;
+    [SerializeField] float freezeZoneX = 0.1f;
 
     [Header("Attack")]
     [SerializeField] float attackRange = 1.2f;    
@@ -53,6 +52,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] float attackCoolTime = 1.0f;
     [Tooltip("일반 공격 지속 시간")]
     [SerializeField] float attackDuration = 1f;
+    [SerializeField] float maxHeightDiffForAttack = 0.8f;
     bool isAttacking;
     bool isAttackReady = true;
     bool heightOk;
@@ -73,45 +73,44 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] float delayTime;
     [Tooltip("공격(스킬 or 일반공격)시전 후 정지 상태로 대기하는 시간")]
     [SerializeField] float standByTime;
-    bool isActionLocked = false; // 연속 공격 방지
-    bool canMove = true;    // 대기 도중 이동 방지
-
-    [Header("Hit")]
-    [Tooltip("몹이 피격 시 경직에 걸리는 시간")]
-    [SerializeField] float hitStunTime = 0.25f;
-    [SerializeField]float knockBackXForce = 5f;
-    [SerializeField]float knockBackYForce = 1f;
-    float hitLockTimer = 0f;
-    [SerializeField] float hitLockDuration = 0.15f;
-    public bool isHit;
-    Vector2 lastHitFrom;
 
     [Header("Detect")]
     [SerializeField] Transform player;
     [SerializeField] LayerMask playerMask;
     [Tooltip("플레이어까지의 거리")]
     [SerializeField] float distance;
-    float freezeZoneX = 0.1f;
     float dx;  // 좌우 방향 + 좌우 거리
-    
-    // facing/flip 
+
+    //움직임 방향
+    int moveDirX = 1;
     int facingX = 1;
     Vector3 originScale;
-
-    // 사망 여부
-    bool isDead;
+    bool canMove = true;    // 대기 도중 이동 방지
 
     // 코루틴 중복 방지
     Coroutine runningRoutine;
     Coroutine lockActionRoutine; // 공격(스킬 or 일반 공격) 후 연속 공격 방지
+    bool isActionLocked = false; // 연속 공격 방지
+
+    [Header("OnDamage")]
+    [Tooltip("몹이 피격 시 경직에 걸리는 시간")]
+    [SerializeField]float knockBackXForce = 5f;
+    [SerializeField]float knockBackYForce = 1f;
+    [SerializeField] float hitStunTime = 0.25f;
+    [SerializeField] float hitLockDuration = 0.15f;
+    float hitLockTimer = 0f;
+    Vector2 lastHitFrom;
+    public bool isHit;
+    bool isDead;
 
     [Header("GroundCheck")]
-    bool cliffStopped = false;
+    [SerializeField] BoxCollider2D boxCollider;
+    [SerializeField] LayerMask groundMask;
     [SerializeField] float rayLength;
     [SerializeField] float forwardPadding;
     [SerializeField] float bottomPadding;
-    [SerializeField] LayerMask groundMask;
-    [SerializeField] bool isCliffAhead;
+    bool isCliffAhead;
+    bool cliffStopped = false;
     #endregion
 
     void Reset()
