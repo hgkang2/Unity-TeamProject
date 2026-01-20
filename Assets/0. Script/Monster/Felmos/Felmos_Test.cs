@@ -65,13 +65,21 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     float distanceOfX;
     float distanceOfY;    
 
-    [Header("Min Height Limit")]
-    [SerializeField] float minHeight = 3f;       
-    [SerializeField] float heightPushUpSpeed = 2f;
+    [Header("Min Height Limit Ray")]
+    [SerializeField] Transform groundRayOrigin;
+    [SerializeField] LayerMask groundMask;
+    [SerializeField] float groundCheckRayLength;
 
     [Header("Keep Distance")]
+    [SerializeField] float keepDistanceWait;
+    [SerializeField] float retreatDuration;
     [SerializeField] float keepDistance = 4f;      
-    [SerializeField] float keepDistanceForce = 1.0f; 
+    [SerializeField] float keepDistanceSpeed; 
+    [SerializeField] float keepDistanceCooldown = 0.25f; 
+    Coroutine keepDistanceRoutine;
+    bool isRetreating;
+    float retreatCooldownTimer;
+
     public Vector2 dirToPlayer;
 
     bool isDead;
@@ -123,6 +131,9 @@ public class Felmos_Test : MonoBehaviour, IDamageable
             TakeDamage(10f);
         }
         hitLockTimer -= Time.deltaTime;
+
+        if (retreatCooldownTimer > 0f)
+        retreatCooldownTimer -= Time.deltaTime;
     }
 
     void UpdateDetect()
@@ -145,6 +156,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
             playerTransform = null;
             distanceToPlayer = float.PositiveInfinity;
             dirToPlayer = Vector2.zero;
+            return;
         }
 
         Vector2 myPos = transform.position;
@@ -240,7 +252,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         }
         
         Vector2 dir = patrolDirs[patrolDirIndex];
-        dir = ApplyMinHeightLimit(dir);
+        dir = ApplyGroundClampDown(dir);
 
         MoveXY(dir, patrolSpeed);       
     }
@@ -266,7 +278,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     {
         if(Mathf.Abs(distanceOfX) > freezeZoneX) ApplyFlip();
 
-       if (distanceToPlayer >= aggroRange)
+        if (distanceToPlayer >= aggroRange)
         { 
             ChangeState(Felmos_State.Idle);
             animator?.SetTrigger("Idle"); 
@@ -274,16 +286,25 @@ public class Felmos_Test : MonoBehaviour, IDamageable
             return;
         }
 
-        Vector2 desired = dirToPlayer;
-
-        if (enableKeepDistance && distanceToPlayer < keepDistance)
+        if(isRetreating)
         {
-            float t = Mathf.InverseLerp(keepDistance, 0f, distanceToPlayer);
-            Vector2 retreat = -dirToPlayer * (1f + t * keepDistanceForce);
-            desired = (desired + retreat).normalized;
+            StopXY();
+            return;
         }
+
+        if (enableKeepDistance &&
+        retreatCooldownTimer <= 0f &&
+        distanceToPlayer < keepDistance &&
+        keepDistanceRoutine == null &&
+        !isAttacking && !isHit)
+        {
+        keepDistanceRoutine = StartCoroutine(KeepDistanceRoutine());
+        return;
+        }
+
+        Vector2 desired = dirToPlayer;
         
-        //desired = ApplyMinHeightLimit(desired);
+        desired = ApplyGroundClampDown(desired);
 
         MoveXY(desired, aggroSpeed);
 
@@ -294,19 +315,72 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         }
     }
 
-    Vector2 ApplyMinHeightLimit(Vector2 dir)
+    IEnumerator KeepDistanceRoutine()
     {
-        if (!enableMinHeightLimit) return dir;
+    isRetreating = true;
 
-        if (transform.position.y < minHeight)
-        {
-            if (dir.y < 0f) dir.y = 0f;
+    // 1) 1초 대기(완전 정지)
+    StopXY();
+    yield return new WaitForSeconds(keepDistanceWait);
 
-            dir += Vector2.up * (heightPushUpSpeed / Mathf.Max(0.01f, aggroSpeed));
-            dir.Normalize();
-        }
-        return dir;
+    // 2) 1초간 후퇴
+    float t = 0f;
+    while (t < retreatDuration)
+    {
+        // 상태/타겟 유효성 체크
+        if (isDead) break;
+        if (state != Felmos_State.Aggro) break;
+        if (!playerTransform) break;
+
+        // 현재 프레임 기준 플레이어 반대 방향으로 이동
+        Vector2 retreatDir = -dirToPlayer;
+
+        // 레이 기반 하강 금지(바닥 맞으면 아래로 못 내려가게)
+        retreatDir = ApplyGroundClampDown(retreatDir);
+
+        // 0 벡터면 그냥 멈춤
+        if (retreatDir.sqrMagnitude < 0.0001f)
+            StopXY();
+        else
+            MoveXY(retreatDir.normalized, keepDistanceSpeed);
+
+        t += Time.deltaTime;
+        yield return null;
     }
+
+    StopXY();
+
+    // 떨림 방지용 쿨타임(선택)
+    retreatCooldownTimer = keepDistanceCooldown;
+
+    isRetreating = false;
+    keepDistanceRoutine = null;
+}
+
+Vector2 ApplyGroundClampDown(Vector2 desired)
+{
+    if (!enableMinHeightLimit) return desired;
+    if (state != Felmos_State.Aggro) return desired; // ✅ 요구사항: Aggro에서만
+
+    Vector2 origin = groundRayOrigin ? (Vector2)groundRayOrigin.position : (Vector2)transform.position;
+
+    RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, groundCheckRayLength, groundMask);
+
+    // 디버그 시각화
+    Debug.DrawRay(origin, Vector2.down * groundCheckRayLength, hit.collider ? Color.red : Color.green);
+
+    // ✅ 바닥이 아래에 있으면 "내려가려는 입력"만 막음
+    if (hit.collider != null && desired.y < 0f)
+    {
+        desired.y = 0f;
+
+        // 완전 0이 되면 그대로 0, 아니면 정규화(원하는 스타일에 맞게)
+        if (desired.sqrMagnitude > 0.0001f)
+            desired.Normalize();
+    }
+
+    return desired;
+}
 
     void StartAttack()
     {
