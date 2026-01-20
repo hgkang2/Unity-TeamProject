@@ -21,6 +21,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     [SerializeField] SpriteRenderer spriteRenderer;
     HP hp;
     [SerializeField] GameObject attackHitBox;
+    [SerializeField] GameObject skillHitbox;
     [SerializeField] GameObject WarningVFX;
     
     [Header("Idle")]
@@ -91,6 +92,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         if(!vfxAnimator) vfxAnimator = GetComponent<Animator>();
 
         isDead = false;
+        isCliffAhead = false;
 
         hp.OnDied += OnDied;
 
@@ -106,6 +108,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         hp.OnDied -= OnDied;
     }
 
+    float lastNormalized;
     private void Update() 
     {
         if(isDead) return;
@@ -118,13 +121,19 @@ public class Malirgue : MonoBehaviour, IDamageable
 
         ApplyFlip();   
         hitLockTimer -= Time.deltaTime;
-        
     }
 
     void ChangeState(malirgue_State next)
     {
+// Debug.Log(
+//         $"[FSM] {state} → {next} | Time:{Time.time:F2} | Frame:{Time.frameCount}",
+//         this
+//     );
+
         state = next;
         stateTimer = 0f;
+
+        
 
         if(state != malirgue_State.TakeDamage && isHit)
         {
@@ -139,7 +148,7 @@ public class Malirgue : MonoBehaviour, IDamageable
             case malirgue_State.Idle: TickIdle(); offGuardTimer -= Time.deltaTime; break;
             case malirgue_State.Patrol: TickPatrol(); offGuardTimer -= Time.deltaTime; break;
             case malirgue_State.Alerted: break;
-            case malirgue_State.Aggro: TickAggro(); break;
+            case malirgue_State.Aggro: TickAggro(); offGuardTimer = alertedStateDuration; break;
             case malirgue_State.Attack: if(cliffStopped) StopX(); break;
             case malirgue_State.Skill: if(cliffStopped) StopX(); break;
             case malirgue_State.TakeDamage: TickTakeDamage(); break;   
@@ -231,6 +240,7 @@ public class Malirgue : MonoBehaviour, IDamageable
             if(offGuardTimer <= 0 && state == malirgue_State.Patrol)
             {
                 ChangeState(malirgue_State.Alerted);
+                animator?.SetTrigger("Idle");
                 StartCoroutine(AlertRoutine());
                 return;
             }
@@ -264,7 +274,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     IEnumerator AlertRoutine()
     {
         StopX();
-        animator?.SetTrigger("Idle");
+        //animator?.SetTrigger("Idle");
         if (Mathf.Abs(distanceOfX) > freezeZoneX)
             facingX = distanceOfX > 0f ? 1 : -1;
         alertSprite.SetActive(true);
@@ -366,7 +376,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         isSkillReady = false;
         isActionLocked = true;
         canMove = false;
-        animator?.SetTrigger("ReadyAttack");
+        animator?.SetTrigger("ReadySkill");
         runningRoutine = StartCoroutine(SkillRoutine());
     }
 
@@ -496,19 +506,23 @@ public class Malirgue : MonoBehaviour, IDamageable
         GameObject.Destroy(this.gameObject, 3f);
     }
 
-    void HitboxOn()
-    {
-        attackHitBox.SetActive(true);
+    void MonsterHitboxOn(malirgue_State currentState)
+    {   
+        switch(currentState)
+        {
+            case malirgue_State.Attack: attackHitBox.SetActive(true);Debug.Log("Attack"); break;
+            case malirgue_State.Skill: skillHitbox.SetActive(true); Debug.Log("Skill"); break;
+        }
     }
 
-    void HitBoxOff()
+    void MonsterHitBoxOff()
     {
-        attackHitBox.SetActive(false);
+        if(attackHitBox != null) attackHitBox.SetActive(false);
+        if(skillHitbox != null) skillHitbox.SetActive(false);
     }
 
     void ShowWarningVFX()
     {
-        if(state == malirgue_State.Skill) return;
         WarningVFX.SetActive(true);
         vfxAnimator.Play("MaligureWarningVFX", 0, 0f);
     }
@@ -532,7 +546,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     }
 
     bool cliffStopped = false;
-    bool isCliffAhead;
+    [SerializeField] bool isCliffAhead;
     [SerializeField] float rayLength;
     [SerializeField] float forwardPadding;
     [SerializeField] float bottomPadding;
@@ -571,6 +585,6 @@ public class Malirgue : MonoBehaviour, IDamageable
         cliffStopped = isCliffAhead;
 
         if(state == malirgue_State.TakeDamage) return;
-        animator?.SetBool("Aggro(IdleAni)", cliffStopped);
+            animator?.SetBool("Aggro(IdleAni)", cliffStopped);
     }
 }

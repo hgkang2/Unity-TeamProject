@@ -125,14 +125,14 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.9166667
-    functionName: HitboxOn
+    functionName: MonsterHitboxOn
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
-    intParameter: 0
+    intParameter: 4
     messageOptions: 0
   - time: 1.1666666
-    functionName: HitBoxOff
+    functionName: MonsterHitBoxOff
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
