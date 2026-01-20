@@ -317,70 +317,63 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
     IEnumerator KeepDistanceRoutine()
     {
-    isRetreating = true;
+        isRetreating = true;
 
-    // 1) 1초 대기(완전 정지)
-    StopXY();
-    yield return new WaitForSeconds(keepDistanceWait);
+        StopXY();
+        yield return new WaitForSeconds(keepDistanceWait);
 
-    // 2) 1초간 후퇴
-    float t = 0f;
-    while (t < retreatDuration)
-    {
-        // 상태/타겟 유효성 체크
-        if (isDead) break;
-        if (state != Felmos_State.Aggro) break;
-        if (!playerTransform) break;
+        float t = 0f;
+        while (t < retreatDuration)
+        {
+        
+            if (isDead) break;
+            if (state != Felmos_State.Aggro) break;
+            if (!playerTransform) break;
 
-        // 현재 프레임 기준 플레이어 반대 방향으로 이동
-        Vector2 retreatDir = -dirToPlayer;
+        
+            Vector2 retreatDir = -dirToPlayer;
 
-        // 레이 기반 하강 금지(바닥 맞으면 아래로 못 내려가게)
-        retreatDir = ApplyGroundClampDown(retreatDir);
+            retreatDir = ApplyGroundClampDown(retreatDir);
 
-        // 0 벡터면 그냥 멈춤
-        if (retreatDir.sqrMagnitude < 0.0001f)
-            StopXY();
-        else
-            MoveXY(retreatDir.normalized, keepDistanceSpeed);
+            if (retreatDir.sqrMagnitude < 0.0001f)
+                StopXY();
+            else
+                MoveXY(retreatDir.normalized, keepDistanceSpeed);
 
-        t += Time.deltaTime;
-        yield return null;
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        StopXY();
+
+        retreatCooldownTimer = keepDistanceCooldown;
+
+        isRetreating = false;
+        keepDistanceRoutine = null;
     }
 
-    StopXY();
-
-    // 떨림 방지용 쿨타임(선택)
-    retreatCooldownTimer = keepDistanceCooldown;
-
-    isRetreating = false;
-    keepDistanceRoutine = null;
-}
-
-Vector2 ApplyGroundClampDown(Vector2 desired)
-{
-    if (!enableMinHeightLimit) return desired;
-    if (state != Felmos_State.Aggro) return desired; // ✅ 요구사항: Aggro에서만
-
-    Vector2 origin = groundRayOrigin ? (Vector2)groundRayOrigin.position : (Vector2)transform.position;
-
-    RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, groundCheckRayLength, groundMask);
-
-    // 디버그 시각화
-    Debug.DrawRay(origin, Vector2.down * groundCheckRayLength, hit.collider ? Color.red : Color.green);
-
-    // ✅ 바닥이 아래에 있으면 "내려가려는 입력"만 막음
-    if (hit.collider != null && desired.y < 0f)
+    Vector2 ApplyGroundClampDown(Vector2 desired)
     {
-        desired.y = 0f;
+        if (!enableMinHeightLimit) return desired;
+        if (state != Felmos_State.Aggro) return desired; 
 
-        // 완전 0이 되면 그대로 0, 아니면 정규화(원하는 스타일에 맞게)
-        if (desired.sqrMagnitude > 0.0001f)
-            desired.Normalize();
+        Vector2 origin = groundRayOrigin ? (Vector2)groundRayOrigin.position : (Vector2)transform.position;
+
+        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, groundCheckRayLength, groundMask);
+
+        Debug.DrawRay(origin, Vector2.down * groundCheckRayLength, hit.collider ? Color.red : Color.green);
+
+    
+        if (hit.collider != null && desired.y < 0f)
+        {
+            desired.y = 0f;
+
+            if (desired.sqrMagnitude > 0.0001f)
+                desired.Normalize();
+        }
+
+        return desired;
     }
-
-    return desired;
-}
 
     void StartAttack()
     {
