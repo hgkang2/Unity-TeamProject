@@ -10,9 +10,11 @@ public class HaveBeadSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public SoulData SoulData => soulData;
     [SerializeField] Image beadImage;
     [SerializeField] TMP_Text numText;
+    CanvasGroup cg;
     void Awake()
     {
         haveSoulPanel = GetComponentInParent<HaveSoulPanel>();
+        cg = GetComponent<CanvasGroup>();
     }
 
     public void PreSet(SoulData data)
@@ -22,7 +24,22 @@ public class HaveBeadSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     }
     public void Set(SoulInstance instance)
     {
-        numText.SetText($"{instance.stack}");
+        if(instance.data.maxStack <= 1) numText.SetText($"고유");
+        else numText.SetText($"{instance.stack}");
+    }
+
+    public void Show()
+    {
+        cg.alpha = 1;
+        cg.blocksRaycasts = true;
+        cg.interactable = true;
+    }
+
+    public void Hide()
+    {
+        cg.alpha = 0;
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
     }
 
     public void OnPointerEnter(PointerEventData eventData)

@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4175175364869456418
 RectTransform:
   m_ObjectHideFlags: 0
@@ -56,8 +56,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73822bae6cc2f674390424ecb3f30c46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialDelay: 0.25
-  repeatInterval: 0.08
+  blocksGameplay: 1
   rerollButton: {fileID: 3068880338756101428}
   rerollText: {fileID: 2049529543387035767}
   first_FadeDuration: 0.15
@@ -138,7 +137,6 @@ GameObject:
   - component: {fileID: 2736388612694594772}
   - component: {fileID: 2939330998520614206}
   - component: {fileID: 2691666443065129813}
-  - component: {fileID: 884158957530198312}
   m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
@@ -203,18 +201,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!225 &884158957530198312
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1258860071755209453}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &1475124393875605913
 GameObject:
   m_ObjectHideFlags: 0
@@ -226,7 +212,6 @@ GameObject:
   - component: {fileID: 2069818425448235515}
   - component: {fileID: 8052807514043820388}
   - component: {fileID: 6954852213632509327}
-  - component: {fileID: 1138731649206417522}
   m_Layer: 5
   m_Name: Front
   m_TagString: Untagged
@@ -291,18 +276,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!225 &1138731649206417522
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1475124393875605913}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &2701829671986731031
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,7 +287,6 @@ GameObject:
   - component: {fileID: 1769805807364839089}
   - component: {fileID: 1645086151631930958}
   - component: {fileID: 7560529232502699253}
-  - component: {fileID: 2524485723187702202}
   m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
@@ -379,18 +351,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!225 &2524485723187702202
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2701829671986731031}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &3688360891582074903
 GameObject:
   m_ObjectHideFlags: 0
@@ -427,7 +387,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 64, y: -415.00006}
-  m_SizeDelta: {x: 29.05, y: 69.51}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5651954373484254908
 CanvasRenderer:
@@ -808,8 +768,8 @@ MonoBehaviour:
   backDuration: 0.15
   hoverEase: 6
   backEase: 5
-  front: {fileID: 1138731649206417522}
-  back: {fileID: 884158957530198312}
+  front: {fileID: 1475124393875605913}
+  back: {fileID: 1258860071755209453}
   soulImage: {fileID: 6954852213632509327}
 --- !u!114 &7332529241086001414
 MonoBehaviour:
@@ -888,7 +848,6 @@ GameObject:
   - component: {fileID: 7682128412889286530}
   - component: {fileID: 4173855636917417515}
   - component: {fileID: 9156947397157749971}
-  - component: {fileID: 4587843272031795926}
   m_Layer: 5
   m_Name: Front
   m_TagString: Untagged
@@ -953,18 +912,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!225 &4587843272031795926
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6286439388118857848}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &6370456868034486048
 GameObject:
   m_ObjectHideFlags: 0
@@ -1208,8 +1155,8 @@ MonoBehaviour:
   backDuration: 0.15
   hoverEase: 6
   backEase: 5
-  front: {fileID: 5168368384984571164}
-  back: {fileID: 2524485723187702202}
+  front: {fileID: 8875217633051352459}
+  back: {fileID: 2701829671986731031}
   soulImage: {fileID: 8772292562172290954}
 --- !u!114 &14580036358566574
 MonoBehaviour:
@@ -1336,8 +1283,8 @@ MonoBehaviour:
   backDuration: 0.15
   hoverEase: 6
   backEase: 5
-  front: {fileID: 4587843272031795926}
-  back: {fileID: 6863618258080057549}
+  front: {fileID: 6286439388118857848}
+  back: {fileID: 6759010795775484916}
   soulImage: {fileID: 9156947397157749971}
 --- !u!114 &5803280878260055012
 MonoBehaviour:
@@ -1416,7 +1363,6 @@ GameObject:
   - component: {fileID: 7939260988582327447}
   - component: {fileID: 2360831389474929036}
   - component: {fileID: 8776476493076511036}
-  - component: {fileID: 6863618258080057549}
   m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
@@ -1481,18 +1427,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!225 &6863618258080057549
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6759010795775484916}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &7263992356964246060
 GameObject:
   m_ObjectHideFlags: 0
@@ -1579,7 +1513,6 @@ GameObject:
   - component: {fileID: 7925684655298929453}
   - component: {fileID: 1371572688904075960}
   - component: {fileID: 8772292562172290954}
-  - component: {fileID: 5168368384984571164}
   m_Layer: 5
   m_Name: Front
   m_TagString: Untagged
@@ -1644,15 +1577,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!225 &5168368384984571164
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8875217633051352459}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0

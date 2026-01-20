@@ -5,9 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class StageUI : MonoBehaviour
 {
-
-    [SerializeField] TMP_Text characterName;
-
     //esc 일시 정지 창
     IngameSettingPanel settingPanel;
     //레벨업 시 띄우기
@@ -28,9 +25,6 @@ public class StageUI : MonoBehaviour
         settingPanel.gameObject.SetActive(true);
         levelUpPanel.gameObject.SetActive(true);
         haveSoulsPanel.gameObject.SetActive(true);
-
-
-        characterName.text = GameManager.Instance.curcharacter.ToString();
     }
 
     void Start()

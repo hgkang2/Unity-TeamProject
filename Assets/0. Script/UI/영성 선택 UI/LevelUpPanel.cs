@@ -32,9 +32,6 @@ public class LevelUpPanel : UIPanelBase
     {
         TimeManager.Pause();
 
-        SubscribeChildEvent();
-        InputManager.Instance.UiRerolled += Reroll;
-
         StartAnim();
     }
 
@@ -130,7 +127,7 @@ public class LevelUpPanel : UIPanelBase
             SoulPanel panel = soulPanels[i];
             panel.gameObject.SetActive(true);
 
-            panel.ShowBack();
+            panel.Hide();
 
             RectTransform rect = panel.GetComponent<RectTransform>();
             CanvasGroup cg = panel.GetComponent<CanvasGroup>();
@@ -213,7 +210,7 @@ public class LevelUpPanel : UIPanelBase
             int index = i;
             cardSeq.AppendCallback(() =>
             {
-                soulPanels[index].ShowFront();
+                soulPanels[index].Show();
                 rect.localRotation = Quaternion.Euler(0f, -90f, 0f);
             });
 
@@ -237,6 +234,9 @@ public class LevelUpPanel : UIPanelBase
         isAnimating = false;
 
         ShowRerollButton();
+
+        SubscribeChildEvent();
+        InputManager.Instance.UiRerolled += Reroll;
     }
     #endregion
 

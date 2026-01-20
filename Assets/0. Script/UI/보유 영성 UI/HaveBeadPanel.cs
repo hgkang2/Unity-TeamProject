@@ -28,7 +28,7 @@ public class HaveBeadPanel : MonoBehaviour
     {
         foreach(var slot in beadSlots)
         {
-            slot.gameObject.SetActive(false);
+            slot.Hide();
         }
 
         foreach(var item in items)
@@ -38,7 +38,7 @@ public class HaveBeadPanel : MonoBehaviour
                 if(item.data == slot.SoulData)
                 {
                     slot.Set(item);
-                    slot.gameObject.SetActive(true);
+                    slot.Show();
                 }
             }
         }

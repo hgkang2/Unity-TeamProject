@@ -14,8 +14,10 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public Ease hoverEase = Ease.OutQuad;
     public Ease backEase = Ease.InQuad;
 
-    [SerializeField] CanvasGroup front;
-    [SerializeField] CanvasGroup back;
+    CanvasGroup cg;
+    [SerializeField] GameObject front;
+    [SerializeField] GameObject back;
+
     [SerializeField] Image soulImage;
     SoulData soulData;
     public SoulData SoulData => soulData;
@@ -32,6 +34,7 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         rect = GetComponent<RectTransform>();
         originalScale = rect.localScale;
+        cg = GetComponent<CanvasGroup>();
     }
 
     void OnEnable()
@@ -60,15 +63,19 @@ public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         OriginPanelScale();
     }
 
-    public void ShowFront()
+    public void Show()
     {
-        front.alpha = 1f;
-        back.alpha = 0f;
+        cg.blocksRaycasts = true;
+        cg.interactable = true;
+        front.SetActive(true);
+        back.SetActive(false);
     }
-    public void ShowBack()
+    public void Hide()
     {
-        front.alpha = 0f;
-        back.alpha = 1f;
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
+        front.SetActive(false);
+        back.SetActive(true);
     }
 
     public void ExpandPanelScale()
