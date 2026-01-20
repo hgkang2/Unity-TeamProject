@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 2c439dd7ea60c3d4c83da0456916335c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ecacb1bd823891148bfaf5827c4ce29b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -103,15 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ee6701a89e18694d83adeed58641a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soulEffect:
-    type: 2
-    targetStat: 0
-    flatValue: 1
-    percentValue: 0
-    bonusValue: 1
-    skillToLearn: 0
-    soulEtcEffect: 0
-    healAmount: 0
+  soulData: {fileID: 11400000, guid: 8e41b3ad0bb75dc418025571b8905a80, type: 2}
 --- !u!58 &7816902692215733894
 CircleCollider2D:
   m_ObjectHideFlags: 0

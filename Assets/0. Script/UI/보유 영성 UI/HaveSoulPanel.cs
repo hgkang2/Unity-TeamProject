@@ -53,6 +53,7 @@ public class HaveSoulPanel : UIPanelBase
 
         beadPanel.Set(onlyBeads);
         
+        statPanel.Clear();
         foreach(var item in onlySouls)
         {
             statPanel.AddStat(item);

@@ -16,7 +16,7 @@ MonoBehaviour:
   soulType: 1
   soulSprite: {fileID: 0}
   soulIcon: {fileID: 21300000, guid: 9e287ba85335ac34a9ab6e849ada7a82, type: 3}
-  displayName: "\uB178\uB7AD\uC774"
+  displayName: "\uB178\uB7AD\uC774 \uC601\uB2E8"
   soulEffectText: "\uBBF8\uC815"
   soulEffectText2: 
   soulDescript: 

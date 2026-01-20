@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7816902692215733894}
   - component: {fileID: 228033464500841498}
   m_Layer: 8
-  m_Name: Bead_Move
+  m_Name: Bead_WallJump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 9e287ba85335ac34a9ab6e849ada7a82, type: 3}
+  m_Sprite: {fileID: 21300000, guid: addf09dbe91116e44b9008ace24e9cae, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -103,7 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ee6701a89e18694d83adeed58641a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soulData: {fileID: 11400000, guid: c8f5249f69a5f504e95314a5551355e4, type: 2}
+  soulData: {fileID: 11400000, guid: 9a4c8027dc61e124cabfe5e7212e66c6, type: 2}
 --- !u!58 &7816902692215733894
 CircleCollider2D:
   m_ObjectHideFlags: 0

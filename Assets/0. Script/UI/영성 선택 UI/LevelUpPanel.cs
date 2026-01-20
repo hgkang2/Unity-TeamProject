@@ -112,8 +112,8 @@ public class LevelUpPanel : UIPanelBase
         isAnimating = true;
 
         animSequence?.Kill();          // 혹시 남아있으면 정리
-        animSequence = DOTween.Sequence();
-        animSequence.SetUpdate(true);
+        animSequence = DOTween.Sequence()
+            .SetUpdate(UpdateType.Normal, true);
 
         // 패널 개수에 따른 부채꼴 각도 세팅 (2 or 3개)
         float startAngle = -angleRange * 0.5f;
@@ -140,7 +140,8 @@ public class LevelUpPanel : UIPanelBase
             cg.alpha = 0f;
             cg.blocksRaycasts = true;
 
-            DG.Tweening.Sequence cardSeq = DOTween.Sequence();
+            Sequence cardSeq = DOTween.Sequence()
+                .SetUpdate(UpdateType.Normal, true);
 
             // 1단계: Fade In
             cardSeq.Join(
@@ -470,7 +471,8 @@ public class LevelUpPanel : UIPanelBase
         // 연출 재생 중이라면 바로 종료
         if (isAnimating && animSequence != null && animSequence.IsActive())
         {
-            CompleteAnim();
+            animSequence.Complete(true);
+            return;
         }
         // 선택된 영성이 있다면 정리
         curIndex = null;
