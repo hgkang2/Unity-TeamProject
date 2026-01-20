@@ -53657,7 +53657,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: ecacb1bd823891148bfaf5827c4ce29b, type: 3}
     - target: {fileID: 6129756193001766925, guid: 213b1aabf277ee34d9fa8fa6a5eb3c17, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0003703497
+      value: 0.00011539402
       objectReference: {fileID: 0}
     - target: {fileID: 6328434393286209097, guid: 213b1aabf277ee34d9fa8fa6a5eb3c17, type: 3}
       propertyPath: m_Sprite
@@ -53827,6 +53827,10 @@ PrefabInstance:
       propertyPath: statPanel
       value: 
       objectReference: {fileID: 2032663730}
+    - target: {fileID: 7930117328750456739, guid: 213b1aabf277ee34d9fa8fa6a5eb3c17, type: 3}
+      propertyPath: blocksGameplay
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7930117328750456739, guid: 213b1aabf277ee34d9fa8fa6a5eb3c17, type: 3}
       propertyPath: soulSlots.Array.size
       value: 9
