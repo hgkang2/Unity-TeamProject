@@ -112,7 +112,7 @@ public class Interactor : MonoBehaviour
         if (!selected.IsAvailable()) return;
 
         current = selected;
-        current.Interact(player);
+        current.Interact(player, this);
     }
 
     public void InteractExit()

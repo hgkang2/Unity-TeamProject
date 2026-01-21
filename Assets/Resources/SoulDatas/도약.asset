@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25478d91cec221a48bf1008395afd652, type: 3}
   m_Name: "\uB3C4\uC57D"
   m_EditorClassIdentifier: 
-  index: 1007
-  soulSprite: {fileID: 21300004, guid: a75445bb16444f14f96fdf9c734945cc, type: 3}
-  soulIcon: {fileID: -1193241744032689177, guid: bf111c476c1f7d7458ada2a8dd521da5, type: 3}
+  index: 1100
+  soulSprite: {fileID: 21300000, guid: 8f4f7e8296cccc84288f7e073dca3ab2, type: 3}
+  soulIcon: {fileID: 21300000, guid: e9084049c4189504e858bcdcf2a0cede, type: 3}
   displayName: "\uB3C4\uC57D"
   soulEffectText: "\uC810\uD504 \uD69F\uC218 +"
   soulEffectText2: 
-  soulDescript: "\uC810\uD504\uB97C \uD55C \uBC88 \uB354 \uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  soulDescript: "\uC5EC\uC2E0\uACFC\uC758 \uAD50\uAC10\uC744 \uD1B5\uD574 \uD55C\uBC88
+    \uB354 \uB3C4\uC57D\uC774 \uAC00\uB2A5\uD569\uB2C8\uB2E4."
   effect:
     type: 5
     targetStat: 0
@@ -26,10 +27,9 @@ MonoBehaviour:
     percentValue: 0
     bonusValue: 0
     skillToLearn: 0
-    soulEtcEffect: 0
     healAmount: 0
   soulCharacterType: 0
   soulNeedType: 2
   levelConstrains: 0
-  maxStack: 2
+  maxStack: 1
   isDisposable: 0

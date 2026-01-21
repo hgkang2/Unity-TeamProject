@@ -5,17 +5,17 @@ using UnityEngine;
 
 public class Player : MonoBehaviour, IDamageable
 {
-    HP hp;
+    [SerializeField] HP hp;
     public HP HP { get { return hp; } }
 
-    Exp exp;
+    [SerializeField] Exp exp;
     public Exp Exp { get { return exp; } }
 
     PlayerStats stats;
     public PlayerStats Stats { get { return stats; } }
 
-    public PlayerMove playerMove;
-    public PlayerAttack playerAttack;
+    [HideInInspector] public PlayerMove playerMove;
+    [HideInInspector] public PlayerAttack playerAttack;
 
     public SpriteRenderer playerSprite;
     public GameObject playerPartSprite;
@@ -77,18 +77,22 @@ public class Player : MonoBehaviour, IDamageable
     }
     #endregion
 
+
     #region 회피
-    [SerializeField] GameObject dodgeEffectSprite;
+    [Header("Dodge")]
+    
     public bool isDodging = false;
     public bool Dodgeflag = false;
     public float dodgeDuration = 1f;
     public float dodgeCooldown = 2f;
+    [SerializeField] GameObject dodgeEffectSprite;
+
     float nextDodgeAvailableTime = 0f;
     Coroutine dodgeRoutine;
+
     void OnDodgePressed()
     {
         //회피 가능 조건 확인
-        if (TimeManager.IsPaused) return;
         if (!CanControl) return;
         if (Time.time < nextDodgeAvailableTime) return;
         if (isDodging) return;
@@ -138,8 +142,8 @@ public class Player : MonoBehaviour, IDamageable
     }
     #endregion
 
-    #region 착지 공격
-    [Header("Air Down Attack")]
+    #region 아래 공격
+    [Header("Down Attack")]
     [SerializeField] float airDownPrepareDuration = 0.15f;
 
     public bool isAirDownAttack;
@@ -356,37 +360,23 @@ public class Player : MonoBehaviour, IDamageable
 
     public void TakeTrapDamage()
     {
-        if (isInvincible || HP.IsDead) return;
-
-        isTrapDeath = true;
-        hp.Kill();
+        Respawn();
     }
+
     void HandleDie()
     {
         playerMove.HandleDieMotion();
         sfx.Play("Die");
         // + 기타 사망 연출
-        if (!isTrapDeath)
-        {
-            Destroy(gameObject, 2f);
-        }
     }
 
     //사망 후 처리 (애니메이션 프레임 이벤트로 호출)
     public void OnEndDieAnimation()
     {
-        if (isTrapDeath)
-        {
-            // 함정 사망이면 부활 로직 실행
-            Respawn();
-        }
-        else
-        {
-            // 일반 사망이면 기존처럼 씬 이동
-            SceneLoader.LoadScene("Start");
-            playerSprite.enabled = false;
-        }
+        SceneLoader.LoadScene("Start");
+        playerSprite.enabled = false;
     }
+
     private void Respawn()
     {
         isTrapDeath = false;
@@ -428,7 +418,6 @@ public class Player : MonoBehaviour, IDamageable
     
     public void SetControlLocked(bool b)
     {
-        Debug.Log($"Locked : {b}");
         isInCinematic = b;
     }
 }

@@ -13,10 +13,6 @@ public class Elevator : MonoBehaviour, IInteractable
     [SerializeField] SpriteRenderer leverSprite;
 
 
-    private void Awake()
-    {
-    }
-
     public bool CanInteract()
     {
         return true;
@@ -26,7 +22,7 @@ public class Elevator : MonoBehaviour, IInteractable
     {
 
     }
-    public void Interact(Player player)
+    public void Interact(Player player, Interactor interactor)
     {
         leverAnimator.SetTrigger("Interact");
         leverAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;

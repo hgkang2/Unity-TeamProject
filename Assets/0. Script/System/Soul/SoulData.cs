@@ -6,6 +6,8 @@ public class SoulData : ScriptableObject
 {
     [Label("영성 ID")]
     public int index;
+    [Label("영성 타입(영성 or 영단)")]
+    public SoulType soulType;
     [Label("영성 이미지(풀버전)")]
     public Sprite soulSprite;
     [Label("영성 이미지(아이콘)")]
@@ -82,18 +84,18 @@ public class SoulData : ScriptableObject
 
         return true;
     }
-    public int GetValue()
+    public float GetValue()
     {
         switch (effect.type)
         {
             case SoulEffectType.StatFlat:
-                return (int)effect.flatValue;
+                return effect.flatValue;
             case SoulEffectType.StatPercent:
                 return effect.percentValue;
+            case SoulEffectType.StatBonus:
+                return effect.bonusValue;
             case SoulEffectType.IncreaseJumpNum:
-                return 1;
             case SoulEffectType.LearnSkill:
-                return 0;
             case SoulEffectType.HealHP:
                 return -1;
         }

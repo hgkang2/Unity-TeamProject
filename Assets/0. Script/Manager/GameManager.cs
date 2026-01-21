@@ -8,9 +8,11 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] CanvasGroup fade;
-    CinemachineCamera cinemachineCamera;
     public CharacterId curcharacter = CharacterId.None;
     TutorialRunner tutorialRunner;
+
+    public float ingameTime;
+    public float stageTime;
 
     static GameManager instance;
     public static GameManager Instance
@@ -30,12 +32,6 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        tutorialRunner = GetComponent<TutorialRunner>();
-        if (cinemachineCamera == null)
-        {
-            cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
-        }
-        // 중복 방지
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
@@ -44,6 +40,10 @@ public class GameManager : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+
+        SettingsManager.LoadOrDefault();
+        
+        tutorialRunner = GetComponent<TutorialRunner>();
     }
     void OnEnable()
     {
@@ -65,25 +65,26 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(FadeInRoutine(3));
                 break;
             case "Stage1":
+                tutorialRunner.StartTutorial();
+                ingameTime = 0;
+                stageTime = 0;
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
-                cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
-                tutorialRunner.player = FindFirstObjectByType<Player>();
-                tutorialRunner.dialoguePanel = FindFirstObjectByType<DialoguePanel>();
-                tutorialRunner.visionEmitter = FindFirstObjectByType<TargetTrackerEmitter2D>();
-                tutorialRunner.StartTutorial();
                 break;
             case "Stage1_Test":
+                ingameTime = 0;
+                stageTime = 0;
+                tutorialRunner.StartTutorial();
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
-                cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
-                tutorialRunner.player = FindFirstObjectByType<Player>();
-                tutorialRunner.dialoguePanel = FindFirstObjectByType<DialoguePanel>();
-                tutorialRunner.visionEmitter = FindFirstObjectByType<TargetTrackerEmitter2D>();
-                tutorialRunner.StartTutorial();
                 break;
         }
+    }
 
+    void Update()
+    {
+        ingameTime += Time.deltaTime;
+        stageTime += Time.deltaTime;
     }
 
     public IEnumerator TeleportRoutine(Player p, Transform targetPosition)
@@ -97,7 +98,7 @@ public class GameManager : MonoBehaviour
         Vector3 delta = newPos - oldPos;
 
         p.transform.position = newPos;
-        cinemachineCamera.OnTargetObjectWarped(p.transform, delta);
+        CameraManager.Instance.CameraWarp(p.transform, delta);
 
         TimeManager.Resume();
         yield return FadeInRoutine(1f);    // 끝날 때까지 대기

@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
@@ -12,11 +13,11 @@ public class PlayerMove : MonoBehaviour
     SpriteRenderer spr;
     LocalSFX sfx;
 
-    // ---- 입력 / 상태 ----
+    [Header("입력/상태")]
     public Vector2 inputVec;
     public bool isGrounded = false;
     public bool isRightFacing = true;
-    GravityMode gravityMode = GravityMode.Normal;
+    public GravityMode gravityMode = GravityMode.Normal;
     public bool IsWalking
     {
         get
@@ -24,17 +25,20 @@ public class PlayerMove : MonoBehaviour
             if (!isGrounded) return false;
             if (Mathf.Abs(rb.linearVelocity.x) < 0.1f) return false;
             if (!player.CanControl) return false;
-            if (isWallGrabbing || isWallSliding) return false;
             return true;
         }
     }
 
+    [Header("점프 조작")]
     [SerializeField] float coyoteTime = 0.12f;
     [SerializeField] float jumpBufferTime = 0.12f;
+    [Header("공중 조작 감쇠")]
+    [SerializeField] float airControlLerp = 8f;
     float lastGroundedTime = -999f;
     float lastJumpPressedTime = -999f;
 
-    [SerializeField] float airControlLerp = 8f;
+
+    
 
     public event Action JumpCommitted;
 
@@ -221,8 +225,10 @@ public class PlayerMove : MonoBehaviour
     #endregion
 
     #region Jump/WallJump
+    [Header("최대 점프 가능 횟수")]
     public int maxJumpCount = 2;
-    int currentJumpCount;
+    [Header("남은 점프 가능 횟수")]
+    public int currentJumpCount;
 
     void HandleJump()
     {
@@ -262,10 +268,13 @@ public class PlayerMove : MonoBehaviour
         sfx.Play("Jump");
         JumpCommitted?.Invoke();
     }
-
+    [Header("벽 점프시 반대쪽으로 튕기는 힘")]
+    public bool canWallJump = false;
     public float wallJumpForceX = 5;
     void HandleWallJump()
     {
+        if(!canWallJump) return;
+        
         isWallGrabbing = false;
         isWallSliding = false;
 
@@ -284,7 +293,8 @@ public class PlayerMove : MonoBehaviour
     #endregion
 
     #region Gravity
-    float baseGrav = 9.81f;
+    [Header("중력 관련")]
+    public float baseGrav = 9.81f;
     public float apexGravityMultiplier = 0.66f; // 점프 정점 중력 계수
     public float apexThreshold = 0.6f; // 점프 정점 구간
     public float fallGravityMultiplier = 2.5f; // 공중에서 떨어질때 가속 계수
@@ -380,6 +390,7 @@ public class PlayerMove : MonoBehaviour
 
     #region Ground Check
     public LayerMask groundMask;
+    [Header("바닥 인식")]
     public float groundRayLength = 0.2f;
     public float groundRayOffsetX = 0.25f;
     void HandleGroundCheck()
@@ -459,14 +470,18 @@ public class PlayerMove : MonoBehaviour
     #endregion
 
     #region  Wall Check
+    
+    [Header("벽 잡기 상태")]
     public bool isWallGrabbing = false;
     public bool isWallSliding = false;
+    [SerializeField] float wallSlideSpeed = 2f;
+    
+    [Header("벽 잡기 인식")]
     public LayerMask wallMask;
     [SerializeField] float wallCheckDistance = 0.5f;
     [SerializeField] float wallCheckYOffset = 0f;
-    [SerializeField] float wallSlideSpeed = 2f;
 
-
+    [Header("벽 인식")]
     public bool isFootTouchingWall = false;
     [SerializeField] float footWallCheckDistance = 0.08f; // 0.03~0.12 사이로 취향 조절
     [SerializeField] float footWallCheckYOffset = 0.05f;  // b.min.y에서 살짝 위(발끝)
@@ -532,8 +547,9 @@ public class PlayerMove : MonoBehaviour
         }
 
         // 전방 머리나 하체쪽에 벽이 있을때 스턱 방지용 면 체크
-        Vector2 castOrigin = b.center;
-        Vector2 castSize = b.size;
+        //Vector2 castOrigin = b.center;
+        Vector2 castSize = new Vector2(0.05f, b.size.y * 0.9f);
+        Vector2 castOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, b.center.y);
 
         hit = Physics2D.BoxCast(
             castOrigin,

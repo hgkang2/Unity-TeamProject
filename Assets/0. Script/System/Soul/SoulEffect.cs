@@ -71,6 +71,9 @@ public class SoulEffect
             case SoulEffectType.IncreaseJumpNum:
                 player.playerMove.maxJumpCount++;
                 break;
+            case SoulEffectType.WallJump:
+                player.playerMove.canWallJump = true;
+            break;
             // case SoulEffectType.ETC:
             //     //나중에 ETC가 필요해질 만큼 많이 생기면 적용
             //     break;

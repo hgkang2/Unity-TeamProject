@@ -5,7 +5,7 @@ using System.Linq;
 
 public class SoulManager : MonoBehaviour
 {
-    [SerializeField] Player player;
+    Player player;
 
     // 데이터 원본. 
     List<SoulData> allSouls;
@@ -14,15 +14,12 @@ public class SoulManager : MonoBehaviour
     List<SoulInstance> curSouls = new List<SoulInstance>();
     public List<SoulInstance> CurSouls => curSouls;
 
+    // 보유 영성 UI에서 받는 이벤트. 단순히 열 때마다 새로 갖고와도 되지만 실시간 업데이트를 위해
     public event Action<List<SoulInstance>> soulGot;
 
     public static SoulManager Instance {get; private set;}
     void Awake()
-    {   // Resources/SoulDatas 폴더
-        SoulData[] loaded = Resources.LoadAll<SoulData>("SoulDatas");
-        allSouls = loaded.ToList();
-
-        // 싱글톤
+    {   
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -31,6 +28,14 @@ public class SoulManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        // 데이터 읽어오기. Resources/SoulDatas 폴더
+        SoulData[] loaded = Resources.LoadAll<SoulData>("SoulDatas");
+        allSouls = loaded.ToList();
+
+        // 참조 가져오기.
+        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        player = sceneContext.player;
     }
 
     public void EnrollSoul(SoulData data)
@@ -85,6 +90,7 @@ public class SoulManager : MonoBehaviour
 
         // 0. 먼저 조건(캐릭터/레벨/기타) 만족하는 애들만 필터링
         List<SoulData> candidates = allSouls
+            .Where(soul => soul.soulType == SoulType.Soul)
             .Where(soul => soul != null && soul.CanOffer(player))
             .Where(soul =>
             {

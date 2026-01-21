@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a493137b39b43cd44a6307d011398c7c, type: 3}
+  m_Name: New Attack VFX Library
+  m_EditorClassIdentifier: 
+  entries:
+  - key: Attack
+    prefab: {fileID: 6225071935297065222, guid: 1de816a5707f6de4b87623b5bce4cf86, type: 3}
+    followOwner: 0
+    localOffset: {x: 0.1, y: 0.3, z: 0}
+    localEuler: {x: 0, y: 0, z: 0}
+  - key: UpAttack
+    prefab: {fileID: 8195810819482942243, guid: 7efc3c3dc6f33c74cbf25fb223dc9c13, type: 3}
+    followOwner: 0
+    localOffset: {x: 0, y: 0, z: 0}
+    localEuler: {x: 0, y: 0, z: 0}
+  - key: DownAttack
+    prefab: {fileID: 5222458350388383108, guid: 10d402976e1259749b0f487d3eefa083, type: 3}
+    followOwner: 1
+    localOffset: {x: 0.5, y: 1, z: 0}
+    localEuler: {x: 0, y: 0, z: 0}
+  - key: ImpactWave
+    prefab: {fileID: 4506719792872749221, guid: 756609c11174b9e4380f85087dd115ce, type: 3}
+    followOwner: 0
+    localOffset: {x: 0, y: 0, z: 0}
+    localEuler: {x: 0, y: 0, z: 0}

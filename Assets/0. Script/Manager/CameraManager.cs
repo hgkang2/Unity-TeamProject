@@ -1,17 +1,22 @@
 using System.Collections;
 using UnityEngine;
 using Unity.Cinemachine;
+using System;
+using UnityEngine.SceneManagement;
 
 public class CameraManager : MonoBehaviour
 {
     static CameraManager instance;
     public static CameraManager Instance => instance;
 
-    [Header("Cinemachine Settings")]
-    [SerializeField] CinemachineCamera cinemachineCam;   // 인스펙터에서 물려주면 제일 좋음
+    CinemachineBrain brain; // Main Camera에 붙은 CinemachineBrain
+    CinemachineCamera cinemachineCamera;
+    CinemachineCamera cinemachineCamera_tutorialTrap;  // 추가(함정 고정)
 
     CinemachineBasicMultiChannelPerlin perlin;
     Coroutine shakeRoutine;
+
+    public event Action CinemachineSequenceFinished;
 
     void Awake()
     {
@@ -23,19 +28,29 @@ public class CameraManager : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
-        // 인스펙터에 안 물려있으면 씬에서 첫 번째 CinemachineCamera 찾기
-        if (cinemachineCam == null)
-        {
-            cinemachineCam = FindFirstObjectByType<CinemachineCamera>();
-            // 필요하면 비활성 포함으로:
-            // cinemachineCam = FindFirstObjectByType<CinemachineCamera>(FindObjectsInactive.Include);
-        }
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
 
-        if (cinemachineCam != null)
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        switch (scene.name)
         {
-            // Cinemachine 3.x에선 Noise 컴포넌트가 카메라 게임오브젝트에 직접 붙음
-            perlin = cinemachineCam.GetComponent<CinemachineBasicMultiChannelPerlin>();
+            case "Stage1":
+            case "Stage1_Test":
+                SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+                brain = Camera.main.GetComponent<CinemachineBrain>();
+                defaultChannelMask = brain.ChannelMask;
+                cinemachineCamera = sceneContext.cinemachineCamera;
+                cinemachineCamera_tutorialTrap = sceneContext.cinemachineCamera_tutorialTrap;
+                break;
         }
     }
 
@@ -69,26 +84,65 @@ public class CameraManager : MonoBehaviour
         shakeRoutine = null;
     }
 
-    // ------------------------------------------------------
-    // 나중에 써먹을 줌 기능 예시
-    // ------------------------------------------------------
+    public void CameraWarp(Transform target, Vector3 delta)
+    {
+        cinemachineCamera.OnTargetObjectWarped(target, delta);
+    }
+
     public void Zoom(float targetFOV, float duration)
     {
-        if (cinemachineCam == null) return;
+        if (cinemachineCamera == null) return;
         StartCoroutine(DoZoom(targetFOV, duration));
     }
 
     IEnumerator DoZoom(float targetFOV, float duration)
     {
-        float startFOV = cinemachineCam.Lens.FieldOfView;
+        float startFOV = cinemachineCamera.Lens.FieldOfView;
         float elapsed = 0f;
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
-            cinemachineCam.Lens.FieldOfView = Mathf.Lerp(startFOV, targetFOV, t);
+            cinemachineCamera.Lens.FieldOfView = Mathf.Lerp(startFOV, targetFOV, t);
             yield return null;
         }
     }
+
+    Coroutine channelRoutine;
+    OutputChannels defaultChannelMask;
+
+    IEnumerator CinemachineCameraBlendRoutine(CinemachineChannel channel, float holdSeconds)
+    {
+        // 타겟 채널만 허용
+        brain.ChannelMask =
+            (OutputChannels)(1 << (int)channel);
+
+        if (holdSeconds > 0f)
+            yield return new WaitForSecondsRealtime(holdSeconds);
+
+        // 원래 채널로 복귀
+        brain.ChannelMask = defaultChannelMask;
+
+        channelRoutine = null;
+
+        CinemachineSequenceFinished?.Invoke();
+    }
+    public void ChangeCinemachine(CinemachineChannel channel, float holdSeconds)
+    {
+        if (brain == null) return;
+
+        if (channelRoutine != null)
+            StopCoroutine(channelRoutine);
+
+        channelRoutine = StartCoroutine(
+            CinemachineCameraBlendRoutine(channel, holdSeconds)
+        );
+    }
+
+    public void ChangeCinemachineTutorialTrap(float holdSeconds = 2f)
+    {
+        ChangeCinemachine(CinemachineChannel.TutorialTrap, holdSeconds);
+    }
+
 }

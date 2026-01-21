@@ -1,0 +1,111 @@
+using System;
+using DG.Tweening;
+using Unity.VisualScripting;
+using UnityEngine;
+
+public class MainSaveDataPanel : UIPanelBase
+{
+
+
+    [SerializeField] MainCharacterChoicePanel mainCharacterChoicePanel;
+
+    [SerializeField] MainSaveDataSlot[] slots;
+    int? focusedIndex;
+
+
+    protected override void Init()
+    {
+        mainCharacterChoicePanel.gameObject.SetActive(true);
+        mainCharacterChoicePanel.Close();
+
+        foreach (var slot in slots)
+        {
+            slot.slotFocused += HandleSlotEnter;
+            slot.slotUnFocused += HandleSlotExit;
+            slot.slotselected += HandleSlotLeftClick;
+        }
+
+        // 나중에 세이브 로드 구현시 제대로 하기
+        foreach (var slot in slots)
+        {
+            slot.Bind(null);
+        }
+    }
+
+    void HandleSlotEnter(int index)
+    {
+        focusedIndex = index;
+        UpdatFocusHighlight();
+    }
+
+    void HandleSlotExit(int index)
+    {
+        focusedIndex = null;
+        UpdatFocusHighlight();
+    }
+
+    void HandleSlotLeftClick(int index)
+    {
+        if (slots[index].SaveData == null)
+        {
+            mainCharacterChoicePanel.Open();
+        }
+        else
+        {
+            Debug.Log($"저장 불러오기");
+        }
+    }
+
+
+    void UpdatFocusHighlight()
+    {
+        foreach (var slot in slots)
+        {
+            slot.UnFocused();
+        }
+        if (focusedIndex != null)
+        {
+            slots[(int)focusedIndex].Focused();
+        }
+    }
+
+    //X 버튼 눌렀을 때
+    public void ButtonCancel()
+    {
+        mainCharacterChoicePanel.Close();
+        Close();
+    }
+    public override void OnUIInputMove(Vector2 dir)
+    {
+        base.OnUIInputMove(dir);
+        // 현재 아무것도 선택되지 않은 상태라면
+        if (focusedIndex == null)
+        {
+            // 위쪽 → 0번 선택
+            if (dir.y > 0.1f) focusedIndex = 0;
+            // 아래쪽 → 마지막 선택
+            else if (dir.y < -0.1f) focusedIndex = slots.Length - 1;
+
+            UpdatFocusHighlight();
+            return;
+        }
+
+        //위쪽 방향키시 위쪽 방향으로
+        if (dir.y > 0.1f) focusedIndex--;
+        //아래쪽 방향키시 아래쪽 방향으로
+        else if (dir.y < -0.1f) focusedIndex++;
+
+        //min, max 처리
+        if (focusedIndex < 0) focusedIndex = 0;
+        else if (focusedIndex >= slots.Length) focusedIndex = slots.Length - 1;
+
+        //강조된 버튼 변경
+        UpdatFocusHighlight();
+    }
+
+    public override void OnUIInputConfirm()
+    {
+        if (focusedIndex == null) return;
+        HandleSlotLeftClick((int)focusedIndex);
+    }
+}

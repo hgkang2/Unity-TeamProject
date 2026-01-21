@@ -1,0 +1,113 @@
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System;
+using UnityEngine.EventSystems;
+using DG.Tweening;
+
+public class SoulPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+{
+    [Header("이동 설정")]
+    public float hoverScale = 1.00f;      // 얼마나 커질지
+    public float hoverDuration = 0.2f;  // 커지는 시간
+    public float backDuration = 0.15f;  // 원복 시간
+    public Ease hoverEase = Ease.OutQuad;
+    public Ease backEase = Ease.InQuad;
+
+    CanvasGroup cg;
+    [SerializeField] GameObject front;
+    [SerializeField] GameObject back;
+
+    [SerializeField] Image soulImage;
+    SoulData soulData;
+    public SoulData SoulData => soulData;
+
+    public event Action<SoulPanel> SoulMouseEntered;
+    public event Action<SoulPanel> SoulMouseExited;
+    public event Action<SoulPanel> SoulMouseClicked;
+
+    RectTransform rect;
+    Vector2 originalScale;
+    Tween moveTween;
+
+    void Awake()
+    {
+        rect = GetComponent<RectTransform>();
+        originalScale = rect.localScale;
+        cg = GetComponent<CanvasGroup>();
+    }
+
+    void OnEnable()
+    {
+        KillTween();
+        if (rect != null)
+        {
+            rect.localScale = originalScale;
+        }
+        soulData = null;
+    }
+    void KillTween()
+    {
+        if (moveTween != null && moveTween.IsActive())
+        {
+            moveTween.Kill();
+            moveTween = null;
+        }
+    }
+
+
+    public void Set(SoulData data)
+    {
+        soulImage.sprite = data.soulSprite;
+        soulData = data;
+        OriginPanelScale();
+    }
+
+    public void Show()
+    {
+        cg.blocksRaycasts = true;
+        cg.interactable = true;
+        front.SetActive(true);
+        back.SetActive(false);
+    }
+    public void Hide()
+    {
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
+        front.SetActive(false);
+        back.SetActive(true);
+    }
+
+    public void ExpandPanelScale()
+    {
+        KillTween();
+        if (hoverScale == 1) return;
+
+        moveTween = rect.DOScale(hoverScale, hoverDuration)
+            .SetEase(hoverEase)
+            .SetUpdate(true);
+    }
+    public void OriginPanelScale()
+    {
+        KillTween();
+        moveTween = rect.DOScale(1, backDuration)
+        .SetEase(backEase)
+            .SetUpdate(true);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        SoulMouseEntered?.Invoke(this);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        SoulMouseExited?.Invoke(this);
+    }
+
+    public void OnPointerClick(PointerEventData e)
+    {
+        if(soulData == null) Debug.Log($"클릭한 패널의 soulData 없음");
+        SoulMouseClicked?.Invoke(this);
+    }
+}
