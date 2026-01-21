@@ -23,6 +23,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     [SerializeField] Animator vfxAnimator;
     [SerializeField] private Transform firePos;
     HP hp;
+    LocalSFX sfx;
 
     [Header("Idle")]
     [SerializeField] float idleTime;
@@ -71,6 +72,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     [SerializeField] Transform groundRayOrigin;
     [SerializeField] LayerMask groundMask;
     [SerializeField] float groundCheckRayLength;
+    
 
     [Header("Keep Distance")]
     [SerializeField] float keepDistanceWait;
@@ -100,6 +102,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         if (!rb) rb = GetComponent<Rigidbody2D>();
         if (!animator) animator = GetComponentInChildren<Animator>();
         if (!hp) hp = GetComponent<HP>();
+        if (!sfx) sfx = GetComponent<LocalSFX>();
 
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
@@ -211,6 +214,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
             {
                 ChangeState(Felmos_State.Aggro);
                 animator?.SetTrigger("Aggro");
+                sfx.Play("Felmos_Aggro");
                 return;
             }
         }
@@ -241,6 +245,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
             {
                 ChangeState(Felmos_State.Aggro);
                 animator?.SetTrigger("Aggro");
+                sfx.Play("Felmos_Aggro");
                 return;               
             }
         }
@@ -274,6 +279,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         alertSprite.SetActive(false);
         ChangeState(Felmos_State.Aggro);
         animator?.SetTrigger("Aggro");
+        sfx.Play("Felmos_Aggro");
     }
 
     void TickAggro()
@@ -395,6 +401,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(readyAttackWindup);
 
+        sfx.Play("Felmos_Attack");
         animator?.SetTrigger("Attack");
 
         yield return new WaitForSeconds(attackDuration);
@@ -486,6 +493,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         hp.TakeDamage(amount);
+        sfx.Play("Felmos_OnDamage");
 
         if(isAttacking || isDead) return;
 
@@ -495,6 +503,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
     {
         hp.TakeDamage(amount);
+        sfx.Play("Felmos_OnDamage");
 
         if(isAttacking || isDead) return;
 
@@ -521,6 +530,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
         isDead = true;
         rb.gravityScale = 9.81f;
+        sfx.Play("Felmos_Death");
 
         ChangeState(Felmos_State.Dead);
         animator?.SetTrigger("Dead");

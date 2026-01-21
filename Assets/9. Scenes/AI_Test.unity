@@ -403,7 +403,7 @@ Transform:
   m_GameObject: {fileID: 399982674}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.85, y: 2.06, z: 0}
+  m_LocalPosition: {x: 8.14, y: 2.47, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1013,6 +1013,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Nightfang
       objectReference: {fileID: 0}
+    - target: {fileID: 7052323503559932824, guid: cdd5ee5408c06984fa6e9a91194b9c07, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1165,10 +1169,6 @@ PrefabInstance:
     - target: {fileID: 8290370098441611098, guid: 261a47860874ec748b8d5355c3ce9d7d, type: 3}
       propertyPath: m_Name
       value: Felmos
-      objectReference: {fileID: 0}
-    - target: {fileID: 8290370098441611098, guid: 261a47860874ec748b8d5355c3ce9d7d, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
