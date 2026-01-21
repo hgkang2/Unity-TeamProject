@@ -95,9 +95,10 @@ public class SoulData : ScriptableObject
             case SoulEffectType.StatBonus:
                 return effect.bonusValue;
             case SoulEffectType.IncreaseJumpNum:
+                return 1;
             case SoulEffectType.LearnSkill:
             case SoulEffectType.HealHP:
-                return -1;
+                return effect.healAmount;
         }
         return -1;
     }

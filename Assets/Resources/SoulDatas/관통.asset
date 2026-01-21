@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: "\uAD00\uD1B5"
   m_EditorClassIdentifier: 
   index: 1005
+  soulType: 0
   soulSprite: {fileID: 21300000, guid: 0afeb35142b04d94fba31d48d1412acb, type: 3}
   soulIcon: {fileID: 21300000, guid: 84f7dc12984522c4eb47fd35fb4823fd, type: 3}
   displayName: "\uAD00\uD1B5"
@@ -23,7 +24,7 @@ MonoBehaviour:
   effect:
     type: 0
     targetStat: 0
-    flatValue: 0
+    flatValue: 5
     percentValue: 0
     bonusValue: 0
     skillToLearn: 0
