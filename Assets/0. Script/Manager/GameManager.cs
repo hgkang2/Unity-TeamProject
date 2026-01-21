@@ -83,8 +83,8 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        ingameTime += Time.deltaTime;
-        stageTime += Time.deltaTime;
+        ingameTime += Time.unscaledDeltaTime;
+        stageTime += Time.unscaledDeltaTime;
     }
 
     public IEnumerator TeleportRoutine(Player p, Transform targetPosition)
