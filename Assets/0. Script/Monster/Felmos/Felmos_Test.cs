@@ -19,7 +19,8 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     #region Variables
     [Header("Refs")]
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Animator animator;          
+    [SerializeField] private Animator animator;
+    [SerializeField] Animator vfxAnimator;
     [SerializeField] private Transform firePos;
     HP hp;
 
@@ -46,6 +47,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
     [Header("Attack")]
     [SerializeField] GameObject bulletPrefab;
+    [SerializeField] GameObject WarningVFX;
     [SerializeField] float bulletDamage = 10f;
     [SerializeField] float attackDuration;
     [SerializeField] float readyAttackWindup;
@@ -424,6 +426,18 @@ public class Felmos_Test : MonoBehaviour, IDamageable
             var bullet = go.GetComponent<FelmosBullet>();
             if (bullet) bullet.Initialize(dir, bulletDamage);
         }
+    }
+
+    void ShowWarningVFX()
+    {
+        WarningVFX.SetActive(true);
+        vfxAnimator.Play("MaligureWarningVFX", 0, 0f);
+    }
+
+    void HideWarningVFX()
+    {
+        if (!WarningVFX) return;
+        WarningVFX.SetActive(false);
     }
 
     void ChangeState(Felmos_State next)

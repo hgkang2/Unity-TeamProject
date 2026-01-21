@@ -19,6 +19,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [Header("Refs")]
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Animator animator;
+    [SerializeField] Animator vfxAnimator;
     [SerializeField] public SpriteRenderer spriteRenderer;
     LocalSFX sfx;
     HP hp;
@@ -45,6 +46,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] float freezeZoneX = 0.1f;
 
     [Header("Attack")]
+    [SerializeField] GameObject WarningVFX;
     [SerializeField] float attackRange = 1.2f;    
     [SerializeField] float attackDashForce;
     [Tooltip("일반 공격 선딜레이")]
@@ -458,6 +460,18 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         isActionLocked = false;
     }
     #endregion
+
+    void ShowWarningVFX()
+    {
+        WarningVFX.SetActive(true);
+        vfxAnimator.Play("MaligureWarningVFX", 0, 0f);
+    }
+
+    void HideWarningVFX()
+    {
+        if (!WarningVFX) return;
+        WarningVFX.SetActive(false);
+    }
 
     public void ChangeState(State next)
     {
