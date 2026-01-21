@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     public CharacterId curcharacter = CharacterId.None;
     TutorialRunner tutorialRunner;
 
+    public float ingameTime;
+    public float stageTime;
+
     static GameManager instance;
     public static GameManager Instance
     {
@@ -63,16 +66,25 @@ public class GameManager : MonoBehaviour
                 break;
             case "Stage1":
                 tutorialRunner.StartTutorial();
+                ingameTime = 0;
+                stageTime = 0;
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 break;
             case "Stage1_Test":
+                ingameTime = 0;
+                stageTime = 0;
                 tutorialRunner.StartTutorial();
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 break;
         }
+    }
 
+    void Update()
+    {
+        ingameTime += Time.deltaTime;
+        stageTime += Time.deltaTime;
     }
 
     public IEnumerator TeleportRoutine(Player p, Transform targetPosition)
