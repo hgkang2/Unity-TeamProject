@@ -516,6 +516,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
 
         if (stateTimer >= hitStunTime)
         {
+            isHit = false;
             hitLockTimer = hitLockDuration;
             ChangeState(State.Idle);
             animator?.SetTrigger("Idle");
@@ -546,6 +547,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     {
         ChangeState(State.TakeDamage);
         animator?.SetTrigger("Hit");
+        isHit = true;
 
         Vector2 dir = ((Vector2)transform.position - attackerWorldPosition).normalized;
         dir = new Vector2(dir.x * knockBackXForce, knockBackYForce);

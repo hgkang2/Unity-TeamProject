@@ -5,7 +5,6 @@ public class FelmosBullet : MonoBehaviour
 {
     Collider2D cd;
     Rigidbody2D rb;
-    Player player;
 
     [SerializeField] DamageType damageType;
     float damage;
@@ -28,14 +27,19 @@ public class FelmosBullet : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
+        if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground"))
+        {
+            Destroy(this.gameObject);
+        }
+
+        if(!collision.CompareTag("Player")) return;
+
         if(collision.TryGetComponent<IDamageable>(out var damageable))
         {
             Vector2 hitPos = transform.position;
             damageable.TakeDamage(damage, damageType, hitPos);
-        }
-        if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground"))
-        {
-            Destroy(this.gameObject);
+
+            Destroy(this.gameObject,0.1f);
         }
     }
 }

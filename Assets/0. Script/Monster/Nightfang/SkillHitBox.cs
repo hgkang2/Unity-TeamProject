@@ -24,7 +24,7 @@ public class SkillHitBox : MonoBehaviour
             Vector2 hitPos = transform.position;
             damageable.TakeDamage(damage, damageType, hitPos);
             //OnHit?.Invoke(damageable);
-            sfx.Play("DamageSound");
+            //sfx.Play("DamageSound");
             //Debug.Log("Damage");
         }
     }
