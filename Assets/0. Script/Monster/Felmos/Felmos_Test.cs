@@ -21,7 +21,6 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator animator;
     [SerializeField] Animator vfxAnimator;
-    [SerializeField] private Transform firePos;
     HP hp;
     LocalSFX sfx;
 
@@ -45,10 +44,12 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     [Header("Aggro")]
     [SerializeField] float aggroRange;
     [SerializeField] float aggroSpeed;
+    [SerializeField] float freezeZoneX;
 
     [Header("Attack")]
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] GameObject WarningVFX;
+    [SerializeField] private Transform firePos;
     [SerializeField] float bulletDamage = 10f;
     [SerializeField] float attackDuration;
     [SerializeField] float readyAttackWindup;
@@ -72,29 +73,34 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     [SerializeField] Transform groundRayOrigin;
     [SerializeField] LayerMask groundMask;
     [SerializeField] float groundCheckRayLength;
-    
 
-    [Header("Keep Distance")]
-    [SerializeField] float keepDistanceWait;
+    [Header("거리 유지")]
+    [SerializeField] float waitBeforeRetreat;
     [SerializeField] float retreatDuration;
-    [SerializeField] float keepDistance = 4f;      
-    [SerializeField] float keepDistanceSpeed; 
-    [SerializeField] float keepDistanceCooldown = 0.25f; 
-    Coroutine keepDistanceRoutine;
+    [SerializeField] float retreatStartDistance = 4f;      
+    [SerializeField] float retreatSpeed; 
+    [SerializeField] float retreatCooldown = 0.25f; 
+    Coroutine retreatRoutine;
     bool isRetreating;
     float retreatCooldownTimer;
 
-    public Vector2 dirToPlayer;
-
+    [Header("대미지 처리")]
+    [SerializeField] float hitStunTime;
+    [SerializeField] float hitLockTimer;
+    [SerializeField] float hitLockDuration;
+    Vector2 lastHitFrom;
+    [SerializeField] float knockBackXForce;
+    [SerializeField] float knockBackYForce;
     bool isDead;
     bool isHit = false;
 
-    [SerializeField] float freezeZoneX;
+    //이동
+    Vector2 dirToPlayer;    
     int facingX = 1;
     Vector3 originScale;
+    bool canMove = true;
 
     Coroutine runningRoutine;
-    bool canMove = true;
     #endregion
 
     void Awake()
@@ -131,10 +137,6 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
         ApplyFlip();
 
-        if(Input.GetKeyDown(KeyCode.F1))
-        {
-            TakeDamage(10f);
-        }
         hitLockTimer -= Time.deltaTime;
 
         if (retreatCooldownTimer > 0f)
@@ -221,7 +223,6 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
         if (enablePatrol && stateTimer >= idleTime && !isHit) 
         {
-            
             ApplyFlip();
             facingX *= -1;
             animator?.SetTrigger("Patrol");
@@ -302,12 +303,12 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
         if (enableKeepDistance &&
         retreatCooldownTimer <= 0f &&
-        distanceToPlayer < keepDistance &&
-        keepDistanceRoutine == null &&
+        distanceToPlayer < retreatStartDistance &&
+        retreatRoutine == null &&
         !isAttacking && !isHit)
         {
-        keepDistanceRoutine = StartCoroutine(KeepDistanceRoutine());
-        return;
+            retreatRoutine = StartCoroutine(KeepDistanceRoutine());
+            return;
         }
 
         Vector2 desired = dirToPlayer;
@@ -328,7 +329,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         isRetreating = true;
 
         StopXY();
-        yield return new WaitForSeconds(keepDistanceWait);
+        yield return new WaitForSeconds(waitBeforeRetreat);
 
         float t = 0f;
         while (t < retreatDuration)
@@ -346,7 +347,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
             if (retreatDir.sqrMagnitude < 0.0001f)
                 StopXY();
             else
-                MoveXY(retreatDir.normalized, keepDistanceSpeed);
+                MoveXY(retreatDir.normalized, retreatSpeed);
 
             t += Time.deltaTime;
             yield return null;
@@ -354,10 +355,10 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
         StopXY();
 
-        retreatCooldownTimer = keepDistanceCooldown;
+        retreatCooldownTimer = retreatCooldown;
 
         isRetreating = false;
-        keepDistanceRoutine = null;
+        retreatRoutine = null;
     }
 
     Vector2 ApplyGroundClampDown(Vector2 desired)
@@ -383,6 +384,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         return desired;
     }
 
+    #region Attack
     void StartAttack()
     {
         if(runningRoutine != null) StopCoroutine(runningRoutine);
@@ -434,6 +436,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
             if (bullet) bullet.Initialize(dir, bulletDamage);
         }
     }
+    #endregion
 
     void ShowWarningVFX()
     {
@@ -473,10 +476,6 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         transform.localScale = new Vector3(facingX >0 ? -originScale.x : originScale.x, originScale.y, originScale.z);
     }
 
-    [SerializeField] float hitStunTime;
-    [SerializeField] float hitLockTimer;
-    [SerializeField] float hitLockDuration;
-    Vector2 lastHitFrom;
     void TickTakeDamage()
     {
         if(isAttacking) return;
@@ -511,8 +510,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         OnHit((Vector2)attackerWorldPosition);
     }
 
-    [SerializeField] float knockBackXForce;
-    [SerializeField] float knockBackYForce;
+
     public virtual void OnHit(Vector2 attackWorldPosition)
     {
         ChangeState(Felmos_State.TakeDamage);
