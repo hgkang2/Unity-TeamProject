@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Unity.Mathematics;
 using Unity.VisualScripting;
@@ -64,6 +65,17 @@ public class PlayerAttack : MonoBehaviour
         InputManager.Instance.SpecialAttackPressed -= HandleSpecialAttackPressed;
     }
 
+    bool CanAttack()
+    {
+        // 애니/히트박스 상태
+        if (isAttacking) return false;
+        // 입력 쿨다운
+        if (Time.time < nextAttackTime) return false;
+        return true;
+    }
+
+
+
     void HandleHit(Collider2D other)
     {
         Vector2 hitPoint = other.ClosestPoint(transform.position);
@@ -107,7 +119,7 @@ public class PlayerAttack : MonoBehaviour
     // Attack 키를 눌렀을때 반응
     void HandleAttackPressed()
     {
-        if (isAttacking) return;
+        if (!CanAttack()) return;
         if (player != null && !player.CanControl) return;
 
         // 1. 공중 + 바닥 너무 가까우면 공격 금지
@@ -151,6 +163,7 @@ public class PlayerAttack : MonoBehaviour
             sfxKey = "Attack";
             vfxKey = "Attack";
         }
+        
 
         StartAttack(type);
     }
@@ -161,8 +174,12 @@ public class PlayerAttack : MonoBehaviour
         //StartAttack(AttackType.Special);
     }
 
+    float nextAttackTime;
     public void StartAttack(AttackType type)
     {
+        float cooldown = 1f / stats.curAttackSpeed;
+        nextAttackTime = Time.time + cooldown;
+
         if (type == AttackType.Down)
         {
             player.ExecuteAirDownAttack();
