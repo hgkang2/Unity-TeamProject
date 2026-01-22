@@ -34,6 +34,7 @@ public class TutorialRunner : MonoBehaviour
     }
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        //Debug.Log(scene.name);
         switch (scene.name)
         {
             case "Stage1":
@@ -46,6 +47,7 @@ public class TutorialRunner : MonoBehaviour
 
                 dialoguePanel.gameObject.SetActive(true);
                 player = sceneContext.player;
+                StartTutorial();
                 break;
         }
 

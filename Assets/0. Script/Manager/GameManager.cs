@@ -65,7 +65,6 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(FadeInRoutine(3));
                 break;
             case "Stage1":
-                tutorialRunner.StartTutorial();
                 ingameTime = 0;
                 stageTime = 0;
                 if (SoundManager.Instance == null) return;
@@ -74,7 +73,6 @@ public class GameManager : MonoBehaviour
             case "Stage1_Test":
                 ingameTime = 0;
                 stageTime = 0;
-                tutorialRunner.StartTutorial();
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 break;

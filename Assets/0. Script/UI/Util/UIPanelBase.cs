@@ -19,12 +19,10 @@ public abstract class UIPanelBase : MonoBehaviour, IUIKeyboardTarget
 
     protected virtual void Init() { }
 
-#if UNITY_EDITOR
     void OnDisable()
     {
         if (IsOpen) InputManager.Instance.RemoveUI(this, blocksGameplay);
     }
-#endif
 
     public void Open()
     {
@@ -70,6 +68,8 @@ public abstract class UIPanelBase : MonoBehaviour, IUIKeyboardTarget
 
     void ShowCG(bool visible)
     {
+        if (!cg) cg = GetComponent<CanvasGroup>();
+
         cg.alpha = visible ? 1f : 0f;
         cg.blocksRaycasts = visible;
         cg.interactable = visible;
