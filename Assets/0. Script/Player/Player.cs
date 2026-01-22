@@ -23,7 +23,7 @@ public class Player : MonoBehaviour, IDamageable
     Animator anim;
 
     SpriteFlash spriteFlash;
-    LocalSFX sfx;
+    LocalSFX localSFX;
 
     bool isInCinematic = false;
     public bool CanControl
@@ -48,7 +48,7 @@ public class Player : MonoBehaviour, IDamageable
         playerAttack = GetComponent<PlayerAttack>();
         anim = GetComponent<Animator>();
         spriteFlash = GetComponent<SpriteFlash>();
-        sfx = GetComponent<LocalSFX>();
+        localSFX = GetComponent<LocalSFX>();
     }
 
     void OnEnable()
@@ -72,6 +72,7 @@ public class Player : MonoBehaviour, IDamageable
     public void ApplyKnockback(float force, Vector2? attackerPos = null)
     {
         playerAttack.EndAttack();
+        StartHitStun(0.25f);
         playerMove.ApplyKnockbackImpulse(force, attackerPos);
         anim.SetTrigger("Hit");
     }
@@ -338,7 +339,7 @@ public class Player : MonoBehaviour, IDamageable
         {
             case DamageType.Normal:
                 ApplyKnockback(10f, attackerWorldPosition);
-                sfx.Play("Hit");
+                localSFX.Play("Hit");
                 goto case DamageType.Area;
             case DamageType.Area:
                 StartHitStun(0.15f);
@@ -366,7 +367,7 @@ public class Player : MonoBehaviour, IDamageable
     void HandleDie()
     {
         playerMove.HandleDieMotion();
-        sfx.Play("Die");
+        localSFX.Play("Die");
         // + 기타 사망 연출
     }
 
@@ -387,6 +388,7 @@ public class Player : MonoBehaviour, IDamageable
         // 2. 물리 및 상태 복구
         hp.ResetHP();
         playerMove.ResetAfterDeath();
+        playerAttack.EndAttack();
 
         // 3. 애니메이션 초기화
         anim.Rebind();
@@ -415,6 +417,7 @@ public class Player : MonoBehaviour, IDamageable
         playerSprite.enabled = false;
         playerPartSprite.SetActive(true);
     }
+
     
     public void SetControlLocked(bool b)
     {

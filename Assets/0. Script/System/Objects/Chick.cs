@@ -33,6 +33,8 @@ public class Chick : MonoBehaviour, IInteractable
     SpriteRenderer spriteRenderer;
     Rigidbody2D rb;
 
+    LocalSFX localSFX;
+
     Coroutine idleRoutine;
     bool isInteracting;
 
@@ -44,6 +46,7 @@ public class Chick : MonoBehaviour, IInteractable
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        localSFX = GetComponent<LocalSFX>();
 
         allColliders = GetComponentsInChildren<Collider2D>(true);
     }
@@ -95,6 +98,8 @@ public class Chick : MonoBehaviour, IInteractable
 
             // 2) Move
             SetTrigger(trigMove);
+            //효과음
+            localSFX.Play("대기");
 
             float dir = Random.value < 0.5f ? -1f : 1f;
             float moveTime = RandomRange(moveMin, moveMax);
@@ -128,6 +133,9 @@ public class Chick : MonoBehaviour, IInteractable
 
         SetTrigger(trigPeck);
 
+        //효과음
+        localSFX.Play("쪼기");
+        
         // peckStateTag인 Animation clip 재생이 끝날 때까지 기다리기
         yield return WaitForTaggedStateToFinish(peckStateTag);
     }
@@ -250,6 +258,9 @@ public class Chick : MonoBehaviour, IInteractable
 
         Vector3 start = transform.position;
         Vector3 end = start + new Vector3(facing * flyForwardDistance, flyUpDistance, 0f);
+
+        //효과음
+        localSFX.Play("도망");
 
         // 트윈으로 이동 후 파괴
         transform.DOMove(end, flyDuration)

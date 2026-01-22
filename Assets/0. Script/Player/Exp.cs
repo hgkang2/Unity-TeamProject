@@ -26,6 +26,9 @@ public class Exp : MonoBehaviour
     public event Action<int> LevelChanged;
     public event Action<int, int> ExpChanged; // (curExp, maxExp)
 
+    
+    [SerializeField] AudioClip levelUpSound;
+
 
     void Awake()
     {
@@ -66,6 +69,7 @@ public class Exp : MonoBehaviour
             curlevel = levelMaxExpTable.Length;
         }
         LevelChanged?.Invoke(curlevel);
+        SoundManager.Instance.PlaySFX(levelUpSound);
     }
 
 
