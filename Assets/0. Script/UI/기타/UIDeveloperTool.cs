@@ -48,9 +48,16 @@ public class UIDeveloperTool : MonoBehaviour
         ChangeTakeDamageValueText();
         ChangeGetExpValueText();
     }
+
+    [SerializeField] GameObject developerTool;
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            developerTool.SetActive(!developerTool.activeSelf);
+        }
+        if(!developerTool.activeSelf) return;
+        
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             if (HealSlider.isActiveAndEnabled)
