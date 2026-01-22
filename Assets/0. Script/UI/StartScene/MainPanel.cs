@@ -11,15 +11,30 @@ public class MainPanel : UIPanelBase
     [SerializeField] ConfirmPanel mainExitPanel;
 
     public int? curIndex = null;
-    protected override void Init()
-    {
-        buttons = GetComponentsInChildren<MainPanelButton>();
+protected override void Init()
+{
+    // 비활성 자식까지 포함 (빌드/초기상태에서 buttons가 0개 되는 케이스 방지)
+    buttons = GetComponentsInChildren<MainPanelButton>(true);
 
-        mainExitPanel.gameObject.SetActive(true);
-        mainSaveDataPanel.gameObject.SetActive(true);
-        mainSettingPanel.gameObject.SetActive(true);
-        buttonSelectImage.gameObject.SetActive(false);
+    // 필수 참조 누락이면 입력 콜백에서 NRE 연쇄 발생 → 게임 전체 입력이 망가질 수 있음
+    if (buttonSelectImage == null || mainExitPanel == null || mainSaveDataPanel == null || mainSettingPanel == null)
+    {
+        Debug.LogError(
+            $"[MainPanel] Missing refs.\n" +
+            $"- buttonSelectImage: {(buttonSelectImage ? "OK" : "NULL")}\n" +
+            $"- mainExitPanel: {(mainExitPanel ? "OK" : "NULL")}\n" +
+            $"- mainSaveDataPanel: {(mainSaveDataPanel ? "OK" : "NULL")}\n" +
+            $"- mainSettingPanel: {(mainSettingPanel ? "OK" : "NULL")}"
+        );
+        gameObject.SetActive(false);
+        return;
     }
+
+    mainExitPanel.gameObject.SetActive(true);
+    mainSaveDataPanel.gameObject.SetActive(true);
+    mainSettingPanel.gameObject.SetActive(true);
+    buttonSelectImage.gameObject.SetActive(false);
+}
 
     protected override void OnOpened()
     {
@@ -40,11 +55,18 @@ public class MainPanel : UIPanelBase
 
     public void ButtonMouseEnter(MainPanelButton hoverButton)
     {
+        if (buttons == null || buttons.Length == 0) return;
+        if (hoverButton == null) return;
+
         int i = 0;
         for (; i < buttons.Length; i++)
         {
-            if (buttons[i].Equals(hoverButton)) break;
+            if (buttons[i] == hoverButton) break;
         }
+
+        // 못 찾았으면(curIndex == buttons.Length) 인덱스 범위 밖 접근 방지
+        if (i >= buttons.Length) return;
+
         curIndex = i;
         UpdateButtonHighlight();
     }
@@ -69,13 +91,18 @@ public class MainPanel : UIPanelBase
     }
     void ClearFocus()
     {
-        buttonSelectImage.gameObject.SetActive(false);
-        foreach (var button in buttons)
+        // 빌드에서 참조 누락/초기화 타이밍 이슈가 있어도 입력 콜백을 깨지 않도록 방어
+        if (buttonSelectImage != null)
+            buttonSelectImage.gameObject.SetActive(false);
+
+        if (buttons == null) return;
+
+        for (int i = 0; i < buttons.Length; i++)
         {
-            button.UnFocused();
+            var b = buttons[i];
+            if (b != null) b.UnFocused();
         }
     }
-
 
     public override void OnUIInputMove(Vector2 dir)
     {

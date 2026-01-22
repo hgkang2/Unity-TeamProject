@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-
+[DefaultExecutionOrder(-100)]
 public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
@@ -70,7 +70,7 @@ public class InputManager : MonoBehaviour
     void ApplyInputMode()
     {
         bool uiModalActive = modalCount > 0;
-
+        Debug.Log($"[Input] modalCount={modalCount}, TopUI={(TopUI==null?"null":TopUI.ToString())}, uiModalActive={uiModalActive}");
         if (uiModalActive)
         {
             // UI 모달이 하나라도 있으면 플레이어 입력 강제 차단
