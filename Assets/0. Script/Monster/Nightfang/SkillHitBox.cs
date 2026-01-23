@@ -8,7 +8,6 @@ public class SkillHitBox : MonoBehaviour
 
     [SerializeField] Collider2D col;
 
-    //public event Action<IDamageable> OnHit;
     LocalSFX sfx;
 
     private void Awake()

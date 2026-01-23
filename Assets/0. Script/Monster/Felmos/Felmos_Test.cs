@@ -434,6 +434,8 @@ public class Felmos_Test : MonoBehaviour, IDamageable
 
             var bullet = go.GetComponent<FelmosBullet>();
             if (bullet) bullet.Initialize(dir, bulletDamage);
+
+            return;
         }
     }
     #endregion
