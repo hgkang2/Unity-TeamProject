@@ -19,7 +19,8 @@ public class Interactor : MonoBehaviour
 
     public event Action<IInteractable> SelectedChanged;
 
-    void Awake() {
+    void Awake()
+    {
         player = GetComponent<Player>();
     }
 
@@ -27,7 +28,7 @@ public class Interactor : MonoBehaviour
 
     void Update()
     {
-        if(timer < Time.time + 0.1f)
+        if (timer < Time.time + 0.1f)
         {
             timer = Time.time;
             Scan();

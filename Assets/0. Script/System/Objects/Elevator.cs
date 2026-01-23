@@ -12,6 +12,8 @@ public class Elevator : MonoBehaviour, IInteractable
     [SerializeField] Animator leverAnimator;
     [SerializeField] SpriteRenderer leverSprite;
 
+    [SerializeField] Transform interactionUIPos;
+    public Transform InteractionUIPosition => interactionUIPos;
 
     public bool CanInteract()
     {

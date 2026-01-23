@@ -41,6 +41,9 @@ public class Chick : MonoBehaviour, IInteractable
     Tween highlightTween;
     Collider2D[] allColliders;
 
+    [SerializeField] Transform interactionUIPos;
+    public Transform InteractionUIPosition => interactionUIPos;
+
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
