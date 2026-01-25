@@ -20,14 +20,17 @@ public class BossLuna : MonoBehaviour
     
 
     [Header("SkillA")]
+    public bool canUseSkillA = true;
     public GameObject holyGrenadePrefab;
     public Transform throwPos;
     public float JumpYForce;
     public float JumpXForce;
-    public bool canUseSkillA = true;
     public float sideOffset;
     public float grenadeTravelTime;
     Vector2 targetPos;
+
+    [Header("SkillB")]
+    public bool canUseSkillB;
 
     [Header("Player Pos Check")]
     public LayerMask groundMask;
