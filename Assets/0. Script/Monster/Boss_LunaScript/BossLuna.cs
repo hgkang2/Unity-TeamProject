@@ -32,7 +32,7 @@ public class BossLuna : MonoBehaviour
     [Header("SkillB")]
     public bool canUseSkillB;
     public GameObject expiationPrefab;
-    public Transform expiationSpawnPoint;
+    public float duration;
 
     [Header("Player Pos Check")]
     public LayerMask groundMask;
@@ -136,7 +136,7 @@ public class BossLuna : MonoBehaviour
 
     void Skill_B()
     {
-        if(canUseSkillB)
+        if(distanceToPlayer <= aggroRange && canUseSkillB)
         {
             canUseSkillB = false;
             StartCoroutine(SkillBRoutine());
@@ -145,8 +145,6 @@ public class BossLuna : MonoBehaviour
 
     IEnumerator SkillBRoutine()
     {
-        
-
         yield return new WaitForSeconds(0.7f);
 
         CachPlayerPos();
@@ -156,9 +154,13 @@ public class BossLuna : MonoBehaviour
 
     void ExpiationEvent()
     {
-        Vector2 expiationSpawnpoint = cachedTargetPos + Vector2.up * 5f;
+        if(!hasCachedTarget) return;
+        Vector2 expiationSpawnpoint = cachedTargetPos + Vector2.up * 0.5f;
 
-        Instantiate(expiationPrefab, expiationSpawnpoint, Quaternion.identity);
+        var expiation = Instantiate(expiationPrefab, expiationSpawnpoint, expiationPrefab.transform.rotation);
+        expiation.GetComponent<BossLunaExpiation>().InitializeExpiation(expiationSpawnpoint, duration, gameObject);
+
+        hasCachedTarget = false;
     }
 
     void CachPlayerPos()
