@@ -4,6 +4,7 @@ using UnityEditor.Callbacks;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.ShaderGraph.Internal;
 
 public class BossLuna : MonoBehaviour
 {
@@ -15,11 +16,24 @@ public class BossLuna : MonoBehaviour
     public float distanceOfX;
     public LayerMask playerMask;
 
+    [Header("Attack")]
+    
+
     [Header("SkillA")]
-    public GameObject holyGnadePrefab;
+    public GameObject holyGrenadePrefab;
+    public Transform throwPos;
     public float JumpYForce;
     public float JumpXForce;
     public bool canUseSkillA = true;
+    public float sideOffset;
+    public float grenadeTravelTime;
+    Vector2 targetPos;
+
+    [Header("Player Pos Check")]
+    public LayerMask groundMask;
+    public float groundRayLength;
+    Vector2 cachedTargetPos;
+    bool hasCachedTarget;
 
     Rigidbody2D rb;
 
@@ -32,23 +46,20 @@ public class BossLuna : MonoBehaviour
     {
         PlayerDetect();
 
-        TempSkill_A(); 
+        Skill_A(); 
     }
 
     void PlayerDetect()
     {
-        if (!playerTransform)
-        {
-            Collider2D hit = Physics2D.OverlapCircle(transform.position, aggroRange, playerMask);
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, aggroRange, playerMask);
 
-            if(hit)
-                playerTransform = hit.transform;
-            else
-            {
-                distanceToPlayer = float.PositiveInfinity;
-                distanceOfX = 0f;
-                return;
-            }
+        if(hit)
+            playerTransform = hit.transform;
+        else
+        {
+            distanceToPlayer = float.PositiveInfinity;
+            distanceOfX = 0f;
+            return;
         }
 
         if(!playerTransform.gameObject.activeInHierarchy)
@@ -61,15 +72,16 @@ public class BossLuna : MonoBehaviour
 
         Vector2 myPos = transform.position;
         Vector2 playerPos = playerTransform.position;
+        targetPos = playerTransform.position;
 
         Vector2 toPlayer = playerPos - myPos;
         distanceOfX = toPlayer.x;
         distanceToPlayer = toPlayer.magnitude;
     }
 
-    void TempSkill_A()
+    void Skill_A()
     {
-        if(distanceToPlayer <= aggroRange && canUseSkillA)
+        if(canUseSkillA)
         {
             canUseSkillA = false;
             StartCoroutine(SkillARoutine());
@@ -85,14 +97,54 @@ public class BossLuna : MonoBehaviour
         rb.AddForce(new Vector2(JumpXForce, JumpYForce), ForceMode2D.Impulse);
 
         yield return new WaitForSeconds(0.4f);
-         
-        ThrowGrenade();
+        CachPlayerPos();
+        
+        ThrowGrenadeEvent();
     }
 
-    void ThrowGrenade()
+    void ThrowGrenadeEvent()
     {
-        Instantiate(holyGnadePrefab, transform.position, Quaternion.identity);
-        return;
+        if(!hasCachedTarget) return;
+
+        Vector2 center = cachedTargetPos;
+
+        Vector2 left = center + Vector2.left * sideOffset;
+        Vector2 right = center + Vector2.right * sideOffset;
+
+        ThrowGrenade(left);
+        ThrowGrenade(center);
+        ThrowGrenade(right);
+
+        hasCachedTarget = false;
+    }
+
+    void ThrowGrenade(Vector2 targetPos)
+    {
+        var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
+        grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
+
+        hasCachedTarget = false;
+    }
+
+    void CachPlayerPos()
+    {
+        if(!playerTransform) { hasCachedTarget = false; return;}
+
+        Vector2 origin = (Vector2)playerTransform.position + Vector2.up * 0.5f;
+        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, groundRayLength, groundMask);
+
+        Debug.DrawRay(origin, Vector2.down * groundRayLength, Color.yellow, 0.2f);
+
+        if(hit.collider != null)
+        {
+            cachedTargetPos = hit.point;
+            hasCachedTarget = true;
+        }
+        else
+        {
+            cachedTargetPos = playerTransform.position;
+            hasCachedTarget = true;
+        }
     }
 
     void OnDrawGizmosSelected()

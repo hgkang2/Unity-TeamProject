@@ -1,24 +1,77 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 public class BossLunaHolyGrenade : MonoBehaviour
 {
+    public Transform warningCircle;
     public GameObject ExplosionEffect;
-    public float throwPower;
+    GrenadeTrajectory traj;
+    Vector2 targetPos;
+    GameObject owner;
     Rigidbody2D rb;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        if(warningCircle) warningCircle.gameObject.SetActive(false);
+        traj = GetComponent<GrenadeTrajectory>();
     }
 
-    void Start()
+    public void InitializeGrenadeThrow(Vector2 targetPos, float travelTime, GameObject owner)
     {
-        rb.AddForce(Vector2.left * throwPower, ForceMode2D.Impulse);
-    }   
+        this.targetPos = targetPos;
+        this.owner = owner;
+
+        if(warningCircle)
+        {
+            warningCircle.SetParent(null);
+            warningCircle.position = targetPos + Vector2.up * 1.5f;
+            warningCircle.gameObject.SetActive(true);
+        }
+
+        traj?.Show(targetPos, travelTime);
+        ThrowGrenade(targetPos, travelTime);
+    }
+
+    void ThrowGrenade(Vector2 targetPos, float travelTime)
+    {
+        Vector2 start = rb.position;
+        Vector2 velocity = CaculateVelocity(start, targetPos, travelTime);
+
+        rb.linearVelocity = Vector2.zero;
+        rb.linearVelocity = velocity;
+    }
+
+    Vector2 CaculateVelocity(Vector2 start, Vector2 target, float time)
+    {
+        Vector2 distance = target - start;
+        float gravity = -Physics2D.gravity.y * rb.gravityScale;
+
+        float velocityX = distance.x / time;
+        float velocityY = (distance.y + 0.5f * gravity * time * time) / time;
+
+        return new Vector2(velocityX, velocityY);
+    }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground"))
+        {
+            rb.linearVelocity = Vector2.zero;
+            if(warningCircle) warningCircle.gameObject.SetActive(false);
+            traj?.Hide();
 
+            StartCoroutine(ExplodeRoutine());
+            
+        }
+    }
+
+    IEnumerator ExplodeRoutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
+        Destroy(this.gameObject);
     }
 }
