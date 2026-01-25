@@ -4,7 +4,7 @@ using System.Collections;
 
 public class BossLunaHolyGrenade : MonoBehaviour
 {
-    public Transform warningCircle;
+    public Transform warningSignPos;
     public GameObject ExplosionEffect;
     GrenadeTrajectory traj;
     Vector2 targetPos;
@@ -14,7 +14,7 @@ public class BossLunaHolyGrenade : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        if(warningCircle) warningCircle.gameObject.SetActive(false);
+        if(warningSignPos) warningSignPos.gameObject.SetActive(false);
         traj = GetComponent<GrenadeTrajectory>();
     }
 
@@ -23,11 +23,11 @@ public class BossLunaHolyGrenade : MonoBehaviour
         this.targetPos = targetPos;
         this.owner = owner;
 
-        if(warningCircle)
+        if(warningSignPos)
         {
-            warningCircle.SetParent(null);
-            warningCircle.position = targetPos + Vector2.up * 1.5f;
-            warningCircle.gameObject.SetActive(true);
+            warningSignPos.SetParent(null);
+            warningSignPos.position = targetPos + Vector2.up * 1.5f;
+            warningSignPos.gameObject.SetActive(true);
         }
 
         traj?.Show(targetPos, travelTime);
@@ -59,11 +59,11 @@ public class BossLunaHolyGrenade : MonoBehaviour
         if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground"))
         {
             rb.linearVelocity = Vector2.zero;
-            if(warningCircle) warningCircle.gameObject.SetActive(false);
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            Destroy(warningSignPos.gameObject);
             traj?.Hide();
 
             StartCoroutine(ExplodeRoutine());
-            
         }
     }
 

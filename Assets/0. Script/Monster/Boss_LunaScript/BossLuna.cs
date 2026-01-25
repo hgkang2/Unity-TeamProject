@@ -31,6 +31,8 @@ public class BossLuna : MonoBehaviour
 
     [Header("SkillB")]
     public bool canUseSkillB;
+    public GameObject expiationPrefab;
+    public Transform expiationSpawnPoint;
 
     [Header("Player Pos Check")]
     public LayerMask groundMask;
@@ -50,6 +52,7 @@ public class BossLuna : MonoBehaviour
         PlayerDetect();
 
         Skill_A(); 
+        Skill_B();
     }
 
     void PlayerDetect()
@@ -82,6 +85,7 @@ public class BossLuna : MonoBehaviour
         distanceToPlayer = toPlayer.magnitude;
     }
 
+    #region Skill_A
     void Skill_A()
     {
         if(canUseSkillA)
@@ -128,6 +132,34 @@ public class BossLuna : MonoBehaviour
 
         hasCachedTarget = false;
     }
+    #endregion
+
+    void Skill_B()
+    {
+        if(canUseSkillB)
+        {
+            canUseSkillB = false;
+            StartCoroutine(SkillBRoutine());
+        }
+    }
+
+    IEnumerator SkillBRoutine()
+    {
+        
+
+        yield return new WaitForSeconds(0.7f);
+
+        CachPlayerPos();
+
+        ExpiationEvent();
+    }
+
+    void ExpiationEvent()
+    {
+        Vector2 expiationSpawnpoint = cachedTargetPos + Vector2.up * 5f;
+
+        Instantiate(expiationPrefab, expiationSpawnpoint, Quaternion.identity);
+    }
 
     void CachPlayerPos()
     {
@@ -150,9 +182,9 @@ public class BossLuna : MonoBehaviour
         }
     }
 
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, aggroRange);
-    }
+    // void OnDrawGizmosSelected()
+    // {
+    //     Gizmos.color = Color.red;
+    //     Gizmos.DrawWireSphere(transform.position, aggroRange);
+    // }
 }
