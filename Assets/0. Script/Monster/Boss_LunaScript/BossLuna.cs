@@ -5,9 +5,11 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.ShaderGraph.Internal;
+using Unity.Mathematics;
 
 public class BossLuna : MonoBehaviour
 {
+    #region Variables
     public Transform playerTransform;
 
     [Header("Detect")]
@@ -20,7 +22,7 @@ public class BossLuna : MonoBehaviour
     
 
     [Header("SkillA")]
-    public bool canUseSkillA = true;
+    public bool canUseSkillA;
     public GameObject holyGrenadePrefab;
     public Transform throwPos;
     public float JumpYForce;
@@ -34,6 +36,10 @@ public class BossLuna : MonoBehaviour
     public GameObject expiationPrefab;
     public float duration;
 
+    [Header("SkillC")]
+    public bool canUseSkillC;
+    public GameObject genesisPrefab;
+
     [Header("Player Pos Check")]
     public LayerMask groundMask;
     public float groundRayLength;
@@ -41,6 +47,7 @@ public class BossLuna : MonoBehaviour
     bool hasCachedTarget;
 
     Rigidbody2D rb;
+    #endregion
 
     void Awake()
     {
@@ -53,6 +60,7 @@ public class BossLuna : MonoBehaviour
 
         Skill_A(); 
         Skill_B();
+        Skill_CTrackVer();
     }
 
     void PlayerDetect()
@@ -134,9 +142,10 @@ public class BossLuna : MonoBehaviour
     }
     #endregion
 
+    #region  Skill_B
     void Skill_B()
     {
-        if(distanceToPlayer <= aggroRange && canUseSkillB)
+        if(canUseSkillB)
         {
             canUseSkillB = false;
             StartCoroutine(SkillBRoutine());
@@ -162,6 +171,30 @@ public class BossLuna : MonoBehaviour
 
         hasCachedTarget = false;
     }
+    #endregion
+
+    #region Skill_C(TrackVer)
+    void Skill_CTrackVer()
+    {
+        if(canUseSkillC)
+        {
+            canUseSkillC = false;
+            CachPlayerPos();
+            GenesisEvent();
+        }
+    }
+
+    void GenesisEvent()
+    {
+        if(!hasCachedTarget) return;
+        Vector2 genesisSpawnpoint = cachedTargetPos + Vector2.up * 7f;
+
+        var genesis = Instantiate(genesisPrefab, genesisSpawnpoint, quaternion.identity);
+        genesis.GetComponent<BossLunaGenesis>().InitializeGenesis(genesisSpawnpoint, 1f, gameObject);
+
+        hasCachedTarget = false;
+    }
+    #endregion
 
     void CachPlayerPos()
     {
