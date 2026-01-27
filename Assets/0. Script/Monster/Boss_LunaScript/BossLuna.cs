@@ -1,11 +1,13 @@
 using UnityEngine;
 using System;
 using UnityEditor.Callbacks;
+using System.Collections.Generic;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.ShaderGraph.Internal;
 using Unity.Mathematics;
+using JetBrains.Annotations;
 
 public class BossLuna : MonoBehaviour
 {
@@ -25,20 +27,37 @@ public class BossLuna : MonoBehaviour
     public bool canUseSkillA;
     public GameObject holyGrenadePrefab;
     public Transform throwPos;
+    public float skillADelay;
+    public float skillAThrowMoment;
     public float JumpYForce;
     public float JumpXForce;
-    public float sideOffset;
+    public float sideOffset; // 투척한 3개의 수류탄 사이의 간격
     public float grenadeTravelTime;
     Vector2 targetPos;
 
     [Header("SkillB")]
     public bool canUseSkillB;
     public GameObject expiationPrefab;
-    public float duration;
+    public float skillBDelay;
+    public float skillBSpawnTime;
 
-    [Header("SkillC")]
-    public bool canUseSkillC;
+    [Header("SkillC_Track")]
+    public bool canUseSkillC_Trackver;
     public GameObject genesisPrefab;
+    public float skillCSpawnTime;
+    public float skillCTrackDuration = 5f;
+    public float skillCTrackInterval = 1.2f;
+    public float skillCTrackElapsed = 0f;
+
+    [Header("SkillC_Random")]
+    public bool canUseSkillC_RandomVer;
+    public Collider2D bossRoomArea;
+    public float skillCRandDuration = 4f;
+    public float skillCRandInterval = 0.8f;
+    public float skillCminDistance = 2f; 
+    public int maxTries = 20;
+    public float skillCSpawnY = 6.5f;
+    public int skillCRandomPosMemoryCount = 6;
 
     [Header("Player Pos Check")]
     public LayerMask groundMask;
@@ -61,6 +80,7 @@ public class BossLuna : MonoBehaviour
         Skill_A(); 
         Skill_B();
         Skill_CTrackVer();
+        Skill_CRandVer();
     }
 
     void PlayerDetect()
@@ -107,11 +127,11 @@ public class BossLuna : MonoBehaviour
     {
         rb.linearVelocity = Vector2.zero;
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(skillADelay);
 
         rb.AddForce(new Vector2(JumpXForce, JumpYForce), ForceMode2D.Impulse);
 
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(skillAThrowMoment);
         CachPlayerPos();
         
         ThrowGrenadeEvent();
@@ -142,7 +162,7 @@ public class BossLuna : MonoBehaviour
     }
     #endregion
 
-    #region  Skill_B
+    #region Skill_B
     void Skill_B()
     {
         if(canUseSkillB)
@@ -154,7 +174,7 @@ public class BossLuna : MonoBehaviour
 
     IEnumerator SkillBRoutine()
     {
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(skillBDelay);
 
         CachPlayerPos();
 
@@ -167,7 +187,7 @@ public class BossLuna : MonoBehaviour
         Vector2 expiationSpawnpoint = cachedTargetPos + Vector2.up * 0.5f;
 
         var expiation = Instantiate(expiationPrefab, expiationSpawnpoint, expiationPrefab.transform.rotation);
-        expiation.GetComponent<BossLunaExpiation>().InitializeExpiation(expiationSpawnpoint, duration, gameObject);
+        expiation.GetComponent<BossLunaExpiation>().InitializeExpiation(expiationSpawnpoint, skillBSpawnTime, gameObject);
 
         hasCachedTarget = false;
     }
@@ -176,24 +196,113 @@ public class BossLuna : MonoBehaviour
     #region Skill_C(TrackVer)
     void Skill_CTrackVer()
     {
-        if(canUseSkillC)
+        if(canUseSkillC_Trackver)
         {
-            canUseSkillC = false;
-            CachPlayerPos();
-            GenesisEvent();
+            canUseSkillC_Trackver = false;
+            StartCoroutine(SkillCTrackRoutine());
         }
     }
 
     void GenesisEvent()
     {
         if(!hasCachedTarget) return;
-        Vector2 genesisSpawnpoint = cachedTargetPos + Vector2.up * 7f;
+        Vector2 genesisSpawnpoint = cachedTargetPos + Vector2.up * genesisPrefab.transform.position.y;
 
-        var genesis = Instantiate(genesisPrefab, genesisSpawnpoint, quaternion.identity);
-        genesis.GetComponent<BossLunaGenesis>().InitializeGenesis(genesisSpawnpoint, 1f, gameObject);
+        var genesis = Instantiate(genesisPrefab, genesisSpawnpoint, genesisPrefab.transform.rotation);
+        genesis.GetComponent<BossLunaGenesis>().InitializeGenesis(genesisSpawnpoint, skillCSpawnTime, gameObject);
 
         hasCachedTarget = false;
     }
+
+    IEnumerator SkillCTrackRoutine()
+    {
+        while (skillCTrackElapsed < skillCTrackDuration)
+        {
+            CachPlayerPos();
+
+            GenesisEvent();
+
+            yield return new WaitForSeconds(skillCTrackInterval);
+
+            skillCTrackElapsed += skillCTrackInterval;
+        }
+    }
+    #endregion
+
+    #region Skill_C(RandomVer)
+    void Skill_CRandVer()
+    {
+        if(canUseSkillC_RandomVer)
+        {
+            canUseSkillC_RandomVer = false;
+            StartCoroutine(SkillCRandomRoutine());
+        }
+    }
+
+    IEnumerator SkillCRandomRoutine()
+    {
+        float endTime = Time.time + skillCRandDuration;
+
+        Bounds b = bossRoomArea.bounds;
+
+        Queue<float> recentXs = new Queue<float>();
+
+        while (Time.time < endTime)
+        {
+            float x = GetRandomXWithMinDistanceAll(b, recentXs, skillCminDistance, maxTries);
+
+            Vector2 pos = new Vector2(x, skillCSpawnY);
+
+            cachedTargetPos = pos;
+            hasCachedTarget = true;
+            GenesisEvent();
+
+            // 기록 업데이트
+            recentXs.Enqueue(x); // 아래 코드에서 랜덤으로 뽑은 좌표 저장
+            if (recentXs.Count > skillCRandomPosMemoryCount) recentXs.Dequeue(); // 가장 오래된 좌표값 제거
+
+            yield return new WaitForSeconds(skillCRandInterval);
+        }
+    }
+
+    float GetRandomXWithMinDistanceAll(Bounds b, IEnumerable<float> usedXs, float minDist, int tries)
+    {
+        for (int i = 0; i < tries; i++)
+        {
+            float x = UnityEngine.Random.Range(b.min.x, b.max.x); // 범위 내의 랜덤 x 좌표 tries 만큼 뽑고
+
+            // 이전 사용한 좌표들과 가까운지 확인
+            bool ok = true;
+            foreach (float ux in usedXs)
+            {
+                if (Mathf.Abs(x - ux) < minDist)
+                {
+                    ok = false; // 조건에 부합하지 않는다면 버리고 다음걸로
+                    break;
+                }
+            }
+
+            if (ok) return x; // 충족되면 해당 좌표 return
+        }
+
+        return UnityEngine.Random.Range(b.min.x, b.max.x); // 무한 루프 방지 코드(좌표가 없으면 씹고 밀어내서 생성 위치 지정)
+    }
+
+    // Vector2 GetRandomPointWithMinDistance(Bounds b, Vector2? lastPos, float minDist, int tries)
+    // {
+    //     for (int i = 0; i < tries; i++)
+    //     {
+    //         float x = UnityEngine.Random.Range(b.min.x, b.max.x);
+    //         Vector2 p = new Vector2(x, skillCSpawnY);
+
+    //         if (!lastPos.HasValue) return p;
+
+    //         if (Vector2.Distance(p, lastPos.Value) >= minDist)
+    //             return p;
+    //     }
+
+    //     return new Vector2(UnityEngine.Random.Range(b.min.x, b.max.x), skillCSpawnY);
+    // }
     #endregion
 
     void CachPlayerPos()
