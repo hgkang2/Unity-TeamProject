@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     public float ingameTime;
     public float stageTime;
 
+    public int hasFlame;
+
     static GameManager instance;
     public static GameManager Instance
     {
@@ -85,7 +87,7 @@ public class GameManager : MonoBehaviour
         stageTime += Time.unscaledDeltaTime;
     }
 
-    public IEnumerator TeleportRoutine(Player p, Transform targetPosition, string BGKey)
+    public IEnumerator TeleportRoutine(Player p, Transform targetPosition, BGSetKey BGKey)
     {
 
         TimeManager.Pause();

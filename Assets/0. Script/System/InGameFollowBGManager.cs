@@ -2,21 +2,26 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum BGSetKey
+{
+    Ground,
+    UnderGround
+}
+
 [Serializable]
 public class IngameFollowBGSet
 {
-    public string key;
+    public BGSetKey key;
     public GameObject root;
 }
-
 public class InGameFollowBGManager : MonoBehaviour
 {
     public static InGameFollowBGManager Instance { get; private set; }
 
     [SerializeField] IngameFollowBGSet[] sets;
-    [SerializeField] string startKey;
+    [SerializeField] BGSetKey startKey;
 
-    Dictionary<string, GameObject> dict;
+    Dictionary<BGSetKey, GameObject> dict;
     GameObject currentRoot;
 
     void Awake()
@@ -28,20 +33,20 @@ public class InGameFollowBGManager : MonoBehaviour
         }
 
         Instance = this;
+
         BuildDictionary();
         DisableAll();
 
-        if (!string.IsNullOrEmpty(startKey))
-            ChangeIngameBG(startKey);
+        ChangeIngameBG(startKey);
     }
 
     void BuildDictionary()
     {
-        dict = new Dictionary<string, GameObject>(StringComparer.Ordinal);
+        dict = new Dictionary<BGSetKey, GameObject>();
 
         foreach (var s in sets)
         {
-            if (string.IsNullOrEmpty(s.key) || s.root == null)
+            if (s.root == null)
                 continue;
 
             if (dict.ContainsKey(s.key))
@@ -60,7 +65,7 @@ public class InGameFollowBGManager : MonoBehaviour
             r.SetActive(false);
     }
 
-    public bool ChangeIngameBG(string key)
+    public bool ChangeIngameBG(BGSetKey key)
     {
         if (!dict.TryGetValue(key, out var nextRoot))
         {
