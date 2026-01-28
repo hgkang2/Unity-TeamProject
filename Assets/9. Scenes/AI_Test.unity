@@ -267,7 +267,7 @@ Transform:
   m_GameObject: {fileID: 78373822}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.14, y: 1.61, z: 0}
+  m_LocalPosition: {x: -0.39, y: 1.61, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -301,8 +301,9 @@ MonoBehaviour:
   skillAThrowMoment: 0.4
   JumpYForce: 8
   JumpXForce: 2
+  rollSpeed: 30
   sideOffset: 2
-  grenadeTravelTime: 1.5
+  grenadeTravelTime: 1.8
   canUseSkillB: 0
   expiationPrefab: {fileID: 876667635922888196, guid: 8c7e6bb0c99a97841b847c0785acfb3e, type: 3}
   skillBDelay: 0.7
@@ -324,7 +325,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 128
-  groundRayLength: 6
+  groundRayLength: 30
 --- !u!1 &105237032
 GameObject:
   m_ObjectHideFlags: 0
@@ -609,7 +610,7 @@ Transform:
   m_GameObject: {fileID: 399982674}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.44, y: 1.96, z: 0}
+  m_LocalPosition: {x: -6.98, y: 1.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1270,7 +1271,7 @@ Transform:
   m_GameObject: {fileID: 1929456907}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.85, y: 0, z: 0}
+  m_LocalPosition: {x: -1.42, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
