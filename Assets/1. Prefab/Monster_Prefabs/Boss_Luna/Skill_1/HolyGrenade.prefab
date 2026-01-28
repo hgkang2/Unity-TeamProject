@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lr: {fileID: 4564314251800835882}
-  segments: 30
+  segments: 100
 --- !u!212 &2839418310272430338
 SpriteRenderer:
   m_ObjectHideFlags: 0

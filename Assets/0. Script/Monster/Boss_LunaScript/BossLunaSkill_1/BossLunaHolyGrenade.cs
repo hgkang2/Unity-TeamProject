@@ -26,11 +26,11 @@ public class BossLunaHolyGrenade : MonoBehaviour
         if(warningSignPos)
         {
             warningSignPos.SetParent(null);
-            warningSignPos.position = targetPos + Vector2.up * 1.5f;
+            warningSignPos.position = targetPos + Vector2.up * 1f;
             warningSignPos.gameObject.SetActive(true);
         }
 
-        traj?.Show(targetPos, travelTime);
+        //traj?.Show(targetPos, travelTime);
         ThrowGrenade(targetPos, travelTime);
     }
 
@@ -49,7 +49,7 @@ public class BossLunaHolyGrenade : MonoBehaviour
         float gravity = -Physics2D.gravity.y * rb.gravityScale;
 
         float velocityX = distance.x / time;
-        float velocityY = (distance.y + 0.7f * gravity * time * time) / time;
+        float velocityY = (distance.y + 0.5f * gravity * time * time) / time;
 
         return new Vector2(velocityX, velocityY);
     }

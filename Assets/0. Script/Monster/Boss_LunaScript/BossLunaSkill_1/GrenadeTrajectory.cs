@@ -42,7 +42,7 @@ public class GrenadeTrajectory : MonoBehaviour
         float g = -Physics2D.gravity.y * gravityScale;
 
         float velocityX = distance.x / time;
-        float velocityY = (distance.y + 0.5f * g * time * time) / time;
+        float velocityY = (distance.y + 1f * g * time * time) / time;
 
         return new Vector2(velocityX, velocityY);
     }

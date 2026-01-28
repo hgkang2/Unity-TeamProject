@@ -31,6 +31,7 @@ public class BossLuna : MonoBehaviour
     public float skillAThrowMoment;
     public float JumpYForce;
     public float JumpXForce;
+    public float rollSpeed;
     public float sideOffset; // 투척한 3개의 수류탄 사이의 간격
     public float grenadeTravelTime;
     Vector2 targetPos;
@@ -66,16 +67,24 @@ public class BossLuna : MonoBehaviour
     bool hasCachedTarget;
 
     Rigidbody2D rb;
+
+    int facingX = 1;
+    Vector3 originScale;
     #endregion
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        originScale = transform.localScale;
+        facingX = 1;
     }
 
     void Update()
     {
         PlayerDetect();
+
+        ApplyFlip();
 
         Skill_A(); 
         Skill_B();
@@ -111,6 +120,11 @@ public class BossLuna : MonoBehaviour
         Vector2 toPlayer = playerPos - myPos;
         distanceOfX = toPlayer.x;
         distanceToPlayer = toPlayer.magnitude;
+
+        if(MathF.Abs(distanceOfX) > 0.1f)
+        {
+            facingX = distanceOfX >0 ? 1: -1;
+        }
     }
 
     #region Skill_A
@@ -129,12 +143,17 @@ public class BossLuna : MonoBehaviour
 
         yield return new WaitForSeconds(skillADelay);
 
-        rb.AddForce(new Vector2(JumpXForce, JumpYForce), ForceMode2D.Impulse);
+        rb.AddForce(new Vector2(JumpXForce * -facingX, JumpYForce), ForceMode2D.Impulse);
 
         yield return new WaitForSeconds(skillAThrowMoment);
         CachPlayerPos();
         
         ThrowGrenadeEvent();
+    }
+
+    void SkillABackJump()
+    {
+        
     }
 
     void ThrowGrenadeEvent()
@@ -146,9 +165,9 @@ public class BossLuna : MonoBehaviour
         Vector2 left = center + Vector2.left * sideOffset;
         Vector2 right = center + Vector2.right * sideOffset;
 
-        ThrowGrenade(left);
         ThrowGrenade(center);
-        ThrowGrenade(right);
+        //ThrowGrenade(left);
+        //ThrowGrenade(right);
 
         hasCachedTarget = false;
     }
@@ -324,6 +343,11 @@ public class BossLuna : MonoBehaviour
             cachedTargetPos = playerTransform.position;
             hasCachedTarget = true;
         }
+    }
+
+    void ApplyFlip()
+    {
+        gameObject.transform.localScale = new Vector3(facingX > 0 ? -originScale.x : originScale.x, originScale.y, originScale.z);
     }
 
     // void OnDrawGizmosSelected()
