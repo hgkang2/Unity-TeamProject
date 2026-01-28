@@ -14,6 +14,13 @@ public class BossLuna : MonoBehaviour
     #region Variables
     public Transform playerTransform;
 
+    [Header("Skill Test")]
+    public bool canUseSkillA;
+    public bool canUseSkillA_Ver2;
+    public bool canUseSkillB;
+    public bool canUseSkillC_Trackver;
+    public bool canUseSkillC_RandomVer;
+
     [Header("Detect")]
     public float aggroRange;
     public float distanceToPlayer;
@@ -24,7 +31,6 @@ public class BossLuna : MonoBehaviour
     
 
     [Header("SkillA")]
-    public bool canUseSkillA;
     public GameObject holyGrenadePrefab;
     public Transform throwPos;
     public float skillADelay;
@@ -36,14 +42,17 @@ public class BossLuna : MonoBehaviour
     public float grenadeTravelTime;
     Vector2 targetPos;
 
+    [Header("SkillA Ver2")]
+    public GameObject grenadeVer2;
+    public float jumpTimeFar;
+    public float jumpTimeNear;
+
     [Header("SkillB")]
-    public bool canUseSkillB;
     public GameObject expiationPrefab;
     public float skillBDelay;
     public float skillBSpawnTime;
 
     [Header("SkillC_Track")]
-    public bool canUseSkillC_Trackver;
     public GameObject genesisPrefab;
     public float skillCSpawnTime;
     public float skillCTrackDuration = 5f;
@@ -51,7 +60,6 @@ public class BossLuna : MonoBehaviour
     public float skillCTrackElapsed = 0f;
 
     [Header("SkillC_Random")]
-    public bool canUseSkillC_RandomVer;
     public Collider2D bossRoomArea;
     public float skillCRandDuration = 4f;
     public float skillCRandInterval = 0.8f;
@@ -86,11 +94,21 @@ public class BossLuna : MonoBehaviour
 
         ApplyFlip();
 
-        Skill_A(); 
+        Skill_A();
+        Skill_AVer2();
         Skill_B();
         Skill_CTrackVer();
         Skill_CRandVer();
     }
+
+    bool isGrounded;
+    void FixedUpdate()
+    {
+        if (isGrounded)
+        {
+            OnJumpLanded();
+        }
+    }   
 
     void PlayerDetect()
     {
@@ -140,20 +158,36 @@ public class BossLuna : MonoBehaviour
     IEnumerator SkillARoutine()
     {
         rb.linearVelocity = Vector2.zero;
+        isGrounded = false;
 
         yield return new WaitForSeconds(skillADelay);
 
         rb.AddForce(new Vector2(JumpXForce * -facingX, JumpYForce), ForceMode2D.Impulse);
+        StartCoroutine(SkillABackJump());
 
         yield return new WaitForSeconds(skillAThrowMoment);
+        
+
+        yield return new WaitForSeconds(0.5f);
         CachPlayerPos();
         
         ThrowGrenadeEvent();
     }
 
-    void SkillABackJump()
+    IEnumerator SkillABackJump()
     {
-        
+        float rotated = 0f;
+        float speed = 720f; // 회전 속도
+
+        while (rotated < 360f)
+        {
+            float step = speed * Time.deltaTime;
+            transform.Rotate(0f, 0f, -step);
+            rotated += step;
+            yield return null;
+        }
+
+        transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
     }
 
     void ThrowGrenadeEvent()
@@ -168,17 +202,117 @@ public class BossLuna : MonoBehaviour
         ThrowGrenade(center);
         //ThrowGrenade(left);
         //ThrowGrenade(right);
+        //SkillAGrenadeVer2(center);
 
         hasCachedTarget = false;
     }
 
     void ThrowGrenade(Vector2 targetPos)
     {
-        var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
-        grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
-
+        //var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
+        grenadeTravelTime = 0.3f;
+        //grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
+        
+        var grenade = Instantiate(grenadeVer2, throwPos.position, Quaternion.identity);
+        grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
         hasCachedTarget = false;
     }
+    #endregion
+
+    #region Skill_A Ver2
+    [SerializeField] float nearDist = 6f;
+    [SerializeField] float farDist  = 12f;
+    public float jumpTime;
+    public float margin;
+    bool useStraight;
+    Vector2 landingPos;
+    void Skill_AVer2()
+    {
+        if(canUseSkillA_Ver2)
+        {
+            canUseSkillA_Ver2 = false;
+            StartCoroutine(SkillAVer2Routine());
+        }
+    }
+
+    IEnumerator SkillAVer2Routine()
+    {
+        isGrounded = false;
+        CachPlayerPos();
+        SkillAJumpPosCalc();
+
+        yield return new WaitForSeconds(0.7f);
+
+        StartBackJump();
+
+        yield return new WaitForSeconds(0.1f);
+
+        StartCoroutine(SkillABackJump());
+
+        yield return new WaitForSeconds(0.3f);
+
+        //ThrowGrenadeEvent();
+        //StartCoroutine(LandFriction(0.1f, 10f));
+    }
+
+    void StartBackJump()
+    {
+        Vector2 start = rb.position;
+        Vector2 v = CalcVelocity(start, landingPos, jumpTime);
+        rb.linearVelocity = v;
+    }
+
+    void SkillAJumpPosCalc()
+    {
+        Vector2 bossPos = rb.position;  
+        float d = Vector2.Distance(bossPos, cachedTargetPos);
+
+        float jumpTime = (d < nearDist) ? jumpTimeNear
+            : (d > farDist)  ? jumpTimeFar
+            : Mathf.Lerp(jumpTimeNear, jumpTimeFar, (d - nearDist) / (farDist - nearDist));
+
+        useStraight = d > farDist;
+
+        // 착지점: 보는 방향 반대(-facingX)로 플레이어 기준 10f
+        float desiredX = cachedTargetPos.x + (-facingX) * 10f;
+
+        Bounds b = bossRoomArea.bounds;
+        desiredX = Mathf.Clamp(desiredX, b.min.x + margin, b.max.x - margin);
+
+        landingPos = new Vector2(desiredX, rb.position.y);
+    }
+
+    Vector2 CalcVelocity(Vector2 start, Vector2 target, float time)
+    {
+        Vector2 d = target - start;
+        float g = -Physics2D.gravity.y * rb.gravityScale; // 양수
+
+        float vx = d.x / time;
+        float vy = (d.y + 0.5f * g * time * time) / time;
+
+        return new Vector2(vx, vy);
+    }
+
+    // void SkillAGrenadeVer2(Vector2 tartgetPos)
+    // {
+    //     if(useStraight)
+    //     {
+    //         var grenade = Instantiate(grenadeVer2, throwPos.position, Quaternion.identity);
+    //         grenadeTravelTime = 0.4f;
+    //         grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
+    //     }
+    //     else
+    //     {
+    //         var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
+    //         grenadeTravelTime = 1.1f;
+            
+    //         grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
+    //     }
+        
+        
+    //     //grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
+    //     hasCachedTarget = false;
+    // }
     #endregion
 
     #region Skill_B
@@ -349,6 +483,36 @@ public class BossLuna : MonoBehaviour
     {
         gameObject.transform.localScale = new Vector3(facingX > 0 ? -originScale.x : originScale.x, originScale.y, originScale.z);
     }
+
+    void OnJumpLanded()
+    {
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        rb.angularVelocity = 0f;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if(collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
+    }
+
+    // IEnumerator LandFriction(float time, float drag)
+    // {
+    //     float prev = rb.linearDamping;
+    //     rb.linearDamping = drag;
+    //     yield return new WaitForSeconds(time);
+    //     rb.linearDamping = prev;
+    // }
 
     // void OnDrawGizmosSelected()
     // {

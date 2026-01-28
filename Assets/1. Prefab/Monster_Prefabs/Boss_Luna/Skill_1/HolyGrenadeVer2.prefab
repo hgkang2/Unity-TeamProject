@@ -96,14 +96,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6782148627351906675}
-  - component: {fileID: 5256373811095414830}
+  - component: {fileID: 4615888417448944936}
   - component: {fileID: 5237173804551284482}
   - component: {fileID: 2839418310272430338}
   - component: {fileID: 7962239709964717913}
   - component: {fileID: 186414828261767485}
   - component: {fileID: 4564314251800835882}
   m_Layer: 31
-  m_Name: HolyGrenade
+  m_Name: HolyGrenadeVer2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -125,7 +125,7 @@ Transform:
   - {fileID: 3499949746115105746}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5256373811095414830
+--- !u!114 &4615888417448944936
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -134,13 +134,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4542838770508194207}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cad860860fa2b3e4f9f7e60f70027371, type: 3}
+  m_Script: {fileID: 11500000, guid: 72639df8f717a024f87a344174ada4f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  explodeRadius: 1
   warningSignPos: {fileID: 3499949746115105746}
   ExplosionEffect: {fileID: 4715333124005903316, guid: 8e4cc13f4db255f4f9a7ecfe3a76de1f, type: 3}
-  explodeRadius: 0.5
-  yVel: 0.5
 --- !u!114 &5237173804551284482
 MonoBehaviour:
   m_ObjectHideFlags: 0

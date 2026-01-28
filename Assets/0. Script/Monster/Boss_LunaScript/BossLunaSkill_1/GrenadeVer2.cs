@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-public class BossLunaHolyGrenade : MonoBehaviour
+public class GrenadeVer2 : MonoBehaviour
 {
     public Transform warningSignPos;
     public GameObject ExplosionEffect;
@@ -17,30 +17,12 @@ public class BossLunaHolyGrenade : MonoBehaviour
         if(warningSignPos) warningSignPos.gameObject.SetActive(false);
         traj = GetComponent<GrenadeTrajectory>();
     }
-    
-    bool hasTarget;
-    bool exploded;
-    public float explodeRadius;
-    void FixedUpdate()
-    {   
-        //if( yVel <= 0f) return;
-        
-        if (!hasTarget || exploded) return;
 
-        float sqrDist = ((Vector2)transform.position - targetPos).sqrMagnitude;
-        if (sqrDist <= explodeRadius * explodeRadius)
-        {
-            exploded = true;
-            StartCoroutine(ExplodeRoutine());
-        }
-    }
 
     public void InitializeGrenadeThrow(Vector2 targetPos, float travelTime, GameObject owner)
     {
         this.targetPos = targetPos;
         this.owner = owner;
-        hasTarget = true;
-        exploded = false;
 
         if(warningSignPos)
         {
@@ -50,47 +32,40 @@ public class BossLunaHolyGrenade : MonoBehaviour
         }
 
         //traj?.Show(targetPos, travelTime);
-        ThrowGrenade(targetPos, travelTime);
+        //ThrowGrenade(targetPos, travelTime);
+
+        ThrowStraight(targetPos, travelTime);
     }
 
-    void ThrowGrenade(Vector2 targetPos, float travelTime)
+    public void ThrowStraight(Vector2 targetPos, float travelTime)
     {
-        Vector2 start = rb.position;
-        Vector2 velocity = CaculateVelocity(start, targetPos, travelTime);
+        Vector2 start = transform.position;
+        Vector2 dir = (targetPos - start);
+        float distance = dir.magnitude;
 
-        rb.linearVelocity = Vector2.zero;
-        rb.linearVelocity = velocity;
-    }
-
-    public float yVel;
-    Vector2 CaculateVelocity(Vector2 start, Vector2 target, float time)
-    {
-        Vector2 distance = target - start;
-        float gravity = -Physics2D.gravity.y * rb.gravityScale;
-
-        float velocityX = distance.x / time;
-        float velocityY = (distance.y + yVel * gravity * time * time) / time;
-
-        return new Vector2(velocityX, velocityY);
+        rb.gravityScale = 0f;
+        rb.linearVelocity = dir.normalized * (distance / travelTime);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if( yVel <= 0f) return;
-
         if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Player"))
         {
-            //StartCoroutine(ExplodeRoutine());
+
+
+            StartCoroutine(ExplodeRoutine());
         }
     }
 
     IEnumerator ExplodeRoutine()
     {
+        
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
         Destroy(warningSignPos.gameObject);
         traj?.Hide();
         yield return new WaitForSeconds(0.5f);
+
 
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
         Destroy(this.gameObject);
