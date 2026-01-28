@@ -1,18 +1,33 @@
 using UnityEngine;
 
-public class BackGroundFollow : MonoBehaviour
+public class InGameFollowBG : MonoBehaviour
 {
-    Transform cam;
     [SerializeField, Range(0f, 1f)] float followFactor = 0.15f;
 
+    Transform cam;
     Vector3 startPos;
     float camStartX;
 
     void Awake()
     {
-        Camera main = Camera.main;
-        cam = main.transform;
+        CacheCamera();
+        ResetOrigin();
+    }
 
+    void OnEnable()
+    {
+        CacheCamera();
+        ResetOrigin();
+    }
+
+    void CacheCamera()
+    {
+        Camera main = Camera.main;
+        cam = main != null ? main.transform : null;
+    }
+
+    public void ResetOrigin()
+    {
         startPos = transform.position;
         camStartX = cam != null ? cam.position.x : 0f;
     }
@@ -24,7 +39,6 @@ public class BackGroundFollow : MonoBehaviour
         float camDeltaX = cam.position.x - camStartX;
         float x = startPos.x + camDeltaX * followFactor;
 
-        // Y는 startPos.y 고정
         transform.position = new Vector3(x, startPos.y, startPos.z);
     }
 }

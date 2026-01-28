@@ -6,6 +6,8 @@ public class Elevator : MonoBehaviour, IInteractable
 {
     [Header("순간이동할 위치")]
     [SerializeField] Transform targetPos;
+    [Header("순간이동할 맵의 배경")]
+    [SerializeField] string BGkey;
 
 
     [Header("아래는 초기화용 건들지말기")]
@@ -28,7 +30,7 @@ public class Elevator : MonoBehaviour, IInteractable
     {
         leverAnimator.SetTrigger("Interact");
         leverAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
-        StartCoroutine(GameManager.Instance.TeleportRoutine(player, targetPos));
+        StartCoroutine(GameManager.Instance.TeleportRoutine(player, targetPos, BGkey));
         StartCoroutine(Initialize());
     }
     IEnumerator Initialize()

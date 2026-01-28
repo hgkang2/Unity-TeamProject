@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
         stageTime += Time.unscaledDeltaTime;
     }
 
-    public IEnumerator TeleportRoutine(Player p, Transform targetPosition)
+    public IEnumerator TeleportRoutine(Player p, Transform targetPosition, string BGKey)
     {
 
         TimeManager.Pause();
@@ -98,6 +98,7 @@ public class GameManager : MonoBehaviour
         p.transform.position = newPos;
         CameraManager.Instance.CameraWarp(p.transform, delta);
 
+        InGameFollowBGManager.Instance.ChangeIngameBG(BGKey);
         TimeManager.Resume();
         yield return FadeInRoutine(1f);    // 끝날 때까지 대기
     }
