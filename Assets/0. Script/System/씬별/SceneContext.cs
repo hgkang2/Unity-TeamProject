@@ -18,6 +18,7 @@ public class SceneContext : MonoBehaviour
     public LevelUpPanel levelUpPanel;
     public HaveSoulPanel haveSoulsPanel;
     public IngameSettingPanel ingameSettingPanel;
+    public AltarUI altarUI;
 
     [Header("Stage1 Tutorial")]
     public TutorialTrigger2D tutorialTrigger_monsterMeet;

@@ -229,6 +229,8 @@ public class Chick : MonoBehaviour, IInteractable
         if (isInteracting)
             return;
 
+        interactor.InteractExit();
+
         isInteracting = true;
 
         // 진행 중 행동 중지

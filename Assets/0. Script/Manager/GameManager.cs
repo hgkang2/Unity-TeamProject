@@ -1,5 +1,5 @@
+using System;
 using System.Collections;
-using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     public float ingameTime;
     public float stageTime;
 
-    public int hasFlame;
+
 
     static GameManager instance;
     public static GameManager Instance
@@ -143,6 +143,55 @@ public class GameManager : MonoBehaviour
         // 1 : serena, 2 : luna, 3 : 미출시
         curcharacter = (CharacterId)(num);
     }
+
+    #region 정화의 불꽃 처리
+    int hasFlame;
+    public int HasFlame => hasFlame;
+    public event Action changedHasFlame;
+    public void AddFlame(int amount = 1)
+    {
+        if (amount <= 0) return;
+
+        hasFlame += amount;
+        changedHasFlame?.Invoke();
+    }
+
+    int usedFlame;
+    public int UsedFlame => usedFlame;
+    public event Action changedUsedFlame;
+    public void AlterPurify(int amount)
+    {
+        usedFlame += amount;
+        hasFlame -= amount;
+
+        // 바쳐진 제물의 개수에 따라 확률적으로 제단 활성화
+        switch (usedFlame)
+        {
+            case 1:
+                if (UnityEngine.Random.value < 0.3f) ActivateAlter();
+                break;
+            case 2:
+                if (UnityEngine.Random.value < 0.6f) ActivateAlter();
+                break;
+            case 3:
+                ActivateAlter();
+                break;
+            default:
+                Debug.LogWarning($"4개 이상의 제물이 바쳐짐");
+                break;
+        }
+
+        changedUsedFlame?.Invoke();
+    }
+    public void ActivateAlter()
+    {
+        usedFlame = 3;
+        changedUsedFlame?.Invoke();
+        Debug.Log("제단 활성화");
+    }
+
+    #endregion
+
 
     public void QuitGame()
     {

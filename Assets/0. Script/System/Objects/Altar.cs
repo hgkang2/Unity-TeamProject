@@ -2,28 +2,50 @@ using UnityEngine;
 
 public class Altar : MonoBehaviour, IInteractable
 {
-    [SerializeField] Transform interactionBound;
+    AltarUI altarUI;
+    [SerializeField] Transform interactUIPos;
 
-    [SerializeField] GameObject candle1;
-    [SerializeField] GameObject candle2;
-    [SerializeField] GameObject candle3;
+    [SerializeField] GameObject[] candles;
 
     int offeredFlame = 0;
     bool isActivated = false;
 
     void Awake()
     {
-        candle1.SetActive(false);
-        candle2.SetActive(false);
-        candle3.SetActive(false);
+        SceneContext sc = FindFirstObjectByType<SceneContext>();
+        altarUI = sc.altarUI;
+        
+        foreach(var candle in candles) candle.SetActive(false);
+    }
+
+    void OnEnable()
+    {
+        GameManager.Instance.changedUsedFlame += SetFlameUsedImage;
+    }
+
+    void OnDisable()
+    {
+        GameManager.Instance.changedUsedFlame -= SetFlameUsedImage;
+    }
+
+    void SetFlameUsedImage()
+    {
+        int count = GameManager.Instance.UsedFlame;
+
+        for (int i = 0; i < candles.Length; i++)
+        {
+            candles[i].SetActive(i < count);
+        }
+
+        if(count == 3) isActivated = true;
     }
 
 
-    public Transform InteractionUIPosition => interactionBound;
+    public Transform InteractionUIPosition => interactUIPos;
 
     public bool CanInteract()
     {
-        return true;
+        return !isActivated;
     }
 
     public void Exit()
@@ -33,26 +55,13 @@ public class Altar : MonoBehaviour, IInteractable
 
     public void Interact(Player user, Interactor interactor)
     {
-        switch (GameManager.Instance.hasFlame)
-        {
-            case 0:
-
-            break;
-            case 1:
-
-            break;
-            case 2:
-
-            break;
-            case 3:
-
-            break;
-        }
+        altarUI.Open();
+        altarUI.interactor = interactor;
     }
 
     public bool IsAvailable()
     {
-        return true;
+        return !isActivated;
     }
 
     public void OnFocus()
