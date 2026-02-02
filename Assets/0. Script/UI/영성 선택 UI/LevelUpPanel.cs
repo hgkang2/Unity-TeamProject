@@ -5,15 +5,14 @@ using DG.Tweening;
 
 public class LevelUpPanel : UIPanelBase
 {
+    [SerializeField] AudioClip cardSound1;
+    [SerializeField] AudioClip cardSound2;
+    [SerializeField] AudioClip cardShuffleSound;
     SoulPanel[] soulPanels;
     [SerializeField] Button rerollButton;
     [SerializeField] TMP_Text rerollText;
     int panelNum = 2;
     SoulPanel selectedSoulPanel;
-
-    //레벨업 이벤트 구독 용
-    Exp exp;
-
     Vector3[] soulPanels_OriginPos = new Vector3[3];
 
     SceneContext sceneContext;
@@ -166,6 +165,10 @@ public class LevelUpPanel : UIPanelBase
                 rect.DORotate(new Vector3(0f, nowY, angle), 0.3f, RotateMode.Fast)
                     .SetEase(Ease.OutCubic)
             );
+            cardSeq.AppendCallback(() =>
+            {
+                SoundManager.Instance.PlaySFX(cardSound1);
+            });
 
             // 3단계 : Fade Out
             cardSeq.Append(
@@ -200,12 +203,20 @@ public class LevelUpPanel : UIPanelBase
                     .SetEase(fifth_MoveEase)
                     .SetDelay(fifthDelay)
             );
+            cardSeq.AppendCallback(() =>
+            {
+                SoundManager.Instance.PlaySFX(cardSound2);
+            });
 
             // 6단계 : 회전 + 내용 보이기
             cardSeq.Append(
                 rect.DOLocalRotate(new Vector3(0f, 90f, 0f), sixth_MoveDuration / 2, RotateMode.LocalAxisAdd)
                     .SetEase(sixth_MoveEase)
             );
+            cardSeq.AppendCallback(() =>
+            {
+                SoundManager.Instance.PlaySFX(cardShuffleSound);
+            });
 
             int index = i;
             cardSeq.AppendCallback(() =>

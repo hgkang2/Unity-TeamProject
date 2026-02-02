@@ -97,10 +97,11 @@ public class LocalSFX : MonoBehaviour
 
     void StopAllLoops()
     {
-        foreach (KeyValuePair<string, AudioSource> pair in loopSources)
-        {
-            StopLoop(pair.Key);
-        }
+        var keys = new List<string>(loopSources.Keys);
+
+        foreach (var key in keys)
+            StopLoop(key);
+
         loopSources.Clear();
     }
 

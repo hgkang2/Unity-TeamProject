@@ -20,9 +20,9 @@ TagManager:
   - Player
   - Ground
   - NoWallClimb
-  - 
+  - Environment
   - IInteractable
-  - 
+  - IInteractbale(Rigidbody)
   - 
   - 
   - 

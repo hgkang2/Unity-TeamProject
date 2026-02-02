@@ -193,6 +193,11 @@ public class PlayerMove : MonoBehaviour
         {
             newX = 0f;
         }
+        // 기타 조작 불가
+        else if (!player.CanControl)
+        {
+            
+        }
         // 일반 이동
         else
         {

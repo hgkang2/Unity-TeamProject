@@ -5,6 +5,7 @@ public class SceneContext : MonoBehaviour
 {
     
     public Player player;
+    public Interactor interactor;
     [Header("Player/TutorialCollider")]
     
     [Header("CameraManager/Cameras/MouseVFXCamera")]
@@ -12,10 +13,12 @@ public class SceneContext : MonoBehaviour
     public CinemachineCamera cinemachineCamera;
     public CinemachineCamera cinemachineCamera_tutorialTrap;
 
+    public Canvas canvas;
     public DialoguePanel dialoguePanel;
     public LevelUpPanel levelUpPanel;
     public HaveSoulPanel haveSoulsPanel;
     public IngameSettingPanel ingameSettingPanel;
+    public AltarUI altarUI;
 
     [Header("Stage1 Tutorial")]
     public TutorialTrigger2D tutorialTrigger_monsterMeet;

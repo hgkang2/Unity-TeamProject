@@ -81,20 +81,20 @@ public class SoundManager : MonoBehaviour
     }
 
 
-    public void PlayUI(AudioClip clip)
+    public void PlaySFX(AudioClip clip)
     {
         if (clip == null) return;
         uiSource.PlayOneShot(clip, masterVolume * sfxVolume);
     }
 
-    public void PlayUI(string key, bool loop = true)
+    public void PlaySFX(string key, bool loop = true)
     {
         if (!uiLibrary.TryGetValue(key, out AudioClip clip) || clip == null)
         {
             Debug.LogWarning($"[SoundManager] UI key not found: {key}");
             return;
         }
-        PlayUI(clip);
+        PlaySFX(clip);
     }
 
     public void SetMasterVolume(float volume)

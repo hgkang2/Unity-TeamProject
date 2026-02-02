@@ -20,7 +20,7 @@ public class UIPointerSfx : MonoBehaviour,
         if (string.IsNullOrEmpty(hoverKey)) return;
         if (hovered) return;
         hovered = true;
-        SoundManager.Instance?.PlayUI(hoverKey);
+        SoundManager.Instance?.PlaySFX(hoverKey);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -33,6 +33,6 @@ public class UIPointerSfx : MonoBehaviour,
         if (!enableClick) return;
         if (string.IsNullOrEmpty(clickKey)) return;
 
-        SoundManager.Instance?.PlayUI(clickKey);
+        SoundManager.Instance?.PlaySFX(clickKey);
     }
 }
