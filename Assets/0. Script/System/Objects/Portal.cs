@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
-public class Elevator : MonoBehaviour, IInteractable
+public class Portal : MonoBehaviour, IInteractable
 {
     [Header("순간이동할 위치")]
     [SerializeField] Transform targetPos;
@@ -10,12 +12,22 @@ public class Elevator : MonoBehaviour, IInteractable
     [SerializeField] BGSetKey BGkey;
 
 
-    [Header("아래는 초기화용 건들지말기")]
     [SerializeField] Animator animator;
     [SerializeField] SpriteRenderer sprite;
-
     [SerializeField] Transform interactionUIPos;
     public Transform InteractionUIPosition => interactionUIPos;
+
+    LocalSFX localSFX;
+
+    void Awake()
+    {
+        localSFX = GetComponent<LocalSFX>();
+    }
+    void Start()
+    {
+        localSFX.Play("Open");
+        localSFX.PlayLoop("Continue");
+    }
 
     public bool CanInteract()
     {
@@ -28,17 +40,17 @@ public class Elevator : MonoBehaviour, IInteractable
     }
     public void Interact(Player player, Interactor interactor)
     {
-        animator.SetTrigger("Interact");
         animator.updateMode = AnimatorUpdateMode.UnscaledTime;
         StartCoroutine(GameManager.Instance.TeleportRoutine(player, targetPos, BGkey));
-        StartCoroutine(Initialize());
+        StartCoroutine(Close());
+        localSFX.Play("Horolrolro");
     }
-    IEnumerator Initialize()
+
+    IEnumerator Close()
     {
-        yield return new WaitForSeconds(5);
-        animator.SetTrigger("Initialize");
-        animator.updateMode = AnimatorUpdateMode.Normal;
-        HighlightOff();
+        yield return new WaitForSecondsRealtime(0.5f);
+        localSFX.Play("Close");
+        animator.SetTrigger("Close");
     }
 
     public bool IsAvailable()
@@ -49,7 +61,6 @@ public class Elevator : MonoBehaviour, IInteractable
     public void OnFocus()
     {
         HighlightOn();
-        animator.SetTrigger("OnFocus");
     }
 
     public void OnUnfocus()

@@ -158,7 +158,7 @@ public class GameManager : MonoBehaviour
 
     int usedFlame;
     public int UsedFlame => usedFlame;
-    public event Action changedUsedFlame;
+    public event Action changedUsedFlame;  
     public void AlterPurify(int amount)
     {
         usedFlame += amount;
@@ -183,10 +183,13 @@ public class GameManager : MonoBehaviour
 
         changedUsedFlame?.Invoke();
     }
+
+    public event Action AltarActivated;
     public void ActivateAlter()
     {
         usedFlame = 3;
         changedUsedFlame?.Invoke();
+        AltarActivated?.Invoke();
         Debug.Log("제단 활성화");
     }
 

@@ -4,6 +4,7 @@ public class Altar : MonoBehaviour, IInteractable
 {
     AltarUI altarUI;
     [SerializeField] Transform interactUIPos;
+    [SerializeField] GameObject portal;
 
     [SerializeField] GameObject[] candles;
 
@@ -21,11 +22,13 @@ public class Altar : MonoBehaviour, IInteractable
     void OnEnable()
     {
         GameManager.Instance.changedUsedFlame += SetFlameUsedImage;
+        GameManager.Instance.AltarActivated += AltarActivate;
     }
 
     void OnDisable()
     {
         GameManager.Instance.changedUsedFlame -= SetFlameUsedImage;
+        GameManager.Instance.AltarActivated -= AltarActivate;
     }
 
     void SetFlameUsedImage()
@@ -38,6 +41,11 @@ public class Altar : MonoBehaviour, IInteractable
         }
 
         if(count == 3) isActivated = true;
+    }
+    void AltarActivate()
+    {
+        isActivated = true;
+        portal.SetActive(true);
     }
 
 
