@@ -267,7 +267,7 @@ Transform:
   m_GameObject: {fileID: 78373822}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.5, y: 1.64, z: 0}
+  m_LocalPosition: {x: 3.3, y: 1.64, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -295,6 +295,7 @@ MonoBehaviour:
   playerMask:
     serializedVersion: 2
     m_Bits: 64
+  basicAttackHitBox: {fileID: 0}
   attackRange: 3
   holyGrenadePrefab: {fileID: 4542838770508194207, guid: 5833a647d14ac0b4587ddc9be8f56fe3, type: 3}
   grenadeVer2: {fileID: 4542838770508194207, guid: cb071f29c9aada748a0e5db7986b90be, type: 3}
@@ -630,7 +631,7 @@ Transform:
   m_GameObject: {fileID: 399982674}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.13, y: 1.22, z: 0}
+  m_LocalPosition: {x: -3.7, y: 1.22, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

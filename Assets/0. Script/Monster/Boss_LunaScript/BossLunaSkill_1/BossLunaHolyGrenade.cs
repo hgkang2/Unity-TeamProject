@@ -47,7 +47,7 @@ public class BossLunaHolyGrenade : MonoBehaviour
             warningSignPos.gameObject.SetActive(true);
         }
 
-        //traj?.Show(targetPos, travelTime);
+        traj?.Show(targetPos, travelTime);
         ThrowGrenade(targetPos, travelTime);
     }
 
