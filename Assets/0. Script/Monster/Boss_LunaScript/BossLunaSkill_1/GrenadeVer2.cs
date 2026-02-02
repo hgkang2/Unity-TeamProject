@@ -4,6 +4,9 @@ using System.Collections;
 
 public class GrenadeVer2 : MonoBehaviour
 {
+    [SerializeField] GameObject innerExlpodeArea;
+    [SerializeField] GameObject middleExplodeArea;
+    [SerializeField] GameObject outerExplodeArea;
     public Transform warningSignPos;
     public GameObject ExplosionEffect;
     GrenadeTrajectory traj;
@@ -51,23 +54,22 @@ public class GrenadeVer2 : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Player"))
         {
-
-
             StartCoroutine(ExplodeRoutine());
         }
     }
 
     IEnumerator ExplodeRoutine()
     {
-        
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
         Destroy(warningSignPos.gameObject);
         traj?.Hide();
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
 
 
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
+        
+
         Destroy(this.gameObject);
     }
 }

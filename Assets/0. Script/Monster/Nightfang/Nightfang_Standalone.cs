@@ -20,6 +20,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Animator animator;
     [SerializeField] Animator vfxAnimator;
+    [SerializeField] MonsterEventChannel monsterEvent;
     [SerializeField] public SpriteRenderer spriteRenderer;
     LocalSFX sfx;
     HP hp;
@@ -582,6 +583,7 @@ public class NightfangStandalone : MonoBehaviour, IDamageable
         animator.SetTrigger("Dead");
 
         StopAllCoroutines();
+        monsterEvent.RaiseMonsterDead();
         isUsingSkill = false;
 
         GetComponent<Collider2D>().enabled = false;

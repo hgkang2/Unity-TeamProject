@@ -21,6 +21,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator animator;
     [SerializeField] Animator vfxAnimator;
+    [SerializeField] MonsterEventChannel monsterEvent;
     HP hp;
     LocalSFX sfx;
 
@@ -536,6 +537,7 @@ public class Felmos_Test : MonoBehaviour, IDamageable
         animator?.SetTrigger("Dead");
 
         StopAllCoroutines();
+        monsterEvent.RaiseMonsterDead();
         isAttacking = false;
 
         GetComponent<Collider2D>().enabled = false;

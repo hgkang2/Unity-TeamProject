@@ -1,12 +1,10 @@
-using System.ComponentModel;
 using UnityEngine;
 
-public class BossLunaBasicAtkHitBox : MonoBehaviour
+public class BossLunaExpiationHitBox : MonoBehaviour
 {
-    [SerializeField] float damage = 10f;
+    [SerializeField] float damage;
     [SerializeField] DamageType damageType;
     [SerializeField] Collider2D col;
-    //LocalSFX sfx;
 
     BossLuna bossLuna;
 
@@ -22,9 +20,8 @@ public class BossLunaBasicAtkHitBox : MonoBehaviour
         if(collision.TryGetComponent<IDamageable>(out var damageable))
         {
             Vector2 hitPos = transform.position;
-            damageable.TakeDamage(damage,damageType, hitPos);
-
-            bossLuna.BasicAttackHitCombo();
+            damageable.TakeDamage(damage, DamageType.Normal, hitPos);
+            bossLuna.hasSkillBHit = true;
         }
     }
 }

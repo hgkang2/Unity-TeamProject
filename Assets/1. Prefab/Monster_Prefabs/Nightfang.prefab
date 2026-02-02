@@ -724,11 +724,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3401993074058783418}
+  - component: {fileID: 4374579463350917064}
   - component: {fileID: 3837669514687026716}
   - component: {fileID: 2385346632982430652}
   - component: {fileID: 4706650381876820821}
   - component: {fileID: 3454637434491517520}
-  - component: {fileID: 4374579463350917064}
   - component: {fileID: 1091997839790200113}
   - component: {fileID: 1991725715858692186}
   - component: {fileID: 5668301796177521214}
@@ -758,6 +758,70 @@ Transform:
   - {fileID: 3960777848846684979}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4374579463350917064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7052323503559932824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbbde55a8e5bdd8429fb66b08fd9078b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enablePatrol: 1
+  enableAggro: 1
+  enableAttack: 1
+  enableSkill: 1
+  state: 0
+  stateTimer: 0
+  rb: {fileID: 4706650381876820821}
+  animator: {fileID: 2385346632982430652}
+  vfxAnimator: {fileID: 429493440188281348}
+  monsterEvent: {fileID: 11400000, guid: 95cae45f2f0bbc64e9977ea84876aceb, type: 2}
+  spriteRenderer: {fileID: 3837669514687026716}
+  skillHitBoxObj: {fileID: 6924634786436510817}
+  attackHitboxObj: {fileID: 2228227066451931551}
+  idleTime: 1
+  patrolSpeed: 2
+  patrolTime: 2
+  alertSprite: {fileID: 3152607725845675935}
+  alertedStateDuration: 15
+  aggroRange: 8
+  aggroSpeed: 3.5
+  freezeZoneX: 0.1
+  WarningVFX: {fileID: 2575265818629752074}
+  attackRange: 2
+  attackDashForce: 10
+  readyAttackWindup: 1
+  attackCoolTime: 1
+  attackDuration: 0.5
+  maxHeightDiffForAttack: 2.04
+  skillRange: 4.5
+  skillDashForce: 12
+  readySkillWindup: 1
+  skillCoolTime: 5
+  skillDuration: 0.7
+  delayTime: 1
+  standByTime: 1
+  player: {fileID: 0}
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  distance: 0
+  knockBackXForce: 5
+  knockBackYForce: 2
+  hitStunTime: 0.5
+  hitLockDuration: 0.15
+  isHit: 0
+  boxCollider: {fileID: 5378892132954568225}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 128
+  rayLength: 1
+  forwardPadding: 0.2
+  bottomPadding: 0.3
 --- !u!212 &3837669514687026716
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -899,69 +963,6 @@ CapsuleCollider2D:
   m_Offset: {x: -0.06076002, y: 0.017974973}
   m_Size: {x: 2.6559496, y: 2.6559498}
   m_Direction: 0
---- !u!114 &4374579463350917064
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7052323503559932824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbbde55a8e5bdd8429fb66b08fd9078b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enablePatrol: 1
-  enableAggro: 1
-  enableAttack: 1
-  enableSkill: 1
-  state: 0
-  stateTimer: 0
-  rb: {fileID: 4706650381876820821}
-  animator: {fileID: 2385346632982430652}
-  vfxAnimator: {fileID: 429493440188281348}
-  spriteRenderer: {fileID: 3837669514687026716}
-  skillHitBoxObj: {fileID: 6924634786436510817}
-  attackHitboxObj: {fileID: 2228227066451931551}
-  idleTime: 1
-  patrolSpeed: 2
-  patrolTime: 2
-  alertSprite: {fileID: 3152607725845675935}
-  alertedStateDuration: 15
-  aggroRange: 8
-  aggroSpeed: 3.5
-  freezeZoneX: 0.1
-  WarningVFX: {fileID: 2575265818629752074}
-  attackRange: 2
-  attackDashForce: 10
-  readyAttackWindup: 1
-  attackCoolTime: 1
-  attackDuration: 0.5
-  maxHeightDiffForAttack: 2.04
-  skillRange: 4.5
-  skillDashForce: 12
-  readySkillWindup: 1
-  skillCoolTime: 5
-  skillDuration: 0.7
-  delayTime: 1
-  standByTime: 1
-  player: {fileID: 0}
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  distance: 0
-  knockBackXForce: 5
-  knockBackYForce: 2
-  hitStunTime: 0.5
-  hitLockDuration: 0.15
-  isHit: 0
-  boxCollider: {fileID: 5378892132954568225}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 128
-  rayLength: 1
-  forwardPadding: 0.2
-  bottomPadding: 0.3
 --- !u!114 &1091997839790200113
 MonoBehaviour:
   m_ObjectHideFlags: 0

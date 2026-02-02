@@ -22,6 +22,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     [SerializeField] Animator animator;
     [SerializeField] Animator vfxAnimator;
     [SerializeField] SpriteRenderer spriteRenderer;
+    [SerializeField] MonsterEventChannel monsterEvent;
     HP hp;
 
     [Header("hitbox")]
@@ -509,6 +510,7 @@ public class Malirgue : MonoBehaviour, IDamageable
         animator?.SetTrigger("Dead");
 
         StopAllCoroutines();
+        monsterEvent.RaiseMonsterDead();
         isAttacking = false;
 
         GetComponent<Collider2D>().enabled = false;

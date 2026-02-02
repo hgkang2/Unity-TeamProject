@@ -28,6 +28,7 @@ public class BossLuna : MonoBehaviour, IDamageable
     [SerializeField] LayerMask playerMask;
 
     [Header("Attack")]
+    [SerializeField] GameObject basicAttackHitBox;
     [SerializeField] float attackRange;
 
     [Header("SkillA")]
@@ -120,18 +121,21 @@ public class BossLuna : MonoBehaviour, IDamageable
         PlayerDetect();
 
         stateTimer += Time.deltaTime;
-        StateMachine();
+        //StateMachine();
         ApplyFlip();
 
 
         //SelectPattern();
         ResetHitComboIfExpired();
+        BasicAttackHitCombo();
         hitLockTimer -= Time.deltaTime;
-        // if(canUseTeleport)
-        // {
-        //     canUseTeleport = false;
-        //     Teleport();
-        // }
+
+        if(canUseTeleport)
+        {
+            canUseTeleport = false;
+            //TeleportFromPlayer();
+            TeleportToPlayer();
+        }
     }
 
     int lockXFrames = 0;
@@ -222,7 +226,6 @@ public class BossLuna : MonoBehaviour, IDamageable
 
         if(canUsePatternC() && !hasUsedPatternC)
         {
-            
             StartCoroutine(PatternC());
         }
 
@@ -251,7 +254,17 @@ public class BossLuna : MonoBehaviour, IDamageable
     int attackHitCombo = 0;
     float lastAttackHitTime = -999f;
     bool specialQueuedByAttackHit = false;
-    public void BasicAttack()
+    public void OnAttackHitBoxOn()
+    {
+        basicAttackHitBox.SetActive(true);
+    }
+
+    public void OnAttackHitBoxOff()
+    {
+        if(!basicAttackHitBox) basicAttackHitBox.SetActive(false);
+    }
+
+    public void BasicAttackHitCombo()
     {
         float now = Time.time;
 
@@ -283,13 +296,6 @@ public class BossLuna : MonoBehaviour, IDamageable
         isBackJumping = true;
 
         yield return new WaitForSeconds(0.1f);
-
-        if(!skillAUseStraightThrow)
-        {
-            StartCoroutine(SkillABackJump());
-        }
-    
-        yield return new WaitForSeconds(0.3f);
 
         ThrowGrenadeEvent();
         nextSkillATime = Time.time + skillACoolTime;
@@ -368,17 +374,9 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     void SkillAGrenadeInstantiate(Vector2 tartgetPos)
     {
-        if(skillAUseStraightThrow)
-        {
-            var grenade = Instantiate(grenadeVer2, throwPos.position, Quaternion.identity);
-            grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, skillAGrenadeTravelTime, gameObject);
-        }
-        else
-        {
-            var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
-            
-            grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, skillAGrenadeTravelTime, gameObject);
-        }
+        var grenade = Instantiate(grenadeVer2, throwPos.position, Quaternion.identity);
+        grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, skillAGrenadeTravelTime, gameObject);
+        
         hasCachedTarget = false;
     }
 
@@ -438,6 +436,7 @@ public class BossLuna : MonoBehaviour, IDamageable
     #region Skill_C
     void Skill_C()
     {
+        // !이거 랜덤 아님!!!! 첫 시전 때만 추적, 이후로는 전부 랜덤!
         isUsingSkill = true;
         float r = UnityEngine.Random.value;
 
@@ -554,7 +553,7 @@ public class BossLuna : MonoBehaviour, IDamageable
     public float teleportXDistance = 8f;
     public float teleportPadding = 0.1f;
     public bool canUseTeleport = true;
-    void Teleport()
+    void TeleportFromPlayer()
     {
         Bounds b = bossRoomArea.bounds;
 
@@ -564,20 +563,20 @@ public class BossLuna : MonoBehaviour, IDamageable
         float maxX = b.max.x - bossRoomHalf - teleportPadding;
 
         float curX = rb ? rb.position.x : transform.position.x;
-        float y    = rb ? rb.position.y : transform.position.y;
+        float y = rb ? rb.position.y : transform.position.y;
 
-        // 1) 기본: 플레이어 반대 방향으로 이동
+        //플레이어 반대 방향으로 이동
         float dir = (curX < playerTransform.position.x) ? -1f : 1f;
         float candidateX = curX + dir * teleportXDistance;
 
-        // 2) 방 밖이면 -> 플레이어 건너편으로 스왑
+        //방 밖이면 플레이어 건너편으로 스왑
         if (candidateX < minX || candidateX > maxX)
         {
             float swapDir = (curX < playerTransform.position.x) ? 1f : -1f;
             candidateX = playerTransform.position.x + swapDir * teleportXDistance;
         }
 
-        // 3) 마지막: 무조건 방 안으로
+        //무조건 방 안으로
         candidateX = Mathf.Clamp(candidateX, minX, maxX);
 
         SetX(candidateX);
@@ -588,6 +587,36 @@ public class BossLuna : MonoBehaviour, IDamageable
         if (rb) rb.position = new Vector2(x, rb.position.y);
         else transform.position = new Vector2(x, transform.position.y);
     }
+
+    void TeleportToPlayer()
+    {
+        // 텔포 거리 계산 측정 방식 수정 하면 될듯 ? maybe?
+        Bounds b = bossRoomArea.bounds;
+
+        float bossRoomHalf = bossCollider.bounds.extents.x;
+
+        float minX = b.min.x + bossRoomHalf + teleportPadding;
+        float maxX = b.max.x - bossRoomHalf - teleportPadding;
+
+        float curX = rb ? rb.position.x : transform.position.x;
+        float y = rb ? rb.position.y : transform.position.y;
+
+        float teleportDis = Mathf.Abs( curX - cachedTargetPos.x);
+
+        float candidateX = curX * teleportDis;
+
+        //방 밖이면 플레이어 건너편으로 스왑
+        if (candidateX < minX || candidateX > maxX)
+        {
+            float swapDir = (curX < playerTransform.position.x) ? 1f : -1f;
+            candidateX = playerTransform.position.x + swapDir * teleportDis;
+        }
+
+        //무조건 방 안으로
+        candidateX = Mathf.Clamp(candidateX, minX, maxX);
+
+        SetX(candidateX);
+    }
     #endregion
 
     #region PatternA
@@ -595,21 +624,21 @@ public class BossLuna : MonoBehaviour, IDamageable
     {
         isUsingSkill = true;
 
-        //평타
+        //평타 애니메이션
 
         yield return new WaitForSeconds(1f);
 
         isInvincible = true;
-        Teleport();
+        //TeleportFromPlayer();
 
         yield return new WaitForSeconds(1f);
         isInvincible = false;
-        //평타
+        //평타 애니메이션
 
         yield return new WaitForSeconds(1f);
         
         isInvincible = true;
-        Teleport();
+        TeleportFromPlayer();
 
         yield return new WaitForSeconds(1f);
         isInvincible = false;
@@ -625,7 +654,6 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     #region PatternB
     public bool hasSkillBHit = false;
-    // 스킬 b 히트박스에서 적중 성공 시 hasSkillBHit true 로 변경
     public void PatternB()
     {
         if(!hasSkillBHit) return;

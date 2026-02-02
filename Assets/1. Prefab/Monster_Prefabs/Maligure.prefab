@@ -310,10 +310,11 @@ MonoBehaviour:
   enableSkill: 1
   state: 0
   stateTimer: 0
-  rb: {fileID: 0}
-  animator: {fileID: 0}
+  rb: {fileID: 6232579956549374285}
+  animator: {fileID: 3383276288366839759}
   vfxAnimator: {fileID: 2892122130830252505}
-  spriteRenderer: {fileID: 0}
+  spriteRenderer: {fileID: 6110386087405898033}
+  monsterEvent: {fileID: 11400000, guid: 95cae45f2f0bbc64e9977ea84876aceb, type: 2}
   attackHitBox: {fileID: 6918387077792308386}
   skillHitbox: {fileID: 3747149761296289034}
   idleTime: 2
