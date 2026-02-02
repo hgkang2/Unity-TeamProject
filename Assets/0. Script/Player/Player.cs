@@ -374,8 +374,8 @@ public class Player : MonoBehaviour, IDamageable
     //사망 후 처리 (애니메이션 프레임 이벤트로 호출)
     public void OnEndDieAnimation()
     {
-        SceneLoader.LoadScene("Start");
         playerSprite.enabled = false;
+        GameManager.Instance.PlayerDieGotoMain();
     }
 
     private void Respawn()

@@ -66,8 +66,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 33dccf83b7f7f294992c97ebe1990464, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -99,7 +99,6 @@ GameObject:
   - component: {fileID: 5538856378364905097}
   - component: {fileID: 2384702622564952673}
   - component: {fileID: 3123213610765190486}
-  - component: {fileID: 2555894221737804908}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -115,7 +114,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6231616922008135916}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 12.15097, y: 1.89242, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -137,6 +136,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fade: {fileID: 2874141871735609864}
   curcharacter: 0
+  ingameTime: 0
+  stageTime: 0
 --- !u!114 &3123213610765190486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,18 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d690053e3872c14c909ce9e66fa8d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!225 &2555894221737804908
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6231616922008135916}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
+  eventHub: {fileID: 11400000, guid: 169b1cc24748e6e4482957a43593deab, type: 2}
 --- !u!1 &6266090556881331732
 GameObject:
   m_ObjectHideFlags: 0

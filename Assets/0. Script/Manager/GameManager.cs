@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[RequireComponent(typeof(CanvasGroup))]
 [RequireComponent(typeof(TutorialRunner))]
 public class GameManager : MonoBehaviour
 {
@@ -14,23 +13,8 @@ public class GameManager : MonoBehaviour
     public float ingameTime;
     public float stageTime;
 
-
-
     static GameManager instance;
-    public static GameManager Instance
-    {
-        get
-        {
-            // 없으면 자동 생성
-            if (instance == null)
-            {
-                GameObject obj = new GameObject(nameof(GameManager));
-                instance = obj.AddComponent<GameManager>();
-                DontDestroyOnLoad(obj);
-            }
-            return instance;
-        }
-    }
+    public static GameManager Instance => instance;
 
     void Awake()
     {
@@ -67,14 +51,12 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(FadeInRoutine(3));
                 break;
             case "Stage1":
-                ingameTime = 0;
-                stageTime = 0;
+                InitInGame();
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 break;
             case "Stage1_Test":
-                ingameTime = 0;
-                stageTime = 0;
+                InitInGame();
                 if (SoundManager.Instance == null) return;
                 SoundManager.Instance.PlayBGM("Stage1");
                 break;
@@ -85,6 +67,17 @@ public class GameManager : MonoBehaviour
     {
         ingameTime += Time.unscaledDeltaTime;
         stageTime += Time.unscaledDeltaTime;
+    }
+
+    public void InitInGame()
+    {
+        ingameTime = 0;
+        stageTime = 0;
+
+        SoulManager.Instance.CurSouls.Clear();
+
+        hasFlame = 0;
+        usedFlame = 0;
     }
 
     public IEnumerator TeleportRoutine(Player p, Transform targetPosition, BGSetKey BGKey)
@@ -167,6 +160,7 @@ public class GameManager : MonoBehaviour
         // 바쳐진 제물의 개수에 따라 확률적으로 제단 활성화
         switch (usedFlame)
         {
+            case 0: return;
             case 1:
                 if (UnityEngine.Random.value < 0.3f) ActivateAlter();
                 break;
@@ -181,6 +175,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
+        changedHasFlame?.Invoke();
         changedUsedFlame?.Invoke();
     }
 
@@ -195,6 +190,13 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
+    #region 인게임 끝
+    public void PlayerDieGotoMain()
+    {
+        SoundManager.Instance.StopBGM();
+        SceneLoader.LoadScene("Start");
+    }
+    #endregion
 
     public void QuitGame()
     {

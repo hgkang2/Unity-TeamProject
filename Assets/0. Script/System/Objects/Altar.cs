@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Altar : MonoBehaviour, IInteractable
@@ -15,20 +16,56 @@ public class Altar : MonoBehaviour, IInteractable
     {
         SceneContext sc = FindFirstObjectByType<SceneContext>();
         altarUI = sc.altarUI;
-        
-        foreach(var candle in candles) candle.SetActive(false);
+
+        foreach (var candle in candles) candle.SetActive(false);
     }
+
+    GameManager GM;
+    Coroutine bindCo;
+    bool bound;
 
     void OnEnable()
     {
-        GameManager.Instance.changedUsedFlame += SetFlameUsedImage;
-        GameManager.Instance.AltarActivated += AltarActivate;
+        if (bound) return;
+
+        if (bindCo == null) bindCo = StartCoroutine(Co_BindGM());
     }
 
     void OnDisable()
     {
-        GameManager.Instance.changedUsedFlame -= SetFlameUsedImage;
-        GameManager.Instance.AltarActivated -= AltarActivate;
+        if (bindCo != null)
+        {
+            StopCoroutine(bindCo);
+            bindCo = null;
+        }
+        
+        if (bound && GM != null)
+        {
+            GM.changedUsedFlame -= SetFlameUsedImage;
+            GM.AltarActivated -= AltarActivate;
+            bound = false;
+        }
+
+        GM = null;
+    }
+
+    IEnumerator Co_BindGM()
+    {
+        // GM이 생길 때까지 대기
+        while (GameManager.Instance == null)
+            yield return null;
+
+        GM = GameManager.Instance;
+
+        // 중복 구독 방지
+        if (!bound)
+        {
+            GM.changedUsedFlame += SetFlameUsedImage;
+            GM.AltarActivated += AltarActivate;
+            bound = true;
+        }
+
+        bindCo = null;
     }
 
     void SetFlameUsedImage()

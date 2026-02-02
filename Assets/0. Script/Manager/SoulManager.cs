@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class SoulManager : MonoBehaviour
 {
@@ -37,6 +38,7 @@ public class SoulManager : MonoBehaviour
         SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
         player = sceneContext.player;
     }
+
 
     public void EnrollSoul(SoulData data)
     {

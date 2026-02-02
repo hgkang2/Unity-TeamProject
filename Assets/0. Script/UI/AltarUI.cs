@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,21 +18,55 @@ public class AltarUI : UIPanelBase
         Close();
     }
 
+
+    GameManager GM;
+    Coroutine bindCo;
+    bool bound;
+
     protected override void OnOpened()
     {
-        slider.minValue = 0;
-        slider.maxValue = GameManager.Instance.HasFlame;
-        slider.value = 0;
-        purifyButton.DeActivate();
-
-        GameManager.Instance.changedHasFlame += SetFlameMaxValue;
+        if (bindCo == null)
+            bindCo = StartCoroutine(InstanceDescribe());
     }
 
     protected override void OnClosing()
     {
-        GameManager.Instance.changedHasFlame -= SetFlameMaxValue;
+        if (bindCo != null)
+        {
+            StopCoroutine(bindCo);
+            bindCo = null;
+        }
+
+        if (bound && GM != null)
+        {
+            GM.changedHasFlame -= SetFlameMaxValue;
+            bound = false;
+        }
+
         interactor.InteractExit();
         interactor = null;
+    }
+
+    IEnumerator InstanceDescribe()
+    {
+        while (GameManager.Instance == null)
+            yield return null;
+
+        GM = GameManager.Instance;
+
+        // 중복 구독 방지(가장 간단한 방법)
+        if (!bound)
+        {
+            GM.changedHasFlame += SetFlameMaxValue;
+            bound = true;
+        }
+
+        slider.minValue = 0;
+        slider.maxValue = GM.HasFlame;
+        slider.value = 0;
+        purifyButton.DeActivate();
+
+        bindCo = null;
     }
 
 
@@ -60,7 +95,7 @@ public class AltarUI : UIPanelBase
 
     public override void OnUIInputConfirm()
     {
-        purifyButton.Click();
+        purifyButton.Click(); // => TryPurify()
     }
 
 

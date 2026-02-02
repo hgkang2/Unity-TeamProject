@@ -71620,6 +71620,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce9297f03677b544b9a30c898ff67dc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &1440105342 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6754064141576704334, guid: 1f42bce69781e2e4483685adc87e0137, type: 3}
+  m_PrefabInstance: {fileID: 1543701412}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &1440105343 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 416238707899551914, guid: 1f42bce69781e2e4483685adc87e0137, type: 3}
+  m_PrefabInstance: {fileID: 1543701412}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1453246816
 GameObject:
   m_ObjectHideFlags: 0
@@ -73322,6 +73332,14 @@ PrefabInstance:
       propertyPath: BGkey
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3684784917719485913, guid: 1f42bce69781e2e4483685adc87e0137, type: 3}
+      propertyPath: sprite
+      value: 
+      objectReference: {fileID: 1440105343}
+    - target: {fileID: 3684784917719485913, guid: 1f42bce69781e2e4483685adc87e0137, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 1440105342}
     - target: {fileID: 8296983305852982526, guid: 1f42bce69781e2e4483685adc87e0137, type: 3}
       propertyPath: m_LocalPosition.x
       value: -21.09
@@ -78795,22 +78813,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3123213610765190486, guid: adab18b011d970b4382b13f7ca9e0d15, type: 3}
-      propertyPath: eventHub
-      value: 
-      objectReference: {fileID: 11400000, guid: 169b1cc24748e6e4482957a43593deab, type: 2}
-    - target: {fileID: 3123213610765190486, guid: adab18b011d970b4382b13f7ca9e0d15, type: 3}
-      propertyPath: tutorialWall
-      value: 
-      objectReference: {fileID: 1047149666}
-    - target: {fileID: 3123213610765190486, guid: adab18b011d970b4382b13f7ca9e0d15, type: 3}
-      propertyPath: tutorialTrigger_trap
-      value: 
-      objectReference: {fileID: 1941308196}
-    - target: {fileID: 3123213610765190486, guid: adab18b011d970b4382b13f7ca9e0d15, type: 3}
-      propertyPath: tutorialTrigger_monsterMeet
-      value: 
-      objectReference: {fileID: 1430363802}
     - target: {fileID: 5538856378364905097, guid: adab18b011d970b4382b13f7ca9e0d15, type: 3}
       propertyPath: m_LocalPosition.x
       value: -12.15097
@@ -85965,15 +85967,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1928679337197738932, guid: 15efd0dee87ea764ea8ac83f734aa514, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6978649706271186288, guid: 15efd0dee87ea764ea8ac83f734aa514, type: 3}
       propertyPath: m_Name
       value: AltarUI
       objectReference: {fileID: 0}
+    - target: {fileID: 6978649706271186288, guid: 15efd0dee87ea764ea8ac83f734aa514, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9177252604714875701, guid: 15efd0dee87ea764ea8ac83f734aa514, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
