@@ -486,7 +486,6 @@ public class Malirgue : MonoBehaviour, IDamageable
         OnHit((Vector2)attackerWorldPosition);
     }
 
-    
     public virtual void OnHit(Vector2 attackWorldPosition)
     {
         ChangeState(malirgue_State.TakeDamage);

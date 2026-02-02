@@ -8,65 +8,91 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.ShaderGraph.Internal;
 using Unity.Mathematics;
 using JetBrains.Annotations;
+using NUnit.Framework;
 
-public class BossLuna : MonoBehaviour
+public class BossLuna : MonoBehaviour, IDamageable
 {
-    #region Variables
-    public Transform playerTransform;
+    public enum bossLunaState { Aggro, Attack,TakeDamage, Dead };
+    public bossLunaState state = bossLunaState.Aggro;
+    float stateTimer;
 
-    [Header("Skill Test")]
-    public bool canUseSkillA;
-    public bool canUseSkillA_Ver2;
-    public bool canUseSkillB;
-    public bool canUseSkillC_Trackver;
-    public bool canUseSkillC_RandomVer;
+    #region Variables
+    [SerializeField] Transform playerTransform;
+    HP hp;
 
     [Header("Detect")]
-    public float aggroRange;
-    public float distanceToPlayer;
-    public float distanceOfX;
-    public LayerMask playerMask;
+    [SerializeField] float aggroRange;
+    float distanceToPlayer;
+    float distanceOfX;
+    Vector2 targetPos;
+    [SerializeField] LayerMask playerMask;
 
     [Header("Attack")]
-    
+    [SerializeField] float attackRange;
 
     [Header("SkillA")]
-    public GameObject holyGrenadePrefab;
-    public Transform throwPos;
-    public float skillADelay;
-    public float skillAThrowMoment;
-    public float JumpYForce;
-    public float JumpXForce;
-    public float rollSpeed;
-    public float sideOffset; // 투척한 3개의 수류탄 사이의 간격
-    public float grenadeTravelTime;
-    Vector2 targetPos;
-
-    [Header("SkillA Ver2")]
-    public GameObject grenadeVer2;
-    public float jumpTimeFar;
-    public float jumpTimeNear;
+    [SerializeField] GameObject holyGrenadePrefab;
+    [SerializeField] GameObject grenadeVer2;
+    [SerializeField] Transform throwPos;
+    [SerializeField] float skillARange;
+    [SerializeField] float skillACoolTime;
+    [SerializeField] float skillASideOffset; // 투척한 3개의 수류탄 사이의 간격
+    [SerializeField] float skillAGrenadeTravelTime;
+    [SerializeField] float skillANearJumpDist = 6f;
+    [SerializeField] float skillAFarJumpDist  = 12f;
+    [SerializeField] float skillAJumpMargin;
+    [SerializeField] float skillAFarJumpTime;
+    [SerializeField] float skillANearJumpTime;
+    float nextSkillATime;
+    float skillAJumpTime;
+    bool skillAUseStraightThrow;
+    Vector2 skillALandingPos;
 
     [Header("SkillB")]
-    public GameObject expiationPrefab;
-    public float skillBDelay;
-    public float skillBSpawnTime;
+    [SerializeField] GameObject expiationPrefab;
+    [SerializeField] float skillBRange;
+    [SerializeField] float skillBCoolTime;
+    [SerializeField] float skillBDelay;
+    [SerializeField] float skillBSpawnTime;
+    float NextSkillBTime;
 
     [Header("SkillC_Track")]
-    public GameObject genesisPrefab;
-    public float skillCSpawnTime;
-    public float skillCTrackDuration = 5f;
-    public float skillCTrackInterval = 1.2f;
-    public float skillCTrackElapsed = 0f;
+    [SerializeField] GameObject genesisPrefab;
+    [SerializeField] float skillCRange;
+    [SerializeField] float skillCCoolTime;
+    [SerializeField] float skillCSpawnTime;
+    [SerializeField] float skillCTrackDuration = 5f;
+    [SerializeField] float skillCTrackInterval = 1.2f;
+    [SerializeField] float skillCTrackElapsed = 0f;
+    float nextSkillCTime;
 
     [Header("SkillC_Random")]
-    public Collider2D bossRoomArea;
-    public float skillCRandDuration = 4f;
-    public float skillCRandInterval = 0.8f;
-    public float skillCminDistance = 2f; 
-    public int maxTries = 20;
-    public float skillCSpawnY = 6.5f;
-    public int skillCRandomPosMemoryCount = 6;
+    [SerializeField] Collider2D bossRoomArea;
+    [SerializeField] float skillCRandDuration = 4f;
+    [SerializeField] float skillCRandInterval = 0.8f;
+    [SerializeField] float skillCminDistance = 2f; 
+    [SerializeField] int maxTries = 20;
+    [SerializeField] float skillCSpawnY;
+    [SerializeField] int skillCRandomPosMemoryCount = 6;
+
+    bool isUsingSkill = false;
+    [SerializeField] float delayForNextSkill;
+
+    [Header("OnDamage")]
+    [SerializeField] float knockBackXForce;
+    [SerializeField] float knockBackYForce;
+    [SerializeField] float hitStunTime;
+    [SerializeField] float hitLockDuration;
+    float hitLockTimer = 0f;
+    Vector2 lastHitFrom;
+    bool isHit = false;
+    bool isInvincible = false;
+    bool isDead = false;
+    [SerializeField] int hitTriggerCount = 5;
+    [SerializeField] float hitComboWindow = 2f;
+    int hitCombo = 0;
+    float lastHitTime = -999f;
+    bool grenadeQueuedByHits = false;
 
     [Header("Player Pos Check")]
     public LayerMask groundMask;
@@ -83,6 +109,7 @@ public class BossLuna : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        hp = GetComponent<HP>();
 
         originScale = transform.localScale;
         facingX = 1;
@@ -92,23 +119,53 @@ public class BossLuna : MonoBehaviour
     {
         PlayerDetect();
 
+        stateTimer += Time.deltaTime;
+        StateMachine();
         ApplyFlip();
 
-        Skill_A();
-        Skill_AVer2();
-        Skill_B();
-        Skill_CTrackVer();
-        Skill_CRandVer();
+
+        //SelectPattern();
+        ResetHitComboIfExpired();
+        hitLockTimer -= Time.deltaTime;
+        // if(canUseTeleport)
+        // {
+        //     canUseTeleport = false;
+        //     Teleport();
+        // }
     }
 
-    bool isGrounded;
+    int lockXFrames = 0;
     void FixedUpdate()
     {
-        if (isGrounded)
+        if (lockXFrames > 0)
         {
-            OnJumpLanded();
+            var v = rb.linearVelocity;
+            v.x = 0f;
+            rb.linearVelocity = v;
+            lockXFrames--;
         }
-    }   
+
+        if (isBackJumping)
+            CheckBackJumpLanding();
+    }
+
+    void StateMachine()
+    {
+        switch(state)
+        {
+            case bossLunaState.Aggro: MoveX(facingX, speed); break;
+            case bossLunaState.TakeDamage: TickTakeDamage(); break;
+            case bossLunaState.Dead: break;
+        }
+    }
+
+    void ChangeState(bossLunaState nextState)
+    {
+        state = nextState;
+        stateTimer = 0f;
+
+        if(state != bossLunaState.TakeDamage && isHit) isHit = false;
+    }
 
     void PlayerDetect()
     {
@@ -145,33 +202,136 @@ public class BossLuna : MonoBehaviour
         }
     }
 
-    #region Skill_A
-    void Skill_A()
+    void SelectPattern()
     {
-        if(canUseSkillA)
+        if(isUsingSkill) return;
+
+        if(grenadeQueuedByHits)
         {
-            canUseSkillA = false;
+            grenadeQueuedByHits = false;
             StartCoroutine(SkillARoutine());
+            return;
+        }
+
+        if(specialQueuedByAttackHit)
+        {
+            specialQueuedByAttackHit = false;
+            StartCoroutine(PatternA());
+            return;
+        }
+
+        if(canUsePatternC() && !hasUsedPatternC)
+        {
+            
+            StartCoroutine(PatternC());
+        }
+
+        if(distanceToPlayer > attackRange && distanceToPlayer < skillARange && CanUseSkillA())
+        {
+            StartCoroutine(SkillARoutine());
+        }
+
+        if(distanceToPlayer > skillARange && distanceToPlayer < skillBRange && CanUseSkillB())
+        {
+            StartCoroutine(SkillBRoutine());
+        }
+
+        if(distanceToPlayer > skillBRange && distanceToPlayer < skillCRange && canUseSkillC())
+        {
+            Skill_C();
+            return;
         }
     }
 
+    [SerializeField] float speed;
+
+    #region Attack
+    [SerializeField] int attackHitTriggerCount = 2;
+    [SerializeField] float attackComboWindow = 5f;
+    int attackHitCombo = 0;
+    float lastAttackHitTime = -999f;
+    bool specialQueuedByAttackHit = false;
+    public void BasicAttack()
+    {
+        float now = Time.time;
+
+        if (now - lastAttackHitTime > attackComboWindow)
+            attackHitCombo = 0;
+
+        lastAttackHitTime = now;
+        attackHitCombo++;
+
+        if (attackHitCombo >= attackHitTriggerCount)
+        {
+            attackHitCombo = 0;
+            specialQueuedByAttackHit = true; 
+        }   
+    }
+    #endregion
+
+    #region Skill_A
+    bool isBackJumping;
     IEnumerator SkillARoutine()
     {
-        rb.linearVelocity = Vector2.zero;
-        isGrounded = false;
-
-        yield return new WaitForSeconds(skillADelay);
-
-        rb.AddForce(new Vector2(JumpXForce * -facingX, JumpYForce), ForceMode2D.Impulse);
-        StartCoroutine(SkillABackJump());
-
-        yield return new WaitForSeconds(skillAThrowMoment);
-        
-
-        yield return new WaitForSeconds(0.5f);
+        isUsingSkill = true;
         CachPlayerPos();
-        
+        SkillAJumpPosCalc();
+
+        yield return new WaitForSeconds(0.7f);
+
+        StartBackJump();
+        isBackJumping = true;
+
+        yield return new WaitForSeconds(0.1f);
+
+        if(!skillAUseStraightThrow)
+        {
+            StartCoroutine(SkillABackJump());
+        }
+    
+        yield return new WaitForSeconds(0.3f);
+
         ThrowGrenadeEvent();
+        nextSkillATime = Time.time + skillACoolTime;
+        StartCoroutine(DelayForNextSkill());
+    }
+
+    void StartBackJump()
+    {
+        Vector2 start = rb.position;
+        Vector2 v = CalcVelocity(start, skillALandingPos, skillAJumpTime);
+        rb.linearVelocity = v;
+    }
+    
+    void SkillAJumpPosCalc()
+    {
+        Vector2 bossPos = rb.position;  
+        float d = Vector2.Distance(bossPos, cachedTargetPos);
+
+        skillAJumpTime = (d < skillANearJumpDist) ? skillANearJumpTime
+            : (d > skillAFarJumpDist)  ? skillAFarJumpTime
+            : Mathf.Lerp(skillANearJumpTime, skillAFarJumpTime, (d - skillANearJumpDist) / (skillAFarJumpDist - skillANearJumpDist));
+
+        skillAUseStraightThrow = d > skillAFarJumpDist;
+
+        // 착지점: 보는 방향 반대(-facingX)로 플레이어 기준 10f
+        float desiredX = cachedTargetPos.x + (-facingX) * 10f;
+
+        Bounds b = bossRoomArea.bounds;
+        desiredX = Mathf.Clamp(desiredX, b.min.x + skillAJumpMargin, b.max.x - skillAJumpMargin);
+
+        skillALandingPos = new Vector2(desiredX, rb.position.y);
+    }
+
+    Vector2 CalcVelocity(Vector2 start, Vector2 target, float time)
+    {
+        Vector2 d = target - start;
+        float g = -Physics2D.gravity.y * rb.gravityScale; // 양수
+
+        float vx = d.x / time;
+        float vy = (d.y + 0.5f * g * time * time) / time;
+
+        return new Vector2(vx, vy);
     }
 
     IEnumerator SkillABackJump()
@@ -196,142 +356,71 @@ public class BossLuna : MonoBehaviour
 
         Vector2 center = cachedTargetPos;
 
-        Vector2 left = center + Vector2.left * sideOffset;
-        Vector2 right = center + Vector2.right * sideOffset;
+        Vector2 left = center + Vector2.left * skillASideOffset;
+        Vector2 right = center + Vector2.right * skillASideOffset;
 
-        ThrowGrenade(center);
-        //ThrowGrenade(left);
-        //ThrowGrenade(right);
-        //SkillAGrenadeVer2(center);
+        SkillAGrenadeInstantiate(center);
+        SkillAGrenadeInstantiate(left);
+        SkillAGrenadeInstantiate(right);
 
         hasCachedTarget = false;
     }
 
-    void ThrowGrenade(Vector2 targetPos)
+    void SkillAGrenadeInstantiate(Vector2 tartgetPos)
     {
-        //var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
-        grenadeTravelTime = 0.3f;
-        //grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
-        
-        var grenade = Instantiate(grenadeVer2, throwPos.position, Quaternion.identity);
-        grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
-        hasCachedTarget = false;
-    }
-    #endregion
-
-    #region Skill_A Ver2
-    [SerializeField] float nearDist = 6f;
-    [SerializeField] float farDist  = 12f;
-    public float jumpTime;
-    public float margin;
-    bool useStraight;
-    Vector2 landingPos;
-    void Skill_AVer2()
-    {
-        if(canUseSkillA_Ver2)
+        if(skillAUseStraightThrow)
         {
-            canUseSkillA_Ver2 = false;
-            StartCoroutine(SkillAVer2Routine());
+            var grenade = Instantiate(grenadeVer2, throwPos.position, Quaternion.identity);
+            grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, skillAGrenadeTravelTime, gameObject);
+        }
+        else
+        {
+            var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
+            
+            grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, skillAGrenadeTravelTime, gameObject);
+        }
+        hasCachedTarget = false;
+    }
+
+    void CheckBackJumpLanding()
+    {
+        if (rb.linearVelocity.y > 0f) return;
+
+        Vector2 origin = transform.position; // 발 아래 or 콜라이더 하단
+        float rayLength = 1.4f;
+
+        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, rayLength, groundMask);
+
+        Debug.DrawRay(origin, Vector2.down * rayLength, Color.red, 2f);
+        if (hit)
+        {
+            OnBackJumpLanded();
         }
     }
 
-    IEnumerator SkillAVer2Routine()
+    void OnBackJumpLanded()
     {
-        isGrounded = false;
-        CachPlayerPos();
-        SkillAJumpPosCalc();
+        isBackJumping = false;
 
-        yield return new WaitForSeconds(0.7f);
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
 
-        StartBackJump();
-
-        yield return new WaitForSeconds(0.1f);
-
-        StartCoroutine(SkillABackJump());
-
-        yield return new WaitForSeconds(0.3f);
-
-        //ThrowGrenadeEvent();
-        //StartCoroutine(LandFriction(0.1f, 10f));
+        lockXFrames = 6;
     }
-
-    void StartBackJump()
-    {
-        Vector2 start = rb.position;
-        Vector2 v = CalcVelocity(start, landingPos, jumpTime);
-        rb.linearVelocity = v;
-    }
-
-    void SkillAJumpPosCalc()
-    {
-        Vector2 bossPos = rb.position;  
-        float d = Vector2.Distance(bossPos, cachedTargetPos);
-
-        float jumpTime = (d < nearDist) ? jumpTimeNear
-            : (d > farDist)  ? jumpTimeFar
-            : Mathf.Lerp(jumpTimeNear, jumpTimeFar, (d - nearDist) / (farDist - nearDist));
-
-        useStraight = d > farDist;
-
-        // 착지점: 보는 방향 반대(-facingX)로 플레이어 기준 10f
-        float desiredX = cachedTargetPos.x + (-facingX) * 10f;
-
-        Bounds b = bossRoomArea.bounds;
-        desiredX = Mathf.Clamp(desiredX, b.min.x + margin, b.max.x - margin);
-
-        landingPos = new Vector2(desiredX, rb.position.y);
-    }
-
-    Vector2 CalcVelocity(Vector2 start, Vector2 target, float time)
-    {
-        Vector2 d = target - start;
-        float g = -Physics2D.gravity.y * rb.gravityScale; // 양수
-
-        float vx = d.x / time;
-        float vy = (d.y + 0.5f * g * time * time) / time;
-
-        return new Vector2(vx, vy);
-    }
-
-    // void SkillAGrenadeVer2(Vector2 tartgetPos)
-    // {
-    //     if(useStraight)
-    //     {
-    //         var grenade = Instantiate(grenadeVer2, throwPos.position, Quaternion.identity);
-    //         grenadeTravelTime = 0.4f;
-    //         grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
-    //     }
-    //     else
-    //     {
-    //         var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
-    //         grenadeTravelTime = 1.1f;
-            
-    //         grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
-    //     }
-        
-        
-    //     //grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, grenadeTravelTime, gameObject);
-    //     hasCachedTarget = false;
-    // }
     #endregion
 
     #region Skill_B
-    void Skill_B()
-    {
-        if(canUseSkillB)
-        {
-            canUseSkillB = false;
-            StartCoroutine(SkillBRoutine());
-        }
-    }
-
     IEnumerator SkillBRoutine()
     {
+        isUsingSkill = true;
         yield return new WaitForSeconds(skillBDelay);
 
         CachPlayerPos();
 
         ExpiationEvent();
+
+        NextSkillBTime = Time.time + skillBCoolTime;
+        StartCoroutine(DelayForNextSkill());
     }
 
     void ExpiationEvent()
@@ -346,14 +435,16 @@ public class BossLuna : MonoBehaviour
     }
     #endregion
 
-    #region Skill_C(TrackVer)
-    void Skill_CTrackVer()
+    #region Skill_C
+    void Skill_C()
     {
-        if(canUseSkillC_Trackver)
-        {
-            canUseSkillC_Trackver = false;
+        isUsingSkill = true;
+        float r = UnityEngine.Random.value;
+
+        if(r < 0.5f)
+            StartCoroutine(SkillCRandomRoutine());
+        else
             StartCoroutine(SkillCTrackRoutine());
-        }
     }
 
     void GenesisEvent()
@@ -369,6 +460,9 @@ public class BossLuna : MonoBehaviour
 
     IEnumerator SkillCTrackRoutine()
     {
+        isUsingSkill = true;
+
+        skillCTrackElapsed = 0f;
         while (skillCTrackElapsed < skillCTrackDuration)
         {
             CachPlayerPos();
@@ -379,21 +473,14 @@ public class BossLuna : MonoBehaviour
 
             skillCTrackElapsed += skillCTrackInterval;
         }
-    }
-    #endregion
 
-    #region Skill_C(RandomVer)
-    void Skill_CRandVer()
-    {
-        if(canUseSkillC_RandomVer)
-        {
-            canUseSkillC_RandomVer = false;
-            StartCoroutine(SkillCRandomRoutine());
-        }
+        nextSkillCTime = Time.time + skillCCoolTime;
+        StartCoroutine(DelayForNextSkill());
     }
 
     IEnumerator SkillCRandomRoutine()
     {
+        isUsingSkill = true;
         float endTime = Time.time + skillCRandDuration;
 
         Bounds b = bossRoomArea.bounds;
@@ -416,6 +503,10 @@ public class BossLuna : MonoBehaviour
 
             yield return new WaitForSeconds(skillCRandInterval);
         }
+
+        nextSkillCTime = Time.time + skillCCoolTime;
+
+        StartCoroutine(DelayForNextSkill());
     }
 
     float GetRandomXWithMinDistanceAll(Bounds b, IEnumerable<float> usedXs, float minDist, int tries)
@@ -458,6 +549,119 @@ public class BossLuna : MonoBehaviour
     // }
     #endregion
 
+    #region Teleport
+    public Collider2D bossCollider;
+    public float teleportXDistance = 8f;
+    public float teleportPadding = 0.1f;
+    public bool canUseTeleport = true;
+    void Teleport()
+    {
+        Bounds b = bossRoomArea.bounds;
+
+        float bossRoomHalf = bossCollider.bounds.extents.x;
+
+        float minX = b.min.x + bossRoomHalf + teleportPadding;
+        float maxX = b.max.x - bossRoomHalf - teleportPadding;
+
+        float curX = rb ? rb.position.x : transform.position.x;
+        float y    = rb ? rb.position.y : transform.position.y;
+
+        // 1) 기본: 플레이어 반대 방향으로 이동
+        float dir = (curX < playerTransform.position.x) ? -1f : 1f;
+        float candidateX = curX + dir * teleportXDistance;
+
+        // 2) 방 밖이면 -> 플레이어 건너편으로 스왑
+        if (candidateX < minX || candidateX > maxX)
+        {
+            float swapDir = (curX < playerTransform.position.x) ? 1f : -1f;
+            candidateX = playerTransform.position.x + swapDir * teleportXDistance;
+        }
+
+        // 3) 마지막: 무조건 방 안으로
+        candidateX = Mathf.Clamp(candidateX, minX, maxX);
+
+        SetX(candidateX);
+    }
+
+    void SetX(float x)
+    {
+        if (rb) rb.position = new Vector2(x, rb.position.y);
+        else transform.position = new Vector2(x, transform.position.y);
+    }
+    #endregion
+
+    #region PatternA
+    IEnumerator PatternA()
+    {
+        isUsingSkill = true;
+
+        //평타
+
+        yield return new WaitForSeconds(1f);
+
+        isInvincible = true;
+        Teleport();
+
+        yield return new WaitForSeconds(1f);
+        isInvincible = false;
+        //평타
+
+        yield return new WaitForSeconds(1f);
+        
+        isInvincible = true;
+        Teleport();
+
+        yield return new WaitForSeconds(1f);
+        isInvincible = false;
+
+        CachPlayerPos();
+        SkillAGrenadeInstantiate(cachedTargetPos);
+        
+        yield return new WaitForSeconds(1f);
+
+        grenadeQueuedByHits = false;
+    }
+    #endregion
+
+    #region PatternB
+    public bool hasSkillBHit = false;
+    // 스킬 b 히트박스에서 적중 성공 시 hasSkillBHit true 로 변경
+    public void PatternB()
+    {
+        if(!hasSkillBHit) return;
+
+        CachPlayerPos();
+        skillAUseStraightThrow = true;
+        SkillAGrenadeInstantiate(cachedTargetPos);
+        hasSkillBHit = false;
+        return;
+    }
+    #endregion
+
+    #region PatternC
+    IEnumerator PatternC()
+    {
+        hasUsedPatternC = true;
+        StopX();
+        isInvincible = true;
+
+        yield return new WaitForSeconds(1f);
+
+        StartCoroutine(SkillBRoutine());
+
+        yield return new WaitForSeconds(2f);
+
+        StartCoroutine(SkillARoutine());
+
+        yield return new WaitForSeconds(2f);
+
+        StartCoroutine(SkillCRandomRoutine());
+
+        yield return new WaitForSeconds(5f);
+        StopX();
+    }
+    #endregion
+
     void CachPlayerPos()
     {
         if(!playerTransform) { hasCachedTarget = false; return;}
@@ -484,39 +688,141 @@ public class BossLuna : MonoBehaviour
         gameObject.transform.localScale = new Vector3(facingX > 0 ? -originScale.x : originScale.x, originScale.y, originScale.z);
     }
 
-    void OnJumpLanded()
+    void MoveX(int dirX, float speed)
+    {
+        rb.linearVelocity = new Vector2(dirX * speed, rb.linearVelocity.y);
+    }
+
+    void StopX()
     {
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-        rb.angularVelocity = 0f;
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    bool CanUseSkillA() => Time.time >= nextSkillATime;
+    bool CanUseSkillB() => Time.time >= NextSkillBTime;
+    bool canUseSkillC()
     {
-        if(collision.gameObject.CompareTag("Ground"))
+        if (hp.CurHP > hp.MaxHP * 0.6f) return false;
+        if (Time.time < nextSkillCTime) return false;
+        return true;
+    }
+
+    bool hasUsedPatternC;
+    bool canUsePatternC()
+    {
+        if(hp.CurHP > hp.MaxHP * 0.2f) return false;
+        return true;
+    }
+
+    IEnumerator DelayForNextSkill()
+    {
+        yield return new WaitForSeconds(delayForNextSkill);
+        isUsingSkill = false;
+    }
+
+    #region Damage Control
+    void TickTakeDamage()
+    {
+        if(isUsingSkill || isInvincible) return;
+
+        if(stateTimer >= hitStunTime)
         {
-            isGrounded = true;
+            isHit = false;
+            hitLockTimer = hitLockDuration;
+            ChangeState(bossLunaState.Aggro);
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision)
+    public void TakeDamage(float amount)
     {
-        if(collision.gameObject.CompareTag("Ground"))
+        if(isInvincible) return;
+
+        hp.TakeDamage(amount);
+        OnDamagedForCombo();
+
+        if(isUsingSkill || isDead) return;
+
+        OnHit(transform.position - Vector3.right);
+    }
+
+    void IDamageable.TakeDamage(float amount, DamageType type, Vector2? attackerWorldPosition)
+    {
+        if(isInvincible) return;
+
+        hp.TakeDamage(amount);
+        OnDamagedForCombo();
+
+        if(isUsingSkill || isDead ) return;
+
+        lastHitFrom = (Vector2)attackerWorldPosition;
+        OnHit((Vector2)attackerWorldPosition);
+    }
+
+    public virtual void OnHit(Vector2 attackWorldPosition)
+    {
+        ChangeState(bossLunaState.TakeDamage);
+        isHit = true;
+
+        Vector2 dir = ((Vector2)transform.position - attackWorldPosition).normalized;
+        dir = new Vector2(dir.x * knockBackXForce,knockBackYForce);
+        rb.linearVelocity = dir; 
+    }
+
+    public void OnDamagedForCombo()
+    {
+        if (state == bossLunaState.Dead) return;
+
+        float now = Time.time;
+
+        if (now - lastHitTime > hitComboWindow)
+        hitCombo = 0;
+
+        lastHitTime = now;
+        hitCombo++;
+
+        if (hitCombo >= hitTriggerCount)
         {
-            isGrounded = false;
+            hitCombo = 0;
+            grenadeQueuedByHits = true; 
         }
     }
 
-    // IEnumerator LandFriction(float time, float drag)
-    // {
-    //     float prev = rb.linearDamping;
-    //     rb.linearDamping = drag;
-    //     yield return new WaitForSeconds(time);
-    //     rb.linearDamping = prev;
-    // }
+    void ResetHitComboIfExpired()
+    {
+        if (hitCombo <= 0) return;
 
-    // void OnDrawGizmosSelected()
-    // {
-    //     Gizmos.color = Color.red;
-    //     Gizmos.DrawWireSphere(transform.position, aggroRange);
-    // }
+        if (Time.time - lastHitTime > hitComboWindow)
+            hitCombo = 0;
+    }
+
+    public virtual void OnDied()
+    {
+        if(isDead) return;
+
+        StopX();
+        isDead = true;
+
+        ChangeState(bossLunaState.Dead);
+        isUsingSkill = false;
+
+        GetComponent<Collider2D>().enabled = false;
+        rb.linearVelocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+    }
+    #endregion
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, skillARange);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, skillBRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, skillCRange);
+    }
 }

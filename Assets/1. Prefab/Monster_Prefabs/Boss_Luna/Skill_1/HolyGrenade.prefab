@@ -140,7 +140,7 @@ MonoBehaviour:
   warningSignPos: {fileID: 3499949746115105746}
   ExplosionEffect: {fileID: 4715333124005903316, guid: 8e4cc13f4db255f4f9a7ecfe3a76de1f, type: 3}
   explodeRadius: 0.5
-  yVel: 0.5
+  yVel: -0.5
 --- !u!114 &5237173804551284482
 MonoBehaviour:
   m_ObjectHideFlags: 0

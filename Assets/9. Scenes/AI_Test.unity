@@ -267,13 +267,14 @@ Transform:
   m_GameObject: {fileID: 78373822}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.9, y: 1.64, z: 0}
+  m_LocalPosition: {x: -3.5, y: 1.64, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1929456908}
   - {fileID: 1961085421}
   - {fileID: 2046107148}
+  - {fileID: 1341304502}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &78373827
@@ -288,34 +289,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b24898bfe46a9944d97d7f0f7a0bb357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
   playerTransform: {fileID: 399982679}
-  canUseSkillA: 0
-  canUseSkillA_Ver2: 0
-  canUseSkillB: 0
-  canUseSkillC_Trackver: 0
-  canUseSkillC_RandomVer: 0
   aggroRange: 50
-  distanceToPlayer: 0
-  distanceOfX: 0
   playerMask:
     serializedVersion: 2
     m_Bits: 64
+  attackRange: 3
   holyGrenadePrefab: {fileID: 4542838770508194207, guid: 5833a647d14ac0b4587ddc9be8f56fe3, type: 3}
-  throwPos: {fileID: 1929456908}
-  skillADelay: 0.6
-  skillAThrowMoment: 0.2
-  JumpYForce: 8
-  JumpXForce: 2
-  rollSpeed: 30
-  sideOffset: 2
-  grenadeTravelTime: 0.6
   grenadeVer2: {fileID: 4542838770508194207, guid: cb071f29c9aada748a0e5db7986b90be, type: 3}
-  jumpTimeFar: 0.9
-  jumpTimeNear: 0.5
+  throwPos: {fileID: 1929456908}
+  skillARange: 8
+  skillACoolTime: 5
+  skillASideOffset: 2
+  skillAGrenadeTravelTime: 1
+  skillANearJumpDist: 4
+  skillAFarJumpDist: 8
+  skillAJumpMargin: 0.1
+  skillAFarJumpTime: 1
+  skillANearJumpTime: 1.5
   expiationPrefab: {fileID: 876667635922888196, guid: 8c7e6bb0c99a97841b847c0785acfb3e, type: 3}
+  skillBRange: 10
+  skillBCoolTime: 8
   skillBDelay: 0.7
   skillBSpawnTime: 1
   genesisPrefab: {fileID: 2491489288044632414, guid: 99e8143bb886ce0459052b62d64a5c59, type: 3}
+  skillCRange: 12
+  skillCCoolTime: 5
   skillCSpawnTime: 1
   skillCTrackDuration: 5
   skillCTrackInterval: 1.2
@@ -327,14 +327,25 @@ MonoBehaviour:
   maxTries: 20
   skillCSpawnY: 0
   skillCRandomPosMemoryCount: 6
+  delayForNextSkill: 3
+  knockBackXForce: 0
+  knockBackYForce: 0
+  hitStunTime: 0
+  hitLockDuration: 0
+  hitTriggerCount: 5
+  hitComboWindow: 2
   groundMask:
     serializedVersion: 2
     m_Bits: 128
   groundRayLength: 30
-  nearDist: 3
-  farDist: 6
-  jumpTime: 1
-  margin: 0.5
+  speed: 8
+  attackHitTriggerCount: 2
+  attackComboWindow: 5
+  bossCollider: {fileID: 78373823}
+  teleportXDistance: 8
+  teleportPadding: 0.1
+  canUseTeleport: 0
+  hasSkillBHit: 0
 --- !u!1 &105237032
 GameObject:
   m_ObjectHideFlags: 0
@@ -619,7 +630,7 @@ Transform:
   m_GameObject: {fileID: 399982674}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.34, y: 1.22, z: 0}
+  m_LocalPosition: {x: -7.13, y: 1.22, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1210,7 +1221,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 2147483648
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -1255,6 +1266,84 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1341304501
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1341304502}
+  - component: {fileID: 1341304503}
+  m_Layer: 31
+  m_Name: bossCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1341304502
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341304501}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 78373826}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1341304503
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341304501}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: -0.0000005364418}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1.8451241}
+  m_EdgeRadius: 0
 --- !u!1 &1929456907
 GameObject:
   m_ObjectHideFlags: 0

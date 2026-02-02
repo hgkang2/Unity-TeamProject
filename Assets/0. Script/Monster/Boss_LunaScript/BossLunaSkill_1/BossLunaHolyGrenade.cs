@@ -23,12 +23,10 @@ public class BossLunaHolyGrenade : MonoBehaviour
     public float explodeRadius;
     void FixedUpdate()
     {   
-        //if( yVel <= 0f) return;
-        
         if (!hasTarget || exploded) return;
 
         float sqrDist = ((Vector2)transform.position - targetPos).sqrMagnitude;
-        if (sqrDist <= explodeRadius * explodeRadius)
+        if (sqrDist <= explodeRadius)
         {
             exploded = true;
             StartCoroutine(ExplodeRoutine());
@@ -72,16 +70,6 @@ public class BossLunaHolyGrenade : MonoBehaviour
         float velocityY = (distance.y + yVel * gravity * time * time) / time;
 
         return new Vector2(velocityX, velocityY);
-    }
-
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if( yVel <= 0f) return;
-
-        if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Player"))
-        {
-            //StartCoroutine(ExplodeRoutine());
-        }
     }
 
     IEnumerator ExplodeRoutine()
