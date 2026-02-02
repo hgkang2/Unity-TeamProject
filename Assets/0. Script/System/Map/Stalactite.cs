@@ -6,10 +6,15 @@ public class Stalactite : MonoBehaviour
     private Rigidbody2D rb;
     private bool isFalling = false;
 
+    [Header("설정")]
+    [SerializeField] float damage = 10f;
+    [SerializeField] float stunDuration = 1.0f; // 1초 경직
+    [SerializeField] float fallGravity = 3.0f;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = 0; // 생성 직후에는 공중에 고정
+        rb.gravityScale = 0; 
         StartCoroutine(FallAfterDelay(2.0f));
     }
 
@@ -17,7 +22,6 @@ public class Stalactite : MonoBehaviour
     {
         isFalling = true;
         
-        // 2초간 떨리는 연출
         Vector3 originalPos = transform.position;
         float elapsed = 0f;
         while (elapsed < delay)
@@ -28,23 +32,31 @@ public class Stalactite : MonoBehaviour
         }
 
         transform.position = originalPos;
-        rb.gravityScale = 3.0f; // 중력 적용하여 낙하
+        rb.gravityScale = fallGravity; 
     }
 
-    // Is Trigger가 꺼져 있을 때 작동하는 충돌 함수
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // 부딪힌 대상의 태그가 Trap라면 삭제
-        if (collision.gameObject.CompareTag("Trap"))
-        {
-            Destroy(gameObject);
-        }
-        
-        // 플레이어와 부딪혔을 때의 로직도 여기에 추가 가능합니다.
+        // 1. 플레이어와 충돌 시
         if (collision.gameObject.CompareTag("Player"))
         {
-            Debug.Log("플레이어가 종유석에 맞았습니다!");
-            Destroy(gameObject); // 필요시 파괴
+            Player player = collision.gameObject.GetComponent<Player>();
+            if (player != null)
+            {
+                // Player.cs에 있는 TakeDamage를 호출
+                // DamageType.Normal 내부 로직에 의해 ApplyKnockback이 자동 실행됩니다.
+                player.TakeDamage(damage, DamageType.Normal, transform.position);
+
+                // 1초 경직을 위해 Player.cs의 StartHitStun을 호출 (리플렉션 방식)
+                player.SendMessage("StartHitStun", stunDuration, SendMessageOptions.DontRequireReceiver);
+            }
+            
+            Destroy(gameObject); // 충돌 후 파괴
+        }
+        // 2. 바닥(Trap이나 Ground)에 부딪혔을 때
+        else if (collision.gameObject.CompareTag("Trap") || collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            Destroy(gameObject);
         }
     }
 }
