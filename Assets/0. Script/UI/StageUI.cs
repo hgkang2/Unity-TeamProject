@@ -12,6 +12,8 @@ public class StageUI : MonoBehaviour
     //보유 영성 ui
     HaveSoulPanel haveSoulsPanel;
 
+    AltarUI altarUI;
+
 
     SceneContext sceneContext;
     void Awake()
@@ -20,11 +22,13 @@ public class StageUI : MonoBehaviour
         levelUpPanel = sceneContext.levelUpPanel;
         haveSoulsPanel = sceneContext.haveSoulsPanel;
         settingPanel = sceneContext.ingameSettingPanel;
+        altarUI = sceneContext.altarUI;
 
         //기본적으로 모든 ui 활성화시켜놓기
         settingPanel.gameObject.SetActive(true);
         levelUpPanel.gameObject.SetActive(true);
         haveSoulsPanel.gameObject.SetActive(true);
+        altarUI.gameObject.SetActive(true);
     }
 
     void Start()
@@ -33,6 +37,7 @@ public class StageUI : MonoBehaviour
         settingPanel.Close();
         levelUpPanel.Close();
         haveSoulsPanel.Close();
+        altarUI.Close();
     }
 
     void OnEnable()
