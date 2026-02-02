@@ -9258,6 +9258,10 @@ PrefabInstance:
       propertyPath: m_BackGroundColor.r
       value: 0.40000004
       objectReference: {fileID: 0}
+    - target: {fileID: 1720260666141654977, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 4095
+      objectReference: {fileID: 0}
     - target: {fileID: 1826242618594228017, guid: 225f5a9976e555545bdb155972ee78a6, type: 3}
       propertyPath: ChannelMask
       value: 1
@@ -71560,6 +71564,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1271409958360589344, guid: a600171f74b81b74489dae9a85c862e9, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 1271409958360589344, guid: a600171f74b81b74489dae9a85c862e9, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3958233661238116690, guid: a600171f74b81b74489dae9a85c862e9, type: 3}
+      propertyPath: m_Name
+      value: InteractionCollider
+      objectReference: {fileID: 0}
     - target: {fileID: 5308212037173298312, guid: a600171f74b81b74489dae9a85c862e9, type: 3}
       propertyPath: m_LocalPosition.x
       value: -28.63
@@ -71603,6 +71619,10 @@ PrefabInstance:
     - target: {fileID: 7813849438088142091, guid: a600171f74b81b74489dae9a85c862e9, type: 3}
       propertyPath: m_Name
       value: "\uC090\uC57D\uC774"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7813849438088142091, guid: a600171f74b81b74489dae9a85c862e9, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -80166,6 +80186,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4266841199075454534, guid: 9ce34a7c6c9ccd048ab78cfa11ce27e4, type: 3}
+      propertyPath: RerollNum
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266841199075454534, guid: 9ce34a7c6c9ccd048ab78cfa11ce27e4, type: 3}
       propertyPath: cardSound1
       value: 
       objectReference: {fileID: 0}
@@ -81856,6 +81880,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 533523428}
+  - {fileID: 1903873819}
   - {fileID: 1567848501}
   - {fileID: 1612961139}
   - {fileID: 1215608336}
@@ -81865,7 +81890,6 @@ RectTransform:
   - {fileID: 2083649270}
   - {fileID: 601887547}
   - {fileID: 1152980852}
-  - {fileID: 1903873819}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -85967,7 +85991,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1928679337197738932, guid: 15efd0dee87ea764ea8ac83f734aa514, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6978649706271186288, guid: 15efd0dee87ea764ea8ac83f734aa514, type: 3}
       propertyPath: m_Name
@@ -85975,11 +85999,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6978649706271186288, guid: 15efd0dee87ea764ea8ac83f734aa514, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9177252604714875701, guid: 15efd0dee87ea764ea8ac83f734aa514, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

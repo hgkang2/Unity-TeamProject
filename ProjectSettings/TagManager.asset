@@ -22,7 +22,7 @@ TagManager:
   - NoWallClimb
   - Environment
   - IInteractable
-  - 
+  - IInteractbale(Rigidbody)
   - 
   - 
   - 
