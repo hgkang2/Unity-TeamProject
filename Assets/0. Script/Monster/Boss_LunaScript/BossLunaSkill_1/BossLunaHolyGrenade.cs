@@ -68,7 +68,8 @@ public class BossLunaHolyGrenade : MonoBehaviour
         return new Vector2(velocityX, velocityY);
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if(isExploding) return;
 
@@ -78,6 +79,7 @@ public class BossLunaHolyGrenade : MonoBehaviour
             StartCoroutine(ExplodeRoutine());
         }
     }
+    
 
     IEnumerator ExplodeRoutine()
     {
