@@ -846,22 +846,25 @@ public class BossLuna : MonoBehaviour, IDamageable
     #region PatternC
     bool isUsingPatternC = false;
     IEnumerator PatternC()
-    {
-        ChangeState(bossLunaState.Attack);
-        animator?.SetTrigger("Expiation");
+    {   
         isUsingSkill = true;
         hasUsedPatternC = true;
         isUsingPatternC = true;
+        ChangeState(bossLunaState.Attack);
+        animator?.SetTrigger("Expiation");
+        
         StopX();
         isInvincible = true;
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         
+        StopX();
         CachPlayerPos();
         ExpiationEvent();
 
         yield return new WaitForSeconds(3f);
 
+        StopX();
         animator?.SetTrigger("GrenadeThrow");
         CachPlayerPos();
         ThrowGrenadeEvent();

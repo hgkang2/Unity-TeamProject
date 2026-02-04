@@ -1479,6 +1479,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Luna
       objectReference: {fileID: 0}
+    - target: {fileID: 992857995951289044, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
+      propertyPath: m_Size.x
+      value: 1.4196744
+      objectReference: {fileID: 0}
+    - target: {fileID: 992857995951289044, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
+      propertyPath: m_Offset.x
+      value: 1.0098372
+      objectReference: {fileID: 0}
+    - target: {fileID: 992857995951289044, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 2147483648
+      objectReference: {fileID: 0}
     - target: {fileID: 3782272840506994194, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.59
@@ -1518,6 +1530,10 @@ PrefabInstance:
     - target: {fileID: 3782272840506994194, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4043495099919347461, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
+      propertyPath: maxHP
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5271291501411278454, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
       propertyPath: bossRoomArea
