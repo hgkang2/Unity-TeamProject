@@ -12,6 +12,7 @@ public class GrenadeVer2 : MonoBehaviour
     Vector2 targetPos;
     GameObject owner;
     Rigidbody2D rb;
+    LocalSFX localSFX;
 
     void Awake()
     {
@@ -19,6 +20,7 @@ public class GrenadeVer2 : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         if(warningSignPos) warningSignPos.gameObject.SetActive(false);
         traj = GetComponent<GrenadeTrajectory>();
+        localSFX = GetComponent<LocalSFX>();
     }
 
 
@@ -65,7 +67,7 @@ public class GrenadeVer2 : MonoBehaviour
         Destroy(warningSignPos.gameObject);
         traj?.Hide();
         yield return new WaitForSeconds(0.3f);
-
+        localSFX.Play("Explode");
         Color c = sr.color;
         c.a = 0f;
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);

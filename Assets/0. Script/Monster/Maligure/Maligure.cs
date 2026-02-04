@@ -498,6 +498,8 @@ public class Malirgue : MonoBehaviour, IDamageable
         rb.linearVelocity = dir;
     }
 
+    
+
     public virtual void OnDied()
     {
         if (isDead) return;

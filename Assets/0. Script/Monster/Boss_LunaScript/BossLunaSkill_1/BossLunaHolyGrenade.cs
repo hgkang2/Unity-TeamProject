@@ -13,6 +13,7 @@ public class BossLunaHolyGrenade : MonoBehaviour
     GameObject owner;
     Rigidbody2D rb;
     SpriteRenderer sr;
+    LocalSFX localSFX;
 
     void Awake()
     {
@@ -20,10 +21,12 @@ public class BossLunaHolyGrenade : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         if(warningSignPos) warningSignPos.gameObject.SetActive(false);
         traj = GetComponent<GrenadeTrajectory>();
+        localSFX = GetComponent<LocalSFX>();
     }
     
     bool hasTarget;
     bool exploded;
+    bool isExploding = false;
     public float explodeRadius;
 
     public void InitializeGrenadeThrow(Vector2 targetPos, float travelTime, GameObject owner)
@@ -67,8 +70,11 @@ public class BossLunaHolyGrenade : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-         if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player"))
+        if(isExploding) return;
+
+        if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player"))
         {
+            isExploding = true;
             StartCoroutine(ExplodeRoutine());
         }
     }
@@ -80,7 +86,7 @@ public class BossLunaHolyGrenade : MonoBehaviour
         Destroy(warningSignPos.gameObject);
         traj?.Hide();
         yield return new WaitForSeconds(0.2f);
-
+        localSFX.Play("Explode");
         Color c = sr.color;
         c.a = 0f;
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);

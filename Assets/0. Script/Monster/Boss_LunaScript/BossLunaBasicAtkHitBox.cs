@@ -6,12 +6,13 @@ public class BossLunaBasicAtkHitBox : MonoBehaviour
     [SerializeField] float damage = 10f;
     [SerializeField] DamageType damageType;
     [SerializeField] Collider2D col;
-    //LocalSFX sfx;
+    LocalSFX sfx;
 
     public BossLuna bossLuna;
 
     void Awake()
     {
+        sfx = GetComponent<LocalSFX>();
         col = GetComponent<Collider2D>();
     }
 
@@ -23,7 +24,7 @@ public class BossLunaBasicAtkHitBox : MonoBehaviour
         {
             Vector2 hitPos = transform.position;
             damageable.TakeDamage(damage,damageType, hitPos);
-
+            sfx.Play("Attack");
             bossLuna.attackHitCombo++;
         }
     }

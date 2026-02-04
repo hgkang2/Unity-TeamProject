@@ -9,10 +9,12 @@ public class BossLunaGenesisLight : MonoBehaviour
     bool inBeam;
     float nextTickTime;
     Transform playerTr;
+    LocalSFX localSFX;
 
     void Awake()
     {
         //damageType = GetComponent<DamageType>();
+        localSFX = GetComponent<LocalSFX>();
     }
 
     void Update()
@@ -21,6 +23,7 @@ public class BossLunaGenesisLight : MonoBehaviour
 
         if(Time.time >= nextTickTime)
         {
+            
             nextTickTime = Time.time + tickInterval;
 
             Vector2 hitPos = playerTr ? (Vector2)playerTr.position : (Vector2)transform.position;
@@ -34,6 +37,7 @@ public class BossLunaGenesisLight : MonoBehaviour
 
         if(collision.TryGetComponent<IDamageable>(out var damageable))
         {
+            localSFX.Play("GenesisHit");
             inBeam = true;
             playerDmg = damageable;
             playerTr = collision.transform;

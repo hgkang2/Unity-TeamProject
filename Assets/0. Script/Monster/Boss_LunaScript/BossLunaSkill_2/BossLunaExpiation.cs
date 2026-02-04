@@ -11,6 +11,7 @@ public class BossLunaExpiation : MonoBehaviour
     Vector2 EexpiationTargetPos;
     GameObject owner;
     BossLuna bossLuna;
+    LocalSFX localSFX;
 
     void Awake()
     {
@@ -18,6 +19,7 @@ public class BossLunaExpiation : MonoBehaviour
         bossLuna = GetComponent<BossLuna>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         chainRb = GetComponentsInChildren<Rigidbody2D>();
+        localSFX = GetComponent<LocalSFX>();
 
         col.enabled = false;
     }
@@ -60,7 +62,7 @@ public class BossLunaExpiation : MonoBehaviour
         {
             rb.AddForce(rb.transform.up * 20f, ForceMode2D.Impulse);
         }
-
+        localSFX.Play("Chain");
         yield return new WaitForFixedUpdate();
         col.enabled = true;
         yield return new WaitForSeconds(0.2f);
@@ -77,13 +79,10 @@ public class BossLunaExpiation : MonoBehaviour
     void OnTriggerEnter2D(Collider2D collision)
     {
         if(!collision.CompareTag("Player")) return;
-        if(collision.gameObject.CompareTag("Player"))
-        {
-            bossLuna.hasSkillBHit = true; 
-        }
 
         if(collision.TryGetComponent<IDamageable>(out var damageable))
         {
+            localSFX.Play("ExpiationHit");
             Vector2 hitPos = transform.position;
             damageable.TakeDamage(damage, DamageType.Normal, hitPos);
             bossLuna.hasSkillBHit = true;

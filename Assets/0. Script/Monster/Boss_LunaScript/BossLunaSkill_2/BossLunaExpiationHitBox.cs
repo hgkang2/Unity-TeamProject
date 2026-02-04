@@ -16,16 +16,16 @@ public class BossLunaExpiationHitBox : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player"))
-        {
-            bossLuna.hasSkillBHit = true; 
-        }
-
-        // if(collision.TryGetComponent<IDamageable>(out var damageable))
+        // if(collision.gameObject.CompareTag("Player"))
         // {
-        //     Vector2 hitPos = transform.position;
-        //     damageable.TakeDamage(damage, DamageType.Normal, hitPos);
-        //     bossLuna.hasSkillBHit = true;
+        //     bossLuna.hasSkillBHit = true; 
         // }
+
+        if(collision.TryGetComponent<IDamageable>(out var damageable))
+        {
+            Vector2 hitPos = transform.position;
+            damageable.TakeDamage(damage, DamageType.Normal, hitPos);
+            bossLuna.hasSkillBHit = true;
+        }
     }
 }
