@@ -24,7 +24,7 @@ public class BossLunaBasicAtkHitBox : MonoBehaviour
             Vector2 hitPos = transform.position;
             damageable.TakeDamage(damage,damageType, hitPos);
 
-            bossLuna.BasicAttackHitCombo();
+            bossLuna.attackHitCombo++;
         }
     }
 }

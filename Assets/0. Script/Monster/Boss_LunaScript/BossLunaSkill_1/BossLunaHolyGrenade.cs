@@ -1,18 +1,22 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class BossLunaHolyGrenade : MonoBehaviour
 {
     public Transform warningSignPos;
     public GameObject ExplosionEffect;
+    [SerializeField] GameObject hitbox;
     GrenadeTrajectory traj;
     Vector2 targetPos;
     GameObject owner;
     Rigidbody2D rb;
+    SpriteRenderer sr;
 
     void Awake()
     {
+        sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         if(warningSignPos) warningSignPos.gameObject.SetActive(false);
         traj = GetComponent<GrenadeTrajectory>();
@@ -21,17 +25,6 @@ public class BossLunaHolyGrenade : MonoBehaviour
     bool hasTarget;
     bool exploded;
     public float explodeRadius;
-    void FixedUpdate()
-    {   
-        if (!hasTarget || exploded) return;
-
-        float sqrDist = ((Vector2)transform.position - targetPos).sqrMagnitude;
-        if (sqrDist <= explodeRadius)
-        {
-            exploded = true;
-            StartCoroutine(ExplodeRoutine());
-        }
-    }
 
     public void InitializeGrenadeThrow(Vector2 targetPos, float travelTime, GameObject owner)
     {
@@ -72,15 +65,28 @@ public class BossLunaHolyGrenade : MonoBehaviour
         return new Vector2(velocityX, velocityY);
     }
 
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player"))
+        {
+            StartCoroutine(ExplodeRoutine());
+        }
+    }
+
     IEnumerator ExplodeRoutine()
     {
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
         Destroy(warningSignPos.gameObject);
         traj?.Hide();
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
 
+        Color c = sr.color;
+        c.a = 0f;
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
+        hitbox.SetActive(true);
+
+        yield return new WaitForSeconds(0.3f);
         Destroy(this.gameObject);
     }
 }

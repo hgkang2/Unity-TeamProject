@@ -4,22 +4,29 @@ using UnityEngine;
 public class BossLunaExpiation : MonoBehaviour
 {
     Rigidbody2D[] chainRb;
-
     SpriteRenderer spriteRenderer;
-
+    [SerializeField] BoxCollider2D col;
+    [SerializeField] float damage;
+    [SerializeField] DamageType damageType;
     Vector2 EexpiationTargetPos;
     GameObject owner;
+    BossLuna bossLuna;
 
     void Awake()
     {
+        col = GetComponent<BoxCollider2D>();
+        bossLuna = GetComponent<BossLuna>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         chainRb = GetComponentsInChildren<Rigidbody2D>();
+
+        col.enabled = false;
     }
 
     public void InitializeExpiation(Vector2 tartgetPos, float duration, GameObject owner)
     {
         EexpiationTargetPos = tartgetPos;
         this.owner = owner;
+        bossLuna = owner.GetComponent<BossLuna>();
 
         StartCoroutine(FadeInRoutine(duration));
     }
@@ -55,6 +62,7 @@ public class BossLunaExpiation : MonoBehaviour
         }
 
         yield return new WaitForFixedUpdate();
+        col.enabled = true;
         yield return new WaitForSeconds(0.2f);
 
         foreach (var rb in chainRb)
@@ -64,5 +72,21 @@ public class BossLunaExpiation : MonoBehaviour
         }
 
         Destroy(this.gameObject, 1f);
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(!collision.CompareTag("Player")) return;
+        if(collision.gameObject.CompareTag("Player"))
+        {
+            bossLuna.hasSkillBHit = true; 
+        }
+
+        if(collision.TryGetComponent<IDamageable>(out var damageable))
+        {
+            Vector2 hitPos = transform.position;
+            damageable.TakeDamage(damage, DamageType.Normal, hitPos);
+            bossLuna.hasSkillBHit = true;
+        }
     }
 }

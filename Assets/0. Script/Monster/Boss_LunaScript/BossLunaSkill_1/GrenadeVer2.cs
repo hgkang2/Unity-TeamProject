@@ -4,11 +4,10 @@ using System.Collections;
 
 public class GrenadeVer2 : MonoBehaviour
 {
-    [SerializeField] GameObject innerExlpodeArea;
-    [SerializeField] GameObject middleExplodeArea;
-    [SerializeField] GameObject outerExplodeArea;
     public Transform warningSignPos;
     public GameObject ExplosionEffect;
+    [SerializeField] GameObject hitbox;
+    SpriteRenderer sr;
     GrenadeTrajectory traj;
     Vector2 targetPos;
     GameObject owner;
@@ -16,6 +15,7 @@ public class GrenadeVer2 : MonoBehaviour
 
     void Awake()
     {
+        sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         if(warningSignPos) warningSignPos.gameObject.SetActive(false);
         traj = GetComponent<GrenadeTrajectory>();
@@ -26,15 +26,15 @@ public class GrenadeVer2 : MonoBehaviour
     {
         this.targetPos = targetPos;
         this.owner = owner;
+        travelTime  = 0.3f;
+        // if(warningSignPos)
+        // {
+        //     warningSignPos.SetParent(null);
+        //     warningSignPos.position = targetPos + Vector2.up * 1f;
+        //     warningSignPos.gameObject.SetActive(true);
+        // }
 
-        if(warningSignPos)
-        {
-            warningSignPos.SetParent(null);
-            warningSignPos.position = targetPos + Vector2.up * 1f;
-            warningSignPos.gameObject.SetActive(true);
-        }
-
-        //traj?.Show(targetPos, travelTime);
+        traj?.Show(targetPos, travelTime);
         //ThrowGrenade(targetPos, travelTime);
 
         ThrowStraight(targetPos, travelTime);
@@ -66,10 +66,13 @@ public class GrenadeVer2 : MonoBehaviour
         traj?.Hide();
         yield return new WaitForSeconds(0.3f);
 
-
+        Color c = sr.color;
+        c.a = 0f;
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
         
+        hitbox.SetActive(true);
 
+        yield return new WaitForSeconds(0.3f);
         Destroy(this.gameObject);
     }
 }

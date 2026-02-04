@@ -12,12 +12,13 @@ using NUnit.Framework;
 
 public class BossLuna : MonoBehaviour, IDamageable
 {
-    public enum bossLunaState { Aggro, Attack,TakeDamage, Dead };
+    public enum bossLunaState { Idle, Aggro, Attack,TakeDamage, Dead };
     public bossLunaState state = bossLunaState.Aggro;
     float stateTimer;
 
     #region Variables
     [SerializeField] Transform playerTransform;
+    [SerializeField] Animator animator;
     HP hp;
 
     [Header("Detect")]
@@ -39,11 +40,13 @@ public class BossLuna : MonoBehaviour, IDamageable
     [SerializeField] float skillACoolTime;
     [SerializeField] float skillASideOffset; // 투척한 3개의 수류탄 사이의 간격
     [SerializeField] float skillAGrenadeTravelTime;
-    [SerializeField] float skillANearJumpDist = 6f;
-    [SerializeField] float skillAFarJumpDist  = 12f;
-    [SerializeField] float skillAJumpMargin;
-    [SerializeField] float skillAFarJumpTime;
-    [SerializeField] float skillANearJumpTime;
+    [SerializeField] float skillAJumpXForce;
+    [SerializeField] float skillAJumpYForce;
+     float skillANearJumpDist = 6f;
+     float skillAFarJumpDist  = 12f;
+    float skillAJumpMargin;
+    float skillAFarJumpTime;
+    float skillANearJumpTime;
     float nextSkillATime;
     float skillAJumpTime;
     bool skillAUseStraightThrow;
@@ -51,7 +54,8 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     [Header("SkillB")]
     [SerializeField] GameObject expiationPrefab;
-    [SerializeField] float skillBRange;
+    [SerializeField] float skillBMaxRange;
+    [SerializeField] float skillBMinRange;
     [SerializeField] float skillBCoolTime;
     [SerializeField] float skillBDelay;
     [SerializeField] float skillBSpawnTime;
@@ -59,7 +63,8 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     [Header("SkillC_Track")]
     [SerializeField] GameObject genesisPrefab;
-    [SerializeField] float skillCRange;
+    [SerializeField] float skillCMaxRange;
+    [SerializeField] float skillCMinRange;
     [SerializeField] float skillCCoolTime;
     [SerializeField] float skillCSpawnTime;
     [SerializeField] float skillCTrackDuration = 5f;
@@ -109,11 +114,22 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     void Awake()
     {
+        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         hp = GetComponent<HP>();
 
+        isDead = false;
+        hp.OnDied += OnDied;
+
         originScale = transform.localScale;
         facingX = 1;
+
+        ChangeState(bossLunaState.Idle);
+    }
+
+    public void Oestroy()
+    {
+        hp.OnDied -= OnDied;        
     }
 
     void Update()
@@ -121,11 +137,15 @@ public class BossLuna : MonoBehaviour, IDamageable
         PlayerDetect();
 
         stateTimer += Time.deltaTime;
-        //StateMachine();
+        StateMachine();
         ApplyFlip();
 
+        if(Input.GetKeyDown(KeyCode.F1))
+        {
+            TakeDamage(1f);
+        }
 
-        //SelectPattern();
+        SelectPattern();
         ResetHitComboIfExpired();
         BasicAttackHitCombo();
         hitLockTimer -= Time.deltaTime;
@@ -134,13 +154,13 @@ public class BossLuna : MonoBehaviour, IDamageable
     int lockXFrames = 0;
     void FixedUpdate()
     {
-        if (lockXFrames > 0)
-        {
-            var v = rb.linearVelocity;
-            v.x = 0f;
-            rb.linearVelocity = v;
-            lockXFrames--;
-        }
+        // if (lockXFrames > 0)
+        // {
+        //     var v = rb.linearVelocity;
+        //     v.x = 0f;
+        //     rb.linearVelocity = v;
+        //     lockXFrames--;
+        // }
 
         if (isBackJumping)
             CheckBackJumpLanding();
@@ -148,10 +168,9 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     void StateMachine()
     {
-        if(isUsingSkill || isAttacking) ChangeState(bossLunaState.Attack);
-
         switch(state)
         {
+            case bossLunaState.Idle: TickIdle(); break;
             case bossLunaState.Aggro: MoveX(facingX, speed); break;
             case bossLunaState.Attack: break;
             case bossLunaState.TakeDamage: TickTakeDamage(); break;
@@ -164,6 +183,7 @@ public class BossLuna : MonoBehaviour, IDamageable
         state = nextState;
         stateTimer = 0f;
 
+        if(nextState == bossLunaState.Aggro) animator?.SetTrigger("Aggro");
         if(state != bossLunaState.TakeDamage && isHit) isHit = false;
     }
 
@@ -203,13 +223,15 @@ public class BossLuna : MonoBehaviour, IDamageable
     }
 
     void SelectPattern()
-    {
+    {   
+        if(isHit || state == bossLunaState.TakeDamage) return;
         if(isUsingSkill || isAttacking) return;
 
         if(grenadeQueuedByHits)
         {
             grenadeQueuedByHits = false;
             StartCoroutine(SkillARoutine());
+            Debug.Log("SkillA");
             return;
         }
 
@@ -217,55 +239,132 @@ public class BossLuna : MonoBehaviour, IDamageable
         {
             specialQueuedByAttackHit = false;
             StartCoroutine(PatternA());
-            return;
-        }
-
-        if(hasSkillBHit)
-        {
-            PatternB();
+            Debug.Log("PatternA");
             return;
         }
 
         if(canUsePatternC() && !hasUsedPatternC)
         {
-            StartCoroutine(SkillCTrackRoutine());
+            hasUsedPatternC = true;
+            StartCoroutine(PatternC());
+            Debug.Log("PatternC");
+            return;
         }
 
-        if(distanceToPlayer > attackRange)
+        if(distanceToPlayer < attackRange && canAttack)
         {
             TickAttack();
         }
 
-        if(distanceToPlayer > attackRange && distanceToPlayer < skillARange && CanUseSkillA())
+        if (!randomSkillQueued && Time.time >= nextRandomSkillTime)
         {
-            StartCoroutine(SkillARoutine());
-        }
-
-        if(distanceToPlayer > skillARange && distanceToPlayer < skillBRange && CanUseSkillB())
-        {
-            StartCoroutine(SkillBRoutine());
-        }
-
-        if(distanceToPlayer > skillBRange && distanceToPlayer < skillCRange && canUseSkillC())
-        {
-            StartCoroutine(SkillCRandomRoutine());
-            return;
+            StartCoroutine(RandomSkillRoutine());
         }
     }
 
+    [SerializeField] float gapA = 5f;
+    [SerializeField] float gapB = 8f;
+    [SerializeField] float gapC = 10f;
+    IEnumerator RandomSkillRoutine()
+    {
+        randomSkillQueued = true;
+
+        // 거리 / 체력비율
+        float dist = distanceToPlayer;
+        float hpRatio = hp.CurHP / hp.MaxHP;
+
+        int pick = PickSkillNoRepeat(dist, hpRatio);
+
+        // 후보가 없으면 그냥 종료(기본 행동으로 빠지게)
+        if (pick == -1)
+        {
+            randomSkillQueued = false;
+            yield break;
+        }
+
+        if (pick == 0) nextRandomSkillTime = Time.time + gapA;
+        else if (pick == 1) nextRandomSkillTime = Time.time + gapB;
+        else nextRandomSkillTime = Time.time + gapC;
+
+        // 실행
+        if (pick == 0) yield return StartCoroutine(SkillARoutine());
+        else if (pick == 1) yield return StartCoroutine(SkillBRoutine());
+        else
+        {
+            if (firstTimeUsingSkillC)
+            {
+                firstTimeUsingSkillC = false;
+                yield return StartCoroutine(SkillCTrackRoutine());
+            }
+            else
+            {
+                yield return StartCoroutine(SkillCRandomRoutine());
+            }
+        }
+
+        randomSkillQueued = false;
+    }
+
+    int lastPick = -1;
+    int PickSkillNoRepeat(float dist, float hpRatio)
+    {
+        if (Time.time < nextRandomSkillTime) return -1;
+
+        int[] pool = new int[3];
+        int count = 0;
+
+        if (dist <= skillARange && CanUseSkillA())
+            pool[count++] = 0;
+    
+        if (dist >= skillBMinRange && dist <= skillBMaxRange && CanUseSkillB())
+            pool[count++] = 1;
+
+        if (hpRatio <= 0.6f &&
+            dist >= skillCMinRange && dist <= skillCMaxRange && CanUseSkillC())
+            pool[count++] = 2;
+
+        if (count == 0) return -1;
+
+        int pick = pool[UnityEngine.Random.Range(0, count)];
+
+        // 연속 방지
+        if (count > 1 && pick == lastPick)
+        {
+            // 한 번만 다시 뽑기
+            pick = pool[UnityEngine.Random.Range(0, count)];
+        }
+
+        lastPick = pick;
+        return pick;
+    }
+
+    void TickIdle()
+    {
+        StopX();
+
+        if(distanceToPlayer < 1000f)
+        {
+            ChangeState(bossLunaState.Aggro);
+            return;
+        }
+    }
     [SerializeField] float speed;
 
     #region Attack
     [SerializeField] int attackHitTriggerCount = 2;
     [SerializeField] float attackComboWindow = 5f;
-    int attackHitCombo = 0;
+    bool canAttack = true;
+    public int attackHitCombo = 0;
     float lastAttackHitTime = -999f;
     bool specialQueuedByAttackHit = false;
     bool isAttacking;
     void TickAttack()
     {
+        StopX();
+        canAttack = false;
+        isAttacking = true;
         ChangeState(bossLunaState.Attack);
-        //애니메이터 어쩌구
+        animator?.SetTrigger("Attack");
     }
 
     public void OnAttackHitBoxOn()
@@ -275,8 +374,18 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     public void OnAttackHitBoxOff()
     {
-        if(!basicAttackHitBox) basicAttackHitBox.SetActive(false);
-        ChangeState(bossLunaState.Attack);
+        basicAttackHitBox.SetActive(false);
+        ChangeState(bossLunaState.Idle);
+        isAttacking = false;
+
+        StartCoroutine(AttackCoolDown());
+    }
+
+    IEnumerator AttackCoolDown()
+    {
+        animator?.SetTrigger("Idle");
+        yield return new WaitForSeconds(1.5f);
+        canAttack = true;
     }
 
     public void BasicAttackHitCombo()
@@ -287,7 +396,6 @@ public class BossLuna : MonoBehaviour, IDamageable
             attackHitCombo = 0;
 
         lastAttackHitTime = now;
-        attackHitCombo++;
 
         if (attackHitCombo >= attackHitTriggerCount)
         {
@@ -301,20 +409,23 @@ public class BossLuna : MonoBehaviour, IDamageable
     bool isBackJumping;
     IEnumerator SkillARoutine()
     {
+        ChangeState(bossLunaState.Attack);
         isUsingSkill = true;
+        StopX();
+
+        yield return new WaitForSeconds(0.2f);
+
+        animator?.SetTrigger("BackFlip");
+        rb.AddForce(new Vector2(skillAJumpXForce * -facingX, skillAJumpYForce), ForceMode2D.Impulse);
+
+        yield return new WaitForSeconds(0.3f);
+
         CachPlayerPos();
-        SkillAJumpPosCalc();
-
-        yield return new WaitForSeconds(0.7f);
-
-        StartBackJump();
-        isBackJumping = true;
-
-        yield return new WaitForSeconds(0.1f);
-
         ThrowGrenadeEvent();
-        nextSkillATime = Time.time + skillACoolTime;
-        StartCoroutine(DelayForNextSkill());
+        isUsingSkill = false;
+        yield return new WaitForSeconds(1f);
+        animator?.SetTrigger("Idle");
+        ChangeState(bossLunaState.Aggro);
     }
 
     void StartBackJump()
@@ -371,7 +482,7 @@ public class BossLuna : MonoBehaviour, IDamageable
         hasCachedTarget = false;
     }
 
-    void SkillAGrenadeInstantiate(Vector2 tartgetPos)
+    void SkillAGrenadeInstantiate(Vector2 targetPos)
     {
         var grenade = Instantiate(holyGrenadePrefab, throwPos.position, Quaternion.identity);
         grenade.GetComponent<BossLunaHolyGrenade>().InitializeGrenadeThrow(targetPos, skillAGrenadeTravelTime, gameObject);
@@ -379,10 +490,11 @@ public class BossLuna : MonoBehaviour, IDamageable
         hasCachedTarget = false;
     }
 
-    void SkillAGrenadeInstantiateVer2(Vector2 targerPos)
+    void SkillAGrenadeInstantiateVer2(Vector2 targetPos)
     {
+        targetPos = new Vector2(cachedTargetPos.x, cachedTargetPos.y);
         var grenade = Instantiate(grenadeVer2, throwPos.position, Quaternion.identity);
-        grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targerPos, skillAGrenadeTravelTime, gameObject);
+        grenade.GetComponent<GrenadeVer2>().InitializeGrenadeThrow(targetPos, skillAGrenadeTravelTime, gameObject);
 
         hasCachedTarget = false;
     }
@@ -399,7 +511,9 @@ public class BossLuna : MonoBehaviour, IDamageable
         Debug.DrawRay(origin, Vector2.down * rayLength, Color.red, 2f);
         if (hit)
         {
+            
             OnBackJumpLanded();
+            return;
         }
     }
 
@@ -411,12 +525,16 @@ public class BossLuna : MonoBehaviour, IDamageable
         rb.angularVelocity = 0f;
 
         lockXFrames = 6;
+        animator?.SetTrigger("Idle");
+        ChangeState(bossLunaState.Aggro);
     }
     #endregion
 
     #region Skill_B
     IEnumerator SkillBRoutine()
     {
+        ChangeState(bossLunaState.Attack);
+        animator?.SetTrigger("Expiation");
         isUsingSkill = true;
         yield return new WaitForSeconds(skillBDelay);
 
@@ -424,8 +542,15 @@ public class BossLuna : MonoBehaviour, IDamageable
 
         ExpiationEvent();
 
-        NextSkillBTime = Time.time + skillBCoolTime;
-        StartCoroutine(DelayForNextSkill());
+        yield return new WaitForSeconds(2f);
+
+        if(hasSkillBHit) StartCoroutine(PatternB());
+        else
+        {
+            isUsingSkill = false;
+            ChangeState(bossLunaState.Idle);
+            animator?.SetTrigger("Idle");
+        }
     }
 
     void ExpiationEvent()
@@ -454,7 +579,10 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     IEnumerator SkillCTrackRoutine()
     {
+        ChangeState(bossLunaState.Attack);
+        animator?.SetTrigger("Genesis");
         isUsingSkill = true;
+        isInvincible = true;
 
         skillCTrackElapsed = 0f;
         while (skillCTrackElapsed < skillCTrackDuration)
@@ -467,14 +595,21 @@ public class BossLuna : MonoBehaviour, IDamageable
 
             skillCTrackElapsed += skillCTrackInterval;
         }
+        ChangeState(bossLunaState.Idle);
+        isInvincible = false;
+        yield return new WaitForSeconds (2f);
+        
+        animator?.SetTrigger("Idle");
 
-        nextSkillCTime = Time.time + skillCCoolTime;
-        StartCoroutine(DelayForNextSkill());
+        isUsingSkill = false;
     }
 
     IEnumerator SkillCRandomRoutine()
     {
+        ChangeState(bossLunaState.Attack);
+        animator?.SetTrigger("Genesis");
         isUsingSkill = true;
+        isInvincible = true;
         float endTime = Time.time + skillCRandDuration;
 
         Bounds b = bossRoomArea.bounds;
@@ -498,9 +633,21 @@ public class BossLuna : MonoBehaviour, IDamageable
             yield return new WaitForSeconds(skillCRandInterval);
         }
 
-        nextSkillCTime = Time.time + skillCCoolTime;
 
-        StartCoroutine(DelayForNextSkill());
+        if(isUsingPatternC) 
+        {
+            StopCoroutine(SkillCRandomRoutine());
+
+            isInvincible = false;
+        }
+        else
+        {
+            ChangeState(bossLunaState.Idle);
+            animator?.SetTrigger("Idle");
+            isInvincible = false;
+        }
+
+        isUsingSkill = false;
     }
 
     float GetRandomXWithMinDistanceAll(Bounds b, IEnumerable<float> usedXs, float minDist, int tries)
@@ -525,22 +672,6 @@ public class BossLuna : MonoBehaviour, IDamageable
 
         return UnityEngine.Random.Range(b.min.x, b.max.x); // 무한 루프 방지 코드(좌표가 없으면 씹고 밀어내서 생성 위치 지정)
     }
-
-    // Vector2 GetRandomPointWithMinDistance(Bounds b, Vector2? lastPos, float minDist, int tries)
-    // {
-    //     for (int i = 0; i < tries; i++)
-    //     {
-    //         float x = UnityEngine.Random.Range(b.min.x, b.max.x);
-    //         Vector2 p = new Vector2(x, skillCSpawnY);
-
-    //         if (!lastPos.HasValue) return p;
-
-    //         if (Vector2.Distance(p, lastPos.Value) >= minDist)
-    //             return p;
-    //     }
-
-    //     return new Vector2(UnityEngine.Random.Range(b.min.x, b.max.x), skillCSpawnY);
-    // }
     #endregion
 
     #region Teleport
@@ -614,71 +745,92 @@ public class BossLuna : MonoBehaviour, IDamageable
     #region PatternA
     IEnumerator PatternA()
     {
+        ChangeState(bossLunaState.Attack);
         isUsingSkill = true;
 
-        //평타 애니메이션
+        animator?.SetTrigger("Attack");
 
         yield return new WaitForSeconds(1f);
 
         isInvincible = true;
-        //TeleportFromPlayer();
+        animator?.SetTrigger("Idle");
+        TeleportToPlayer();
 
         yield return new WaitForSeconds(1f);
         isInvincible = false;
-        //평타 애니메이션
+        animator?.SetTrigger("Attack");
 
         yield return new WaitForSeconds(1f);
         
         isInvincible = true;
+        animator?.SetTrigger("Idle");
         TeleportFromPlayer();
 
         yield return new WaitForSeconds(1f);
         isInvincible = false;
 
         CachPlayerPos();
+        animator?.SetTrigger("GrenadeThrow");
         ThrowGrenadeEvent();
         
         yield return new WaitForSeconds(1f);
 
         grenadeQueuedByHits = false;
+        isUsingSkill = false;
+        ChangeState(bossLunaState.Idle);
+        animator?.SetTrigger("Idle");
     }
     #endregion
 
     #region PatternB
     public bool hasSkillBHit = false;
-    public void PatternB()
+    IEnumerator PatternB()
     {
-        if(!hasSkillBHit) return;
-
-        CachPlayerPos();
-        skillAUseStraightThrow = true;
+        cachedTargetPos = playerTransform.position;
+        animator?.SetTrigger("GrenadeThrow");
         SkillAGrenadeInstantiateVer2(cachedTargetPos);
+
+        yield return new WaitForSeconds(1f);
+
         hasSkillBHit = false;
-        return;
+        isUsingSkill = false;
+        ChangeState(bossLunaState.Idle);
+        animator?.SetTrigger("Idle");
     }
     #endregion
 
     #region PatternC
+    bool isUsingPatternC = false;
     IEnumerator PatternC()
     {
+        ChangeState(bossLunaState.Attack);
+        animator?.SetTrigger("Expiation");
+        isUsingSkill = true;
         hasUsedPatternC = true;
+        isUsingPatternC = true;
         StopX();
         isInvincible = true;
 
         yield return new WaitForSeconds(1f);
+        
+        CachPlayerPos();
+        ExpiationEvent();
 
-        StartCoroutine(SkillBRoutine());
+        yield return new WaitForSeconds(3f);
+
+        animator?.SetTrigger("GrenadeThrow");
+        CachPlayerPos();
+        ThrowGrenadeEvent();
 
         yield return new WaitForSeconds(2f);
 
-        StartCoroutine(SkillARoutine());
-
-        yield return new WaitForSeconds(2f);
-
+        animator?.SetTrigger("Genesis");
         StartCoroutine(SkillCRandomRoutine());
 
-        yield return new WaitForSeconds(5f);
-        StopX();
+        yield return new WaitForSeconds(10f);
+        
+        ChangeState(bossLunaState.Idle);
+        isUsingSkill = false;
     }
     #endregion
 
@@ -720,9 +872,10 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     bool CanUseSkillA() => Time.time >= nextSkillATime;
     bool CanUseSkillB() => Time.time >= NextSkillBTime;
-    bool canUseSkillC()
+    bool firstTimeUsingSkillC = true;
+    bool CanUseSkillC()
     {
-        if (hp.CurHP > hp.MaxHP * 0.6f) return false;
+        if (hp.CurHP / hp.MaxHP > 0.6f) return false;
         if (Time.time < nextSkillCTime) return false;
         return true;
     }
@@ -730,15 +883,13 @@ public class BossLuna : MonoBehaviour, IDamageable
     bool hasUsedPatternC;
     bool canUsePatternC()
     {
-        if(hp.CurHP > hp.MaxHP * 0.2f) return false;
+        if(hp.CurHP / hp.MaxHP > 0.2f) return false;
         return true;
     }
 
-    IEnumerator DelayForNextSkill()
-    {
-        yield return new WaitForSeconds(delayForNextSkill);
-        isUsingSkill = false;
-    }
+    float nextRandomSkillTime = 0f;
+    [SerializeField] float randomSkillGap = 2.0f;
+    bool randomSkillQueued = false;
 
     #region Damage Control
     void TickTakeDamage()
@@ -750,6 +901,7 @@ public class BossLuna : MonoBehaviour, IDamageable
             isHit = false;
             hitLockTimer = hitLockDuration;
             ChangeState(bossLunaState.Aggro);
+            animator?.SetTrigger("Idle");
         }
     }
 
@@ -781,6 +933,7 @@ public class BossLuna : MonoBehaviour, IDamageable
     public virtual void OnHit(Vector2 attackWorldPosition)
     {
         ChangeState(bossLunaState.TakeDamage);
+        animator?.SetTrigger("TakeDamage");
         isHit = true;
 
         Vector2 dir = ((Vector2)transform.position - attackWorldPosition).normalized;
@@ -823,6 +976,7 @@ public class BossLuna : MonoBehaviour, IDamageable
         isDead = true;
 
         ChangeState(bossLunaState.Dead);
+        animator?.SetTrigger("Dead");
         isUsingSkill = false;
 
         GetComponent<Collider2D>().enabled = false;
@@ -839,10 +993,10 @@ public class BossLuna : MonoBehaviour, IDamageable
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, skillARange);
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, skillBRange);
+        // Gizmos.color = Color.green;
+        // Gizmos.DrawWireSphere(transform.position, skillBRange);
 
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, skillCRange);
+        // Gizmos.color = Color.yellow;
+        // Gizmos.DrawWireSphere(transform.position, skillCRange);
     }
 }

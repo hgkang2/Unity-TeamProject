@@ -1,6 +1,5 @@
 ﻿<Solution>
   <Project Path="Assembly-CSharp.csproj" />
-  <Project Path="ChocDino.UIFX.Demos.csproj" />
   <Project Path="RuntimeInspector.Runtime.csproj" />
   <Project Path="NaughtyAttributes.Test.csproj" />
   <Project Path="NaughtyAttributes.Editor.csproj" />

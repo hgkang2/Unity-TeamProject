@@ -12,7 +12,7 @@ public class BossLunaGenesisLight : MonoBehaviour
 
     void Awake()
     {
-        damageType = GetComponent<DamageType>();
+        //damageType = GetComponent<DamageType>();
     }
 
     void Update()
