@@ -65,9 +65,9 @@ public class BossLunaHolyGrenade : MonoBehaviour
         return new Vector2(velocityX, velocityY);
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player"))
+         if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player"))
         {
             StartCoroutine(ExplodeRoutine());
         }
@@ -86,7 +86,7 @@ public class BossLunaHolyGrenade : MonoBehaviour
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
         hitbox.SetActive(true);
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.5f);
         Destroy(this.gameObject);
     }
 }

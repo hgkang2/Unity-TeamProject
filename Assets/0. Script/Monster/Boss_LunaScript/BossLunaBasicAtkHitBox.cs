@@ -8,7 +8,7 @@ public class BossLunaBasicAtkHitBox : MonoBehaviour
     [SerializeField] Collider2D col;
     //LocalSFX sfx;
 
-    BossLuna bossLuna;
+    public BossLuna bossLuna;
 
     void Awake()
     {

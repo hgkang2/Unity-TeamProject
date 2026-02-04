@@ -18,6 +18,8 @@ public class SkillHitBox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if(!collision.CompareTag("Player")) return;
+
         if(collision.TryGetComponent<IDamageable>(out var damageable))
         {
             Vector2 hitPos = transform.position;

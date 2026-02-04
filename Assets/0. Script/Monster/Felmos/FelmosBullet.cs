@@ -7,7 +7,7 @@ public class FelmosBullet : MonoBehaviour
     Rigidbody2D rb;
 
     [SerializeField] DamageType damageType;
-    float damage;
+    [SerializeField] float damage;
 
     private void Awake()
     {

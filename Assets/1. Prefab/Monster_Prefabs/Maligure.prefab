@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4408549707072071338}
   - component: {fileID: 939602154468400936}
   - component: {fileID: 2892122130830252505}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: WarningVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 6369733137881958326}
   - component: {fileID: 5166442864003647467}
   - component: {fileID: 2012367200612034866}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: Maligure
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -382,7 +382,7 @@ GameObject:
   - component: {fileID: 3926387476171345727}
   - component: {fileID: 9181287465863042996}
   - component: {fileID: 7135396517118901179}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: SkillHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -474,7 +474,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 747458233457037325}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: Hitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -509,7 +509,7 @@ GameObject:
   - component: {fileID: 1378594894581554961}
   - component: {fileID: 813939589373355203}
   - component: {fileID: 5223132782769373466}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: GroundCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -547,7 +547,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 2147483712
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -603,7 +603,7 @@ GameObject:
   - component: {fileID: 605189424460587680}
   - component: {fileID: 5604075199073525500}
   - component: {fileID: 524754487810513431}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: AttackHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -696,7 +696,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1361448226852512997}
   - component: {fileID: 7455382487227458019}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: AlertSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -105,7 +105,7 @@ MonoBehaviour:
   gapA: 5
   gapB: 8
   gapC: 10
-  speed: 5
+  speed: 4
   attackHitTriggerCount: 2
   attackComboWindow: 5
   attackHitCombo: 0

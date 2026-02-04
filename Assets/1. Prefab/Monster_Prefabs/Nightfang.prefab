@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 9161603376088115514}
   - component: {fileID: 1981234461261143875}
   - component: {fileID: 6395600156759908873}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: AttackHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 3960777848846684979}
   - component: {fileID: 2323040627611865532}
   - component: {fileID: 429493440188281348}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: WarningVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +332,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2647259639686807689}
   - component: {fileID: 8803378991616571473}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: AlertSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -420,7 +420,7 @@ GameObject:
   - component: {fileID: 5887270353054191846}
   - component: {fileID: 5378892132954568225}
   - component: {fileID: 4378480783797441742}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -458,7 +458,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 2147483712
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -516,7 +516,7 @@ GameObject:
   - component: {fileID: 2485931077962687207}
   - component: {fileID: 2616237485477889189}
   - component: {fileID: 7904496103688349912}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: SkillHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -732,7 +732,7 @@ GameObject:
   - component: {fileID: 1091997839790200113}
   - component: {fileID: 1991725715858692186}
   - component: {fileID: 5668301796177521214}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: Nightfang
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -1116,7 +1116,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6963575559025643499}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: HitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
