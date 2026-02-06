@@ -13,12 +13,6 @@ public class AltarUI : UIPanelBase
 
     [HideInInspector] public Interactor interactor;
 
-    protected override void Init()
-    {
-        Close();
-    }
-
-
     GameManager GM;
     Coroutine bindCo;
     bool bound;

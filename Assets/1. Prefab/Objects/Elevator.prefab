@@ -51,8 +51,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetPos: {fileID: 6393860542659796081}
-  leverAnimator: {fileID: 6754064141576704334}
-  leverSprite: {fileID: 416238707899551914}
+  BGkey: 0
+  animator: {fileID: 6754064141576704334}
+  sprite: {fileID: 416238707899551914}
   interactionUIPos: {fileID: 5565567363589027361}
 --- !u!58 &5467456087545946814
 CircleCollider2D:
@@ -343,7 +344,7 @@ Transform:
   m_GameObject: {fileID: 8043461655147518748}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 48.1, y: -18.7, z: 0}
+  m_LocalPosition: {x: -156.271, y: -174.606, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

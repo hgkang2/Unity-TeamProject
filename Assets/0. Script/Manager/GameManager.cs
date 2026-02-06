@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviour
         usedFlame = 0;
     }
 
+    
     public IEnumerator TeleportRoutine(Player p, Transform targetPosition, BGSetKey BGKey)
     {
 

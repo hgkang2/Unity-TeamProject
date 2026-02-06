@@ -19,16 +19,27 @@ public class Portal : MonoBehaviour, IInteractable
 
     LocalSFX localSFX;
 
+    
     void Awake()
     {
         localSFX = GetComponent<LocalSFX>();
     }
     void Start()
     {
-        localSFX.Play("Open");
-        localSFX.PlayLoop("Continue");
+        // 만약 인스펙터에서 수동으로 넣지 않았다면(null이라면), 이름으로 찾아서 할당합니다.
+        if (targetPos == null)
+        {
+            GameObject destination = GameObject.Find("PortalTarget");
+            if (destination != null)
+            {
+                targetPos = destination.transform;
+            }
+        else
+            {
+                Debug.LogWarning("씬에 PortalTarget 오브젝트가 없습니다!");
+            }
+        }
     }
-
     public bool CanInteract()
     {
         return true;

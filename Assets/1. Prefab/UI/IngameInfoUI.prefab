@@ -1041,7 +1041,7 @@ MonoBehaviour:
   stageTimeText: {fileID: 2670216660630011318}
   ingameTimeText: {fileID: 4299236466314023770}
   stageNumText: {fileID: 7411882826507304949}
-  keyNumText: {fileID: 1816966083010595668}
+  flameNumText: {fileID: 1816966083010595668}
 --- !u!222 &9185125415853876287
 CanvasRenderer:
   m_ObjectHideFlags: 0

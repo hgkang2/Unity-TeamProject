@@ -17,6 +17,7 @@ public class Elevator : MonoBehaviour, IInteractable
     [SerializeField] Transform interactionUIPos;
     public Transform InteractionUIPosition => interactionUIPos;
 
+
     public bool CanInteract()
     {
         return true;
