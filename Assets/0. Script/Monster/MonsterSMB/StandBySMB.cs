@@ -2,20 +2,20 @@ using UnityEngine;
 
 public class StandBySMB : StateMachineBehaviour
 {
-    NightfangStandalone nightfang;
+    Nightfang nightfang;
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        // StandBy »óÅÂ¿¡ µé¾î¿Ã ¶§ ÇÑ ¹ø¸¸ Ã£¾Æ¼­ Ä³½Ì
+        // StandBy ï¿½ï¿½ï¿½Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã£ï¿½Æ¼ï¿½ Ä³ï¿½ï¿½
         if (nightfang == null)
-            nightfang = animator.GetComponentInParent<NightfangStandalone>();
-        // ¶Ç´Â animator.GetComponent<NightfangStandalone>();
-        // (NightfangStandaloneÀÌ Animator ¿ÀºêÁ§Æ®¿¡ ºÙ¾îÀÖÀ¸¸é GetComponent, ºÎ¸ð¸é InParent)
+            nightfang = animator.GetComponentInParent<Nightfang>();
+        // ï¿½Ç´ï¿½ animator.GetComponent<NightfangStandalone>();
+        // (NightfangStandaloneï¿½ï¿½ Animator ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ù¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ GetComponent, ï¿½Î¸ï¿½ï¿½ InParent)
     }
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (nightfang == null) return; // ¾ÈÀüÀåÄ¡
-        nightfang.ChangeState(NightfangStandalone.State.Aggro);
+        if (nightfang == null) return; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡
+        nightfang.ChangeState(Nightfang.State.Aggro);
     }
 }

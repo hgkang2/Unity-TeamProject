@@ -2,7 +2,7 @@ using System.Collections;
 using System.Security.Cryptography;
 using UnityEngine;
 
-public class Felmos_Test : MonoBehaviour, IDamageable
+public class Felmos : MonoBehaviour, IDamageable
 {
     [Header("Test")]
     public bool enablePatrol = true;

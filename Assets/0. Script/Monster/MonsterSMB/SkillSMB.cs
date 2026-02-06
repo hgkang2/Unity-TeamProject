@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class SkillSMB : StateMachineBehaviour
 {
-    NightfangStandalone nightfang;
+    Nightfang nightfang;
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (nightfang == null)
-            nightfang = animator.GetComponentInParent<NightfangStandalone>();
+            nightfang = animator.GetComponentInParent<Nightfang>();
         nightfang.spriteRenderer.color = Color.red;
         nightfang.skillHitBoxObj.SetActive(true);
     }

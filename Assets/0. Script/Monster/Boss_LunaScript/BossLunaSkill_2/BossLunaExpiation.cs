@@ -83,8 +83,8 @@ public class BossLunaExpiation : MonoBehaviour
         if(collision.TryGetComponent<IDamageable>(out var damageable))
         {
             localSFX.Play("ExpiationHit");
-            Vector2 hitPos = transform.position;
-            damageable.TakeDamage(damage, DamageType.Normal, hitPos);
+            Vector2 hitPos = bossLuna.transform.position;
+            damageable.TakeDamage(damage, DamageType.Stun, hitPos);
             bossLuna.hasSkillBHit = true;
         }
     }

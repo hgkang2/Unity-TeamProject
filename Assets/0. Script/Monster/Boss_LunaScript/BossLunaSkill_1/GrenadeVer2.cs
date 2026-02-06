@@ -28,7 +28,7 @@ public class GrenadeVer2 : MonoBehaviour
     {
         this.targetPos = targetPos;
         this.owner = owner;
-        travelTime  = 0.3f;
+        travelTime  = 0.5f;
         // if(warningSignPos)
         // {
         //     warningSignPos.SetParent(null);

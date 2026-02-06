@@ -63,25 +63,25 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   basicAttackHitBox: {fileID: 7413332590780672528}
-  attackRange: 2
+  attackRange: 1.5
   holyGrenadePrefab: {fileID: 4542838770508194207, guid: 5833a647d14ac0b4587ddc9be8f56fe3, type: 3}
   grenadeVer2: {fileID: 4542838770508194207, guid: cb071f29c9aada748a0e5db7986b90be, type: 3}
   throwPos: {fileID: 7465225117123986984}
-  skillARange: 5
+  skillARange: 4
   skillACoolTime: 5
   skillASideOffset: 2
   skillAGrenadeTravelTime: 1
   skillAJumpXForce: 5
   skillAJumpYForce: 5
   expiationPrefab: {fileID: 876667635922888196, guid: 8c7e6bb0c99a97841b847c0785acfb3e, type: 3}
-  skillBMaxRange: 8
-  skillBMinRange: 4
+  skillBMaxRange: 7
+  skillBMinRange: 3
   skillBCoolTime: 8
   skillBDelay: 0.7
   skillBSpawnTime: 1
   genesisPrefab: {fileID: 2491489288044632414, guid: 99e8143bb886ce0459052b62d64a5c59, type: 3}
   skillCMaxRange: 12
-  skillCMinRange: 7
+  skillCMinRange: 6
   skillCCoolTime: 5
   skillCSpawnTime: 1
   skillCTrackDuration: 5
@@ -249,7 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0cfcb006423844fa0546325608247b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 300
+  maxHP: 100
   armor: 0
   initializeOnAwake: 1
   curHP: 0
@@ -524,7 +524,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 2147483648
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -542,7 +542,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.79999995, y: -0.008733451}
+  m_Offset: {x: 1.0098372, y: -0.008733451}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -552,7 +552,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1.9606935}
+  m_Size: {x: 1.4196744, y: 1.9606935}
   m_EdgeRadius: 0
 --- !u!114 &1072706111822365861
 MonoBehaviour:

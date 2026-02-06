@@ -25,7 +25,7 @@ public class BossLunaBasicAtkHitBox : MonoBehaviour
             Vector2 hitPos = transform.position;
             damageable.TakeDamage(damage,damageType, hitPos);
             sfx.Play("Attack");
-            bossLuna.attackHitCombo++;
+            bossLuna.RegisterBasicAttackHit();
         }
     }
 }

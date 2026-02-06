@@ -346,6 +346,13 @@ public class Player : MonoBehaviour, IDamageable
                 StartInvincibleForDuration();
                 spriteFlash.StartInvincibleBlink(0.5f);
                 break;
+            case DamageType.Stun:
+                ApplyKnockback(0f, attackerWorldPosition);
+                localSFX.Play("Hit");
+                StartHitStun(2f);
+                StartInvincibleForDuration();
+                spriteFlash.StartInvincibleBlink(0.5f);
+                break;
         }
     }
     #endregion

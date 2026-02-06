@@ -20,6 +20,7 @@ public class BossLunaExpiationHitBox : MonoBehaviour
         // {
         //     bossLuna.hasSkillBHit = true; 
         // }
+        if(!collision.gameObject.CompareTag("Player")) return;
 
         if(collision.TryGetComponent<IDamageable>(out var damageable))
         {
