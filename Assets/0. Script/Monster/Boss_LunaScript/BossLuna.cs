@@ -134,18 +134,13 @@ public class BossLuna : MonoBehaviour, IDamageable
         ChangeState(bossLunaState.Idle);
     }
 
-    public void Oestroy()
+    public void OnDestroy()
     {
         hp.OnDied -= OnDied;        
     }
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.F1))
-        {
-            hp.TakeDamage(5f);
-            OnDamagedForCombo();
-        }
         PlayerDetect();
 
         stateTimer += Time.deltaTime;
