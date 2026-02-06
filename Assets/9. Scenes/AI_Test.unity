@@ -1292,17 +1292,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5271291501411278454, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
-      propertyPath: player
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5271291501411278454, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
       propertyPath: bossRoomArea
       value: 
       objectReference: {fileID: 1742759669}
-    - target: {fileID: 5271291501411278454, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
-      propertyPath: skillCMinRange
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 5271291501411278454, guid: 68a18d374517c84438d63d5f88d19164, type: 3}
       propertyPath: playerTransform
       value: 

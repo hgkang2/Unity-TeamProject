@@ -57,7 +57,6 @@ MonoBehaviour:
   state: 0
   playerTransform: {fileID: 0}
   animator: {fileID: 4024504513927999256}
-  player: {fileID: 0}
   aggroRange: 50
   playerMask:
     serializedVersion: 2
@@ -81,7 +80,7 @@ MonoBehaviour:
   skillBSpawnTime: 1
   genesisPrefab: {fileID: 2491489288044632414, guid: 99e8143bb886ce0459052b62d64a5c59, type: 3}
   skillCMaxRange: 12
-  skillCMinRange: 6
+  skillCMinRange: 2
   skillCCoolTime: 5
   skillCSpawnTime: 1
   skillCTrackDuration: 5
