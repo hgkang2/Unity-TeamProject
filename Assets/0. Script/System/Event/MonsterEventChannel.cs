@@ -5,6 +5,6 @@ using UnityEngine;
 
 public class MonsterEventChannel : ScriptableObject
 {
-    public event Action monsterDead;
-    public void RaiseMonsterDead() => monsterDead?.Invoke();
+    public event Action<MonsterType> monsterDead;
+    public void RaiseMonsterDead(MonsterType type) => monsterDead?.Invoke(type);
 }

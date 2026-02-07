@@ -9,6 +9,8 @@ public class Altar : MonoBehaviour, IInteractable
 
     [SerializeField] GameObject[] candles;
 
+    [SerializeField] SystemEventChannel systemEventChannel;
+
     int offeredFlame = 0;
     bool isActivated = false;
 
@@ -83,6 +85,7 @@ public class Altar : MonoBehaviour, IInteractable
     {
         isActivated = true;
         portal.SetActive(true);
+        systemEventChannel.RaiseAltarActivate();
     }
 
 

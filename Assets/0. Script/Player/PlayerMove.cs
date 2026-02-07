@@ -90,6 +90,7 @@ public class PlayerMove : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (TimeManager.IsPaused) return;
         if (player.HP.IsDead) return;
 
         // 1) 센서/상태 업데이트
@@ -475,6 +476,8 @@ public class PlayerMove : MonoBehaviour
     #endregion
 
     #region  Wall Check
+    bool canWallGrab = false;
+    public void ActivateWallGrab() => canWallGrab = true;
     
     [Header("벽 잡기 상태")]
     public bool isWallGrabbing = false;
@@ -493,32 +496,53 @@ public class PlayerMove : MonoBehaviour
     bool wasWallSliding;
     void HandleWallCheck()
     {
-        if (isGrounded || !player.CanControl)
+        Bounds b = col.bounds;
+        Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
+
+        // (wallfriction 제대로 작동하면 isFootTouchingWall 굳이 필요 없음.)
+        // 1) 스턱 방지용 면 체크는 "공중"이면 항상 갱신
+//         if (!isGrounded)
+//         {
+//             Vector2 castSize = new Vector2(0.05f, b.size.y * 0.9f);
+//             Vector2 castOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, b.center.y);
+
+//             RaycastHit2D hit = Physics2D.BoxCast(
+//                 castOrigin, castSize, 0f,
+//                 rayDirection,
+//                 footWallCheckDistance,
+//                 wallMask
+//             );
+
+//             isFootTouchingWall = (hit.collider != null);
+
+// #if UNITY_EDITOR
+//             Color c = isFootTouchingWall ? new Color(1f, 0f, 1f, 1f)   // 보라 (맞음)
+//                                          : new Color(1f, 1f, 0f, 1f);  // 노랑 (안 맞음)
+//             DrawBoxCast2D(castOrigin, castSize, rayDirection, footWallCheckDistance, c);
+// #endif
+//         }
+//         else
+//         {
+//             isFootTouchingWall = false;
+//         }
+
+        // 2) 벽잡기/슬라이드는 canWallGrab 켜져있을 때만 처리
+        if (!canWallGrab || isGrounded || !player.CanControl)
         {
             isWallGrabbing = false;
             isWallSliding = false;
-        isFootTouchingWall = false;
             return;
         }
 
         wasWallSliding = isWallSliding;
 
-        Bounds b = col.bounds;
-
-        // 벽 판정용 중앙 레이
+        // 중앙 레이로 벽잡기/슬라이드 판단
         float rayY = b.center.y + wallCheckYOffset;
         Vector2 rayOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, rayY);
-        Vector2 rayDirection = isRightFacing ? Vector2.right : Vector2.left;
 
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, wallCheckDistance, wallMask);
+        RaycastHit2D centerHit = Physics2D.Raycast(rayOrigin, rayDirection, wallCheckDistance, wallMask);
 
-#if UNITY_EDITOR
-        Color color = hit.collider != null ? Color.red : Color.green;
-        Debug.DrawLine(rayOrigin, rayOrigin + rayDirection * wallCheckDistance, color);
-#endif
-
-
-        bool isTouchingWall = (hit.collider != null);
+        bool isTouchingWall = (centerHit.collider != null);
 
         bool inputTowardWall =
             (isRightFacing && inputVec.x > 0.1f) ||
@@ -526,64 +550,15 @@ public class PlayerMove : MonoBehaviour
 
         bool allowWallState = (rb.linearVelocity.y < 0f) || isWallGrabbing || isWallSliding;
 
-        // 중앙 레이가 맞았으면 벽잡기 상태로 진입
         if (isTouchingWall && allowWallState)
         {
-            if (inputTowardWall)
-            {
-                isWallGrabbing = true;
-                isWallSliding = false;
-            }
-            else
-            {
-                isWallSliding = true;
-                isWallGrabbing = false;
-            }
-
-            isFootTouchingWall = false;
+            if (inputTowardWall) { isWallGrabbing = true; isWallSliding = false; }
+            else { isWallSliding = true; isWallGrabbing = false; }
             return;
         }
 
-        // 중앙 레이가 안 맞으면 벽잡기 상태 해제
-        else
-        {
-            isWallGrabbing = false;
-            isWallSliding = false;
-        }
-
-        // 전방 머리나 하체쪽에 벽이 있을때 스턱 방지용 면 체크
-        //Vector2 castOrigin = b.center;
-        Vector2 castSize = new Vector2(0.05f, b.size.y * 0.9f);
-        Vector2 castOrigin = new Vector2(isRightFacing ? b.max.x : b.min.x, b.center.y);
-
-        hit = Physics2D.BoxCast(
-            castOrigin,
-            castSize,
-            0f,
-            rayDirection,
-            footWallCheckDistance,
-            wallMask
-        );
-
-        isFootTouchingWall = (hit.collider != null);
-
-#if UNITY_EDITOR
-        Color footColor = isFootTouchingWall ? Color.magenta : Color.cyan;
-
-        // 박스 윤곽 + 캐스트 방향 표시
-        Vector2 half = castSize * 0.5f;
-        Vector2 p1 = castOrigin + new Vector2(-half.x, -half.y);
-        Vector2 p2 = castOrigin + new Vector2(-half.x, half.y);
-        Vector2 p3 = castOrigin + new Vector2(half.x, half.y);
-        Vector2 p4 = castOrigin + new Vector2(half.x, -half.y);
-
-        Debug.DrawLine(p1, p2, footColor);
-        Debug.DrawLine(p2, p3, footColor);
-        Debug.DrawLine(p3, p4, footColor);
-        Debug.DrawLine(p4, p1, footColor);
-
-        Debug.DrawLine(castOrigin, castOrigin + rayDirection * footWallCheckDistance, footColor);
-#endif
+        isWallGrabbing = false;
+        isWallSliding = false;
     }
     #endregion
 
@@ -618,6 +593,40 @@ public class PlayerMove : MonoBehaviour
     {
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.linearVelocity = Vector2.zero;
-        isGrounded = true; 
+        isGrounded = true;
     }
+
+
+
+#if UNITY_EDITOR
+    static void DrawBoxCast2D(Vector2 origin, Vector2 size, Vector2 dir, float distance, Color color)
+    {
+        // BoxCast는 "시작 박스"와 "끝 박스"를 그려주면 직관적임
+        Vector2 end = origin + dir.normalized * distance;
+
+        // 시작 박스
+        DrawRect(origin, size, color);
+
+        // 끝 박스
+        DrawRect(end, size, color);
+
+        // 연결선(박스 중심선)
+        Debug.DrawLine(origin, end, color, 0f, false);
+    }
+
+    static void DrawRect(Vector2 center, Vector2 size, Color color)
+    {
+        Vector2 half = size * 0.5f;
+
+        Vector3 a = new Vector3(center.x - half.x, center.y - half.y, 0);
+        Vector3 b = new Vector3(center.x - half.x, center.y + half.y, 0);
+        Vector3 c = new Vector3(center.x + half.x, center.y + half.y, 0);
+        Vector3 d = new Vector3(center.x + half.x, center.y - half.y, 0);
+
+        Debug.DrawLine(a, b, color, 0f, false);
+        Debug.DrawLine(b, c, color, 0f, false);
+        Debug.DrawLine(c, d, color, 0f, false);
+        Debug.DrawLine(d, a, color, 0f, false);
+    }
+#endif
 }

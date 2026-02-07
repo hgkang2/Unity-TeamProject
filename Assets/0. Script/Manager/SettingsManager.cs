@@ -13,11 +13,12 @@ public static class SettingsManager
 
     static SettingsData committed;
     static SettingsData working;
+    static bool isLoaded;
 
     public static bool IsDirty { get; private set; }
     public static event Action<bool> DirtyChanged;
 
-    const string KEY_HAS   = "SETTINGS_HAS";
+    const string KEY_HAS = "SETTINGS_HAS";
     const string KEY_BGM = "SETTINGS_BGM01";
     const string KEY_SFX = "SETTINGS_SFX01";
     const string KEY_RES_W = "SETTINGS_RES_W";
@@ -30,18 +31,24 @@ public static class SettingsManager
     public static int CommittedResW => committed.resW;
     public static int CommittedResH => committed.resH;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void BootstrapOnGameStart()
+    {
+        LoadOrDefault();
+    }
 
 
     public static void LoadOrDefault()
     {
+        if (isLoaded) return;
         if (PlayerPrefs.GetInt(KEY_HAS, 0) == 1)
         {
             committed = new SettingsData
             {
                 bgm01 = Mathf.Clamp01(PlayerPrefs.GetFloat(KEY_BGM, 1f)),
                 sfx01 = Mathf.Clamp01(PlayerPrefs.GetFloat(KEY_SFX, 1f)),
-                resW  = PlayerPrefs.GetInt(KEY_RES_W, 0),
-                resH  = PlayerPrefs.GetInt(KEY_RES_H, 0),
+                resW = PlayerPrefs.GetInt(KEY_RES_W, 0),
+                resH = PlayerPrefs.GetInt(KEY_RES_H, 0),
             };
 
             if (committed.resW <= 0 || committed.resH <= 0)
@@ -56,6 +63,16 @@ public static class SettingsManager
         working = committed;
         ApplyWorkingToRuntime();
         SetDirty(false);
+        isLoaded = true;
+    }
+
+    public static void ApplyCommittedAudioToRuntime()
+    {
+        if (!isLoaded) LoadOrDefault();
+
+        if (SoundManager.Instance == null) return;
+        SoundManager.Instance.SetBgmVolume(committed.bgm01);
+        SoundManager.Instance.SetSfxVolume(committed.sfx01);
     }
 
     public static void CommitAndSave()

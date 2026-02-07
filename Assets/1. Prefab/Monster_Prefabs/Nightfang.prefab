@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 9161603376088115514}
   - component: {fileID: 1981234461261143875}
   - component: {fileID: 6395600156759908873}
-  m_Layer: 31
+  m_Layer: 13
   m_Name: AttackHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   damageType: 0
-  col: {fileID: 1394287258072060130}
 --- !u!82 &1981234461261143875
 AudioSource:
   m_ObjectHideFlags: 0
@@ -419,8 +418,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5887270353054191846}
   - component: {fileID: 5378892132954568225}
-  - component: {fileID: 4378480783797441742}
-  m_Layer: 31
+  m_Layer: 14
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -488,21 +486,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3.2818236, y: 2.0542445}
   m_EdgeRadius: 0
---- !u!114 &4378480783797441742
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3578710920004201130}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c2d413ffa3a831499b28425b37de73f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collideDamage: 10
-  damageType: 0
-  col: {fileID: 5378892132954568225}
 --- !u!1 &6924634786436510817
 GameObject:
   m_ObjectHideFlags: 0
@@ -516,7 +499,7 @@ GameObject:
   - component: {fileID: 2485931077962687207}
   - component: {fileID: 2616237485477889189}
   - component: {fileID: 7904496103688349912}
-  m_Layer: 31
+  m_Layer: 13
   m_Name: SkillHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -598,7 +581,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 15
   damageType: 0
-  col: {fileID: 5635014460290342160}
 --- !u!82 &2616237485477889189
 AudioSource:
   m_ObjectHideFlags: 0
@@ -732,7 +714,7 @@ GameObject:
   - component: {fileID: 1091997839790200113}
   - component: {fileID: 1991725715858692186}
   - component: {fileID: 5668301796177521214}
-  m_Layer: 31
+  m_Layer: 12
   m_Name: Nightfang
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -865,7 +847,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 7
   m_Sprite: {fileID: 21300000, guid: 27da003528f94ff4aa3ac2b35e622bbb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -975,7 +957,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0cfcb006423844fa0546325608247b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 10000
+  maxHP: 30
   armor: 0
   initializeOnAwake: 1
   curHP: 0

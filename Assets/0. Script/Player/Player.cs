@@ -68,6 +68,7 @@ public class Player : MonoBehaviour, IDamageable
         if (TimeManager.IsPaused) return;
     }
 
+
     #region 넉백
     public void ApplyKnockback(float force, Vector2? attackerPos = null)
     {

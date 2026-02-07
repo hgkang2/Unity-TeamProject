@@ -583,16 +583,17 @@ public class Nightfang : MonoBehaviour, IDamageable
         animator.SetTrigger("Dead");
 
         StopAllCoroutines();
-        monsterEvent.RaiseMonsterDead();
+        monsterEvent.RaiseMonsterDead(MonsterType.Nightfang);
         isUsingSkill = false;
 
         GetComponent<Collider2D>().enabled = false;
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
+    
         FindFirstObjectByType<Player>().Exp.AddExp(10);
 
-        GameObject.Destroy(this.gameObject, 3f);
+        Destroy(this.gameObject, 3f);
     }
 
     void MonsterGroundCheck()

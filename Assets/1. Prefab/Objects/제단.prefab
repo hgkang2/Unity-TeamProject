@@ -309,6 +309,7 @@ MonoBehaviour:
   - {fileID: 2690024388599757282}
   - {fileID: 5601470467657314639}
   - {fileID: 5103200243269078966}
+  systemEventChannel: {fileID: 11400000, guid: c95400e155e636c46b73b2242a3e2017, type: 2}
 --- !u!212 &9090406554310032085
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -582,7 +583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a17cb474b82dfc4b971b593477592c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPos: {fileID: 3021180398638361133}
+  targetPos: {fileID: 0}
   BGkey: 1
   animator: {fileID: 8683914159799670956}
   sprite: {fileID: 510838822531038142}
@@ -718,11 +719,6 @@ AudioSource:
 --- !u!212 &510838822531038142 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 1285383466311923598, guid: 22fe26eba5cf7314ea647708d2255070, type: 3}
-  m_PrefabInstance: {fileID: 1639385306431900720}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &3021180398638361133 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4552338576287213085, guid: 22fe26eba5cf7314ea647708d2255070, type: 3}
   m_PrefabInstance: {fileID: 1639385306431900720}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &4268135895634410470 stripped

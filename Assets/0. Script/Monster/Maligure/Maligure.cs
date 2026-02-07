@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -17,6 +18,8 @@ public class Malirgue : MonoBehaviour, IDamageable
     public float stateTimer;
 
     #region Variables
+    [SerializeField] GameObject flamePrefab;
+
     [Header("Refs")]
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Animator animator;
@@ -512,14 +515,15 @@ public class Malirgue : MonoBehaviour, IDamageable
         animator?.SetTrigger("Dead");
 
         StopAllCoroutines();
-        monsterEvent.RaiseMonsterDead();
+        monsterEvent.RaiseMonsterDead(MonsterType.Maligure);
         isAttacking = false;
 
         GetComponent<Collider2D>().enabled = false;
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        //FindFirstObjectByType<Player>().Exp.AddExp(10);
+        FindFirstObjectByType<Player>().Exp.AddExp(10);
+        if(flamePrefab != null) Instantiate(flamePrefab, transform.position, Quaternion.identity);
 
         GameObject.Destroy(this.gameObject, 3f);
     }

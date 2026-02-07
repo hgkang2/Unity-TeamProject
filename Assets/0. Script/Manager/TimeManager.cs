@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using System.Diagnostics;
 
 public static class TimeManager
 {
@@ -20,24 +21,22 @@ public static class TimeManager
     }
 
 
-    /// <summary>
-    /// 시간 완전 정지
-    /// </summary>
+    static bool timeScaleLocked;
+
     public static void Pause()
     {
+        timeScaleLocked = true;
         KillTween();
-        SetTimeScale(0f);
         IsPaused = true;
+        SetTimeScale(0f);
     }
 
-    /// <summary>
-    /// 일시정지 해제 (정상 속도로 복귀)
-    /// </summary>
     public static void Resume()
     {
+        timeScaleLocked = false;
         KillTween();
-        SetTimeScale(1f);
         IsPaused = false;
+        SetTimeScale(1f);
     }
 
     /// <summary>
@@ -45,8 +44,12 @@ public static class TimeManager
     /// </summary>
     public static void SetTimeScale(float scale)
     {
+        //pause 중에는 다른 세팅 금지
+        if (timeScaleLocked && scale != 0f) return;
+
         Time.timeScale = Mathf.Clamp(scale, 0f, 10f);
         CurrentScale = Time.timeScale;
+
         OnTimeScaleChanged?.Invoke(CurrentScale);
     }
 

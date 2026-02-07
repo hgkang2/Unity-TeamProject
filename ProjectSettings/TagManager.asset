@@ -23,9 +23,9 @@ TagManager:
   - Environment
   - IInteractable
   - IInteractbale(Rigidbody)
-  - 
-  - 
-  - 
+  - Monster
+  - MonsterAttack
+  - MonsterGround
   - 
   - 
   - 
@@ -42,7 +42,7 @@ TagManager:
   - 
   - 
   - 
-  - Monster
+  - 
   m_SortingLayers:
   - name: Default
     uniqueID: 0

@@ -52,6 +52,7 @@ public class SoundManager : MonoBehaviour
             if (pair.clip != null && !uiLibrary.ContainsKey(pair.key))
                 uiLibrary.Add(pair.key, pair.clip);
         }
+        SettingsManager.ApplyCommittedAudioToRuntime();
     }
 
     // SoundManager에 등록된 클립을 사용
@@ -122,7 +123,7 @@ public class SoundManager : MonoBehaviour
         bgmSource.volume = masterVolume * bgmVolume;
         // SFX는 각 LocalSoundVFX가 개별적으로 적용
     }
-    
+
     public float GetGlobalSfxVolume()
     {
         return masterVolume * sfxVolume;

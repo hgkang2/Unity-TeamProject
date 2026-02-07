@@ -24,6 +24,9 @@ public class SceneContext : MonoBehaviour
     public TutorialTrigger2D tutorialTrigger_monsterMeet;
     public Collider2D tutorialWall;
     public TutorialTrigger2D tutorialTrigger_trap;
+    public TutorialTrigger2D tutorialTrigger_flyMonster;
+    public TutorialTrigger2D tutorialTrigger_breakableGround;
+    public TutorialTrigger2D tutorialTrigger_bossRoom;
 
     [Header("Project/1. Prefab/MouseClickVFX")]
     public ParticleSystem clickVFX;

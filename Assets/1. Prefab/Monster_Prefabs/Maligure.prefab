@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 6369733137881958326}
   - component: {fileID: 5166442864003647467}
   - component: {fileID: 2012367200612034866}
-  m_Layer: 31
+  m_Layer: 12
   m_Name: Maligure
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -194,7 +194,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 7
   m_Sprite: {fileID: 21300000, guid: 4275fc6f1c4b174409c03ccee3d59e52, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -310,6 +310,7 @@ MonoBehaviour:
   enableSkill: 1
   state: 0
   stateTimer: 0
+  flamePrefab: {fileID: 2589797407892488346, guid: fd404e3a694c5f344837af85a001ab35, type: 3}
   rb: {fileID: 6232579956549374285}
   animator: {fileID: 3383276288366839759}
   vfxAnimator: {fileID: 2892122130830252505}
@@ -367,7 +368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0cfcb006423844fa0546325608247b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 30
+  maxHP: 100
   armor: 0
   initializeOnAwake: 1
   curHP: 100
@@ -382,7 +383,7 @@ GameObject:
   - component: {fileID: 3926387476171345727}
   - component: {fileID: 9181287465863042996}
   - component: {fileID: 7135396517118901179}
-  m_Layer: 31
+  m_Layer: 13
   m_Name: SkillHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -464,7 +465,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 15
   damageType: 0
-  col: {fileID: 9181287465863042996}
 --- !u!1 &5071482211063669835
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,8 +508,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1378594894581554961}
   - component: {fileID: 813939589373355203}
-  - component: {fileID: 5223132782769373466}
-  m_Layer: 31
+  m_Layer: 14
   m_Name: GroundCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -577,21 +576,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.57, y: 3.0097601}
   m_EdgeRadius: 0
---- !u!114 &5223132782769373466
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6034697146589143252}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c2d413ffa3a831499b28425b37de73f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collideDamage: 10
-  damageType: 0
-  col: {fileID: 813939589373355203}
 --- !u!1 &6918387077792308386
 GameObject:
   m_ObjectHideFlags: 0
@@ -603,7 +587,7 @@ GameObject:
   - component: {fileID: 605189424460587680}
   - component: {fileID: 5604075199073525500}
   - component: {fileID: 524754487810513431}
-  m_Layer: 31
+  m_Layer: 13
   m_Name: AttackHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -685,7 +669,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   damageType: 0
-  col: {fileID: 5604075199073525500}
 --- !u!1 &8560376589369344395
 GameObject:
   m_ObjectHideFlags: 0

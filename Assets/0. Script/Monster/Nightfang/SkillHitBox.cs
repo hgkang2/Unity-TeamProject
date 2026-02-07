@@ -6,7 +6,7 @@ public class SkillHitBox : MonoBehaviour
     [SerializeField] float damage = 10f;
     [SerializeField] DamageType damageType;
 
-    [SerializeField] Collider2D col;
+    Collider2D col;
 
     LocalSFX sfx;
 
@@ -18,12 +18,10 @@ public class SkillHitBox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(!collision.CompareTag("Player")) return;
-
-        if(collision.TryGetComponent<IDamageable>(out var damageable))
+        if(collision.TryGetComponent<Player>(out var player))
         {
             Vector2 hitPos = transform.position;
-            damageable.TakeDamage(damage, damageType, hitPos);
+            player.TakeDamage(damage, damageType, hitPos);
             //OnHit?.Invoke(damageable);
             //sfx.Play("DamageSound");
             //Debug.Log("Damage");

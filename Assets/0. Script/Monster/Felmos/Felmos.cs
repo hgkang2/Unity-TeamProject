@@ -537,7 +537,7 @@ public class Felmos : MonoBehaviour, IDamageable
         animator?.SetTrigger("Dead");
 
         StopAllCoroutines();
-        monsterEvent.RaiseMonsterDead();
+        monsterEvent.RaiseMonsterDead(MonsterType.Felmos);
         isAttacking = false;
 
         GetComponent<Collider2D>().enabled = false;

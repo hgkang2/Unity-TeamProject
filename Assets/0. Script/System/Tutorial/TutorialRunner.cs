@@ -16,6 +16,9 @@ public class TutorialRunner : MonoBehaviour
     Collider2D tutorialWall;
     // 함정 앞에서 대사 띄우는 트리거
     TutorialTrigger2D tutorialTrigger_trap;
+    TutorialTrigger2D tutorialTrigger_flyMonster;
+    TutorialTrigger2D tutorialTrigger_breakableGround;
+    TutorialTrigger2D tutorialTrigger_bossRoom;
 
     List<ITutorialStep> steps;
     ITutorialStep currentStep;
@@ -44,6 +47,9 @@ public class TutorialRunner : MonoBehaviour
                 tutorialTrigger_monsterMeet = sceneContext.tutorialTrigger_monsterMeet;
                 tutorialWall = sceneContext.tutorialWall;
                 tutorialTrigger_trap = sceneContext.tutorialTrigger_trap;
+                tutorialTrigger_flyMonster = sceneContext.tutorialTrigger_flyMonster;
+                tutorialTrigger_breakableGround = sceneContext.tutorialTrigger_breakableGround;
+                tutorialTrigger_bossRoom = sceneContext.tutorialTrigger_bossRoom;
 
                 dialoguePanel.gameObject.SetActive(true);
                 player = sceneContext.player;
@@ -76,12 +82,6 @@ public class TutorialRunner : MonoBehaviour
 
     void Update()
     {   
-        // 테스트용. 나중에 꼭 삭제하기
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            eventHub.monster.RaiseMonsterDead();
-        }
-
         if (!isRunning || currentStep == null)
             return;
 
@@ -120,7 +120,7 @@ public class TutorialRunner : MonoBehaviour
     // Step 구성
     // -----------------------
 
-
+    Action<MonsterType> handler = null;
     void BuildSteps()
     {
         steps = new List<ITutorialStep>();
@@ -151,14 +151,24 @@ public class TutorialRunner : MonoBehaviour
 
         // 5) 몹 처치까지 대기
         steps.Add(new WaitEventCountStep(
-            cb => eventHub.monster.monsterDead += cb, 
-            cb => eventHub.monster.monsterDead -= cb, 1
+            cb =>
+    {
+        handler = type => { if (type == MonsterType.Maligure) cb(); };
+        eventHub.monster.monsterDead += handler;
+    },
+    cb =>
+    {
+        eventHub.monster.monsterDead -= handler;
+    },
+    1
         ));
 
-        steps.Add(new WaitSecondsStep(1.5f));
-        
+        steps.Add(new WaitSecondsStep(0.5f));
+
         // 6) 몹 처치 완료 후 종료
-        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
+        steps.Add(new CallStep(() => { 
+            player.playerMove.StopMoveOnce();
+            player.SetControlLocked(true); }));
         steps.Add(new DialogueStep(dialoguePanel, new string[]
         {
             "후.. 앞으로 이런 괴물들을 상대해야 하는건가??",
@@ -173,18 +183,166 @@ public class TutorialRunner : MonoBehaviour
             unsubscribe: cb => tutorialTrigger_trap.Triggered -= cb,
             targetCount: 1
         ));
-        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
+        steps.Add(new CallStep(() => { 
+            player.playerMove.StopMoveOnce();
+            player.SetControlLocked(true);
+            TimeManager.Pause(); }));
         steps.Add(new DialogueStep(dialoguePanel, new string[]
         {
             "조심해!! 앞에 함정이 있어!"
         }));
-        steps.Add(new CallStep(() => { CameraManager.Instance.ChangeCinemachineTutorialTrap(); }));
+        steps.Add(new CallStep(() => { 
+            TimeManager.Resume();
+            CameraManager.Instance.ChangeCinemachineTutorialTrap(); }));
         steps.Add(new WaitEventCountStep(
             subscribe: cb => CameraManager.Instance.CinemachineSequenceFinished += cb,
             unsubscribe: cb => CameraManager.Instance.CinemachineSequenceFinished -= cb,
             targetCount: 1
         ));
         steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
+
+        // 8) 플라이 몹 앞에서 경고
+        steps.Add(new WaitEventCountStep(
+            subscribe: cb => tutorialTrigger_flyMonster.Triggered += cb,
+            unsubscribe: cb => tutorialTrigger_flyMonster.Triggered -= cb,
+            targetCount: 1
+        ));
+        steps.Add(new CallStep(() =>
+        {
+            player.playerMove.StopMoveOnce();
+            player.SetControlLocked(true);
+            TimeManager.Pause();
+        }));
+        steps.Add(new DialogueStep(dialoguePanel, new string[]
+        {
+            "↑ + A 윗공격으로 공중 몬스터를 처치하자."
+        }));
+        steps.Add(new CallStep(() =>
+        {
+            TimeManager.Resume();
+            player.SetControlLocked(false);
+        }));
+
+        // 9) 하단 공격으로 벽 부수기
+        steps.Add(new WaitEventCountStep(
+            subscribe: cb => tutorialTrigger_breakableGround.Triggered += cb,
+            unsubscribe: cb => tutorialTrigger_breakableGround.Triggered -= cb,
+            targetCount: 1
+        ));
+        steps.Add(new CallStep(() =>
+        {
+            player.playerMove.StopMoveOnce();
+            player.SetControlLocked(true);
+            TimeManager.Pause();
+        }));
+        steps.Add(new DialogueStep(dialoguePanel, new string[]
+        {
+            "↓ + A 내려찍기로 바닥을 부숴보자."
+        }));
+        steps.Add(new CallStep(() =>
+        {
+            TimeManager.Resume();
+            player.SetControlLocked(false);
+        }));
+
+
+        // 10) 중간 보스 처치까지 대기
+        steps.Add(new WaitEventCountStep(
+            cb =>
+    {
+        handler = type => { if (type == MonsterType.Maligure) cb(); };
+        eventHub.monster.monsterDead += handler;
+    },
+    cb =>
+    {
+        eventHub.monster.monsterDead -= handler;
+    },
+    1
+        ));
+
+        steps.Add(new WaitSecondsStep(0.1f));
+
+        // 11) 정화의 불꽃 안내
+        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
+        steps.Add(new DialogueStep(dialoguePanel, new string[]
+        {
+            "이 불꽃은.. 신성하면서도 불길해 보여. 어디에 쓰는 걸까?"
+        }));
+        steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
+
+        // 12) 포탈 활성화
+        steps.Add(new WaitEventCountStep(
+            cb => eventHub.system.AltarActivate += cb,
+            cb => eventHub.system.AltarActivate -= cb, 1
+        ));
+        steps.Add(new CallStep(() => { player.SetControlLocked(true); }));
+        steps.Add(new DialogueStep(dialoguePanel, new string[]
+        {
+            "도대체 검은 여명회는 무슨 일을 꾸미고 있는 걸까. 확인해 보자."
+        }));
+        steps.Add(new CallStep(() => { player.SetControlLocked(false); }));
+
+        // 13) 보스 전투
+        steps.Add(new WaitEventCountStep(
+            subscribe: cb => tutorialTrigger_bossRoom.Triggered += cb,
+            unsubscribe: cb => tutorialTrigger_bossRoom.Triggered -= cb,
+            targetCount: 1
+        ));
+        steps.Add(new CallStep(() =>
+        {
+            player.playerMove.StopMoveOnce();
+            player.SetControlLocked(true);
+            TimeManager.Pause();
+        }));
+        steps.Add(new DialogueStep(dialoguePanel, new string[]
+        {
+            "사람..? 수녀인가?",
+            "검은 여명회의 신도인 건가?",
+            "저기.."
+        }));
+        steps.Add(new CallStep(() =>
+        {
+            TimeManager.Resume();
+            player.SetControlLocked(false);
+        }));
+
+
+        // 14) 보스 처치
+        steps.Add(new WaitEventCountStep(
+            cb =>
+    {
+        handler = type => { if (type == MonsterType.Luna) cb(); };
+        eventHub.monster.monsterDead += handler;
+    },
+    cb =>
+    {
+        eventHub.monster.monsterDead -= handler;
+    },
+    1
+        ));
+        steps.Add(new CallStep(() =>
+        {
+            player.playerMove.StopMoveOnce();
+            player.SetControlLocked(true);
+            TimeManager.Pause();
+        }));
+        steps.Add(new DialogueStep(dialoguePanel, new string[]
+        {
+            "하아.. 하아... 제발 사람 말 좀 들어달라니까!!",
+            "울지만 말고... 응? 내가 검은 여명회의 신도인 줄 알았다고?",
+            "수호자들을 죽였다고? 제단에 제물을 바쳤..긴 했는데.",
+            "...그보다 너는 왜 여기 있는건데? 정체가 뭐야?",
+            "",
+            "이후 스토리는 다음 업데이트에 계속 진행됩니다!"
+        }));
+        steps.Add(new CallStep(() =>
+        {
+            TimeManager.Resume();
+            player.SetControlLocked(false);
+            GameManager.Instance.PlayerDieGotoMain();
+        }));
+
+
 
         steps.Add(new CallStep(OnTutorialFinished));
     }
@@ -270,7 +428,7 @@ public class TutorialRunner : MonoBehaviour
         {
             if (IsDone) return;
 
-            elapsed += Time.unscaledDeltaTime;
+            elapsed += Time.deltaTime;
             if (elapsed >= seconds)
                 IsDone = true;
         }

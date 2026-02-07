@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 11400000, guid: 0fd8a58c3971fbf4aaee9f3e7565b49f, type: 2}
   monster: {fileID: 11400000, guid: 95cae45f2f0bbc64e9977ea84876aceb, type: 2}
+  system: {fileID: 11400000, guid: c95400e155e636c46b73b2242a3e2017, type: 2}

@@ -72,6 +72,7 @@ public class SoulEffect
                 player.playerMove.maxJumpCount++;
                 break;
             case SoulEffectType.WallJump:
+                player.playerMove.ActivateWallGrab();
                 player.playerMove.canWallJump = true;
             break;
             // case SoulEffectType.ETC:

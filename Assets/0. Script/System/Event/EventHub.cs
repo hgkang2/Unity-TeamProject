@@ -5,4 +5,5 @@ public class EventHub : ScriptableObject
 {
     public PlayerEventChannel player;
     public MonsterEventChannel monster;
+    public SystemEventChannel system;
 }
