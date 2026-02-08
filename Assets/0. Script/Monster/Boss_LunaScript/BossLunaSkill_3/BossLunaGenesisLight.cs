@@ -5,7 +5,7 @@ public class BossLunaGenesisLight : MonoBehaviour
     [SerializeField] float tickInterval;
     [SerializeField] float damage;
     [SerializeField] DamageType damageType;
-    IDamageable playerDmg;
+    Player playerDmg;
     bool inBeam;
     float nextTickTime;
     Transform playerTr;
@@ -33,13 +33,11 @@ public class BossLunaGenesisLight : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if(!collision.CompareTag("Player")) return;
-
-        if(collision.TryGetComponent<IDamageable>(out var damageable))
+        if(collision.TryGetComponent<Player>(out var player))
         {
             localSFX.Play("GenesisHit");
             inBeam = true;
-            playerDmg = damageable;
+            playerDmg = player;
             playerTr = collision.transform;
 
             nextTickTime = Time.time;

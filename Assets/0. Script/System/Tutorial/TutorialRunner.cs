@@ -320,6 +320,9 @@ public class TutorialRunner : MonoBehaviour
     },
     1
         ));
+        
+        steps.Add(new WaitSecondsStep(1f));
+        
         steps.Add(new CallStep(() =>
         {
             player.playerMove.StopMoveOnce();

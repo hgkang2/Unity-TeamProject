@@ -1,6 +1,4 @@
 using System.Collections;
-using NUnit.Framework.Constraints;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 public class BossLunaGenesis : MonoBehaviour
@@ -20,16 +18,6 @@ public class BossLunaGenesis : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void InitializeGenesis(Vector2 targetPos, float speed, GameObject owner)
     {

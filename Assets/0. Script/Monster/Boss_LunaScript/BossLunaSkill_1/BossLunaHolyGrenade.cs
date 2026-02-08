@@ -7,7 +7,6 @@ public class BossLunaHolyGrenade : MonoBehaviour
 {
     public Transform warningSignPos;
     public GameObject ExplosionEffect;
-    [SerializeField] GameObject hitbox;
     GrenadeTrajectory traj;
     Vector2 targetPos;
     GameObject owner;
@@ -19,14 +18,14 @@ public class BossLunaHolyGrenade : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
-        if(warningSignPos) warningSignPos.gameObject.SetActive(false);
+        if (warningSignPos) warningSignPos.gameObject.SetActive(false);
         traj = GetComponent<GrenadeTrajectory>();
         localSFX = GetComponent<LocalSFX>();
     }
-    
+
     bool hasTarget;
     bool exploded;
-    bool isExploding = false;
+
     public float explodeRadius;
 
     public void InitializeGrenadeThrow(Vector2 targetPos, float travelTime, GameObject owner)
@@ -36,7 +35,7 @@ public class BossLunaHolyGrenade : MonoBehaviour
         hasTarget = true;
         exploded = false;
 
-        if(warningSignPos)
+        if (warningSignPos)
         {
             warningSignPos.SetParent(null);
             warningSignPos.position = targetPos + Vector2.up * 1f;
@@ -69,32 +68,28 @@ public class BossLunaHolyGrenade : MonoBehaviour
     }
 
 
-    void OnCollisionEnter2D(Collision2D collision)
+    bool isExploding = false;
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if(isExploding) return;
+        if (isExploding) return;
 
-        if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player"))
         {
             isExploding = true;
-            StartCoroutine(ExplodeRoutine());
+            ExplodeRoutine();
         }
     }
-    
 
-    IEnumerator ExplodeRoutine()
+
+    void ExplodeRoutine()
     {
-        rb.linearVelocity = Vector2.zero;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        Destroy(warningSignPos.gameObject);
+        warningSignPos.gameObject.SetActive(false);
         traj?.Hide();
-        yield return new WaitForSeconds(0.2f);
         localSFX.Play("Explode");
         Color c = sr.color;
         c.a = 0f;
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
-        hitbox.SetActive(true);
 
-        yield return new WaitForSeconds(0.5f);
-        Destroy(this.gameObject);
+        Destroy(gameObject);
     }
 }

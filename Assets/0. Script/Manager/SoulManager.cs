@@ -18,6 +18,8 @@ public class SoulManager : MonoBehaviour
     // 보유 영성 UI에서 받는 이벤트. 단순히 열 때마다 새로 갖고와도 되지만 실시간 업데이트를 위해
     public event Action<List<SoulInstance>> soulGot;
 
+    SceneContext sceneContext;
+
     public static SoulManager Instance {get; private set;}
     void Awake()
     {   
@@ -35,7 +37,7 @@ public class SoulManager : MonoBehaviour
         allSouls = loaded.ToList();
 
         // 참조 가져오기.
-        SceneContext sceneContext = FindFirstObjectByType<SceneContext>();
+        sceneContext = FindFirstObjectByType<SceneContext>();
         player = sceneContext.player;
     }
 
@@ -74,6 +76,7 @@ public class SoulManager : MonoBehaviour
     public void ApplySoulDataEffectsOnce(SoulEffect effect)
     {
         if (effect == null) return;
+        if(player == null) player = sceneContext.player;
         effect.ApplyOnce(player);
         
         // 등록 완료 되면 UI등에 알리기

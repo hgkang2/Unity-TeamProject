@@ -10,14 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 2596708423930278917}
   - component: {fileID: 315835857465739580}
-  - component: {fileID: 7743529589948420472}
-  m_Layer: 31
+  - component: {fileID: 6361649957423055195}
+  m_Layer: 13
   m_Name: Hitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2596708423930278917
 Transform:
   m_ObjectHideFlags: 0
@@ -68,8 +68,8 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 2.5
---- !u!114 &7743529589948420472
+  m_Radius: 0.23
+--- !u!114 &6361649957423055195
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 748848353974481060}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a2670e5bd7e8674581a8062bcca7e14, type: 3}
+  m_Script: {fileID: 11500000, guid: ce9a77ec72ecc564894a99d5b79d6522, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
@@ -187,7 +187,7 @@ GameObject:
   - component: {fileID: 4564314251800835882}
   - component: {fileID: 5053516645160203329}
   - component: {fileID: 6786782820480498123}
-  m_Layer: 31
+  m_Layer: 12
   m_Name: HolyGrenade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -225,7 +225,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   warningSignPos: {fileID: 3499949746115105746}
   ExplosionEffect: {fileID: 4715333124005903316, guid: 8e4cc13f4db255f4f9a7ecfe3a76de1f, type: 3}
-  hitbox: {fileID: 748848353974481060}
   explodeRadius: 0.5
   yVel: 0.5
 --- !u!114 &5237173804551284482
@@ -354,7 +353,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

@@ -186,7 +186,7 @@ public class GameManager : MonoBehaviour
         usedFlame = 3;
         changedUsedFlame?.Invoke();
         AltarActivated?.Invoke();
-        Debug.Log("제단 활성화");
+        //Debug.Log("제단 활성화");
     }
 
     #endregion

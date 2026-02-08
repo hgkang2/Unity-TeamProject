@@ -476,7 +476,7 @@ public class PlayerMove : MonoBehaviour
     #endregion
 
     #region  Wall Check
-    bool canWallGrab = false;
+    public bool canWallGrab = false;
     public void ActivateWallGrab() => canWallGrab = true;
     
     [Header("벽 잡기 상태")]

@@ -29,6 +29,7 @@ public class Malirgue : MonoBehaviour, IDamageable
     HP hp;
 
     [Header("hitbox")]
+    [SerializeField] GameObject hitboxRoot;
     [SerializeField] GameObject attackHitBox;
     [SerializeField] GameObject skillHitbox;
     
@@ -510,6 +511,8 @@ public class Malirgue : MonoBehaviour, IDamageable
         StopX();
         isDead = true;
         HideWarningVFX();
+
+        hitboxRoot?.SetActive(false);
 
         ChangeState(malirgue_State.Dead);
         animator?.SetTrigger("Dead");

@@ -6,7 +6,6 @@ public class GrenadeVer2 : MonoBehaviour
 {
     public Transform warningSignPos;
     public GameObject ExplosionEffect;
-    [SerializeField] GameObject hitbox;
     SpriteRenderer sr;
     GrenadeTrajectory traj;
     Vector2 targetPos;
@@ -52,29 +51,26 @@ public class GrenadeVer2 : MonoBehaviour
         rb.linearVelocity = dir.normalized * (distance / travelTime);
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    bool isExploding = false;
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Player"))
+        if (isExploding) return;
+        if (collision.CompareTag("Wall") || collision.CompareTag("Ground") || collision.CompareTag("Player"))
         {
-            StartCoroutine(ExplodeRoutine());
+            isExploding = true;
+            ExplodeRoutine();
         }
     }
 
-    IEnumerator ExplodeRoutine()
+    void ExplodeRoutine()
     {
-        rb.linearVelocity = Vector2.zero;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        Destroy(warningSignPos.gameObject);
+        warningSignPos.gameObject.SetActive(false);
         traj?.Hide();
-        yield return new WaitForSeconds(0.3f);
         localSFX.Play("Explode");
         Color c = sr.color;
         c.a = 0f;
         Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
-        
-        hitbox.SetActive(true);
 
-        yield return new WaitForSeconds(0.3f);
         Destroy(this.gameObject);
     }
 }

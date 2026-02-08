@@ -1,15 +1,6 @@
 using UnityEngine;
-using System;
-using UnityEditor.Callbacks;
 using System.Collections.Generic;
 using System.Collections;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.ShaderGraph.Internal;
-using Unity.Mathematics;
-using JetBrains.Annotations;
-using NUnit.Framework;
-using UnityEngine.SocialPlatforms;
 
 public class BossLuna : MonoBehaviour, IDamageable
 {
@@ -111,6 +102,8 @@ public class BossLuna : MonoBehaviour, IDamageable
     Vector2 cachedTargetPos;
     bool hasCachedTarget;
 
+    [SerializeField] MonsterEventChannel monsterEventChannel;
+
     Rigidbody2D rb;
 
     int facingX = 1;
@@ -136,7 +129,7 @@ public class BossLuna : MonoBehaviour, IDamageable
 
     public void OnDestroy()
     {
-        hp.OnDied -= OnDied;        
+        if(hp != null) hp.OnDied -= OnDied;        
     }
 
     void Update()
@@ -211,7 +204,7 @@ public class BossLuna : MonoBehaviour, IDamageable
         {
             hasUsedPatternC = true;
             StartCoroutine(PatternC());
-            Debug.Log("PatternC");
+            //Debug.Log("PatternC");
             return;
         }
 
@@ -219,7 +212,7 @@ public class BossLuna : MonoBehaviour, IDamageable
         {
             specialQueuedByAttackHit = false;
             StartCoroutine(PatternA());
-            Debug.Log("PatternA");
+            //Debug.Log("PatternA");
             return;
         }
 
@@ -227,7 +220,7 @@ public class BossLuna : MonoBehaviour, IDamageable
         {
             grenadeQueuedByHits = false;
             StartCoroutine(SkillARoutine());
-            Debug.Log("SkillA");
+            //Debug.Log("SkillA");
             return;
         }
 
@@ -539,7 +532,7 @@ public class BossLuna : MonoBehaviour, IDamageable
         Vector2 expiationSpawnpoint = cachedTargetPos;
 
         var expiation = Instantiate(expiationPrefab, expiationSpawnpoint, expiationPrefab.transform.rotation);
-        expiation.GetComponent<BossLunaExpiation>().InitializeExpiation(expiationSpawnpoint, skillBSpawnTime, gameObject);
+        expiation.GetComponent<BossLunaExpiation>().InitializeExpiation(expiationSpawnpoint, skillBSpawnTime, this);
 
         hasCachedTarget = false;
     }
@@ -985,6 +978,7 @@ public class BossLuna : MonoBehaviour, IDamageable
         GetComponent<Collider2D>().enabled = false;
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
+        monsterEventChannel.RaiseMonsterDead(MonsterType.Luna);
     }
     #endregion
 

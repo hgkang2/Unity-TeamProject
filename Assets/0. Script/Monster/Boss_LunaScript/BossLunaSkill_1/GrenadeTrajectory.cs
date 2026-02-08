@@ -14,6 +14,10 @@ public class GrenadeTrajectory : MonoBehaviour
 
     public void Show(Vector2 targetPos, float travelTime)
     {
+        return;
+
+        if (travelTime <= 0.001f) travelTime = 0.001f;
+
         Vector2 start = transform.position;
 
         Vector2 lrStart = CalculateVelocity(start, targetPos, travelTime);
